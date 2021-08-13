@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::ast::{Expr, NamedValue, Value, Op, ParameterisedFunc, Func};
+use ast::{Expr, NamedValue, Value, Op, ParameterisedFunc, Func};
 
 grammar;
 
