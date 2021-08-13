@@ -1,0 +1,51 @@
+use std::str::FromStr;
+
+use crate::ast::{Expr, NamedValue, Value, Op, ParameterisedFunc, Func};
+
+grammar;
+
+pub Ast: Vec<Expr> = { Exprs };
+
+Exprs: Vec<Expr> = { Expr+ };
+
+Expr: Expr = {
+    Value => Expr::Value(<>),
+    NamedValue => Expr::NamedValue(<>),
+    "()" => Expr::Parens,
+    r"#[^\n\r]*[\n\r]*" => Expr::Comment(String::from(<>))
+};
+
+NamedValue: NamedValue = {
+    <i:Ident> ":" <v:Value> => NamedValue { name: i, value: v }
+};
+
+Value: Value = {
+    Int => Value::Int(<>),
+    Ident => Value::Ident(<>),
+    ParameterisedFunc => Value::Func(<>),
+    Op => Value::Op(<>),
+}
+
+ParameterisedFunc: ParameterisedFunc = {
+    <i: Ident> "->" <f: Func> => ParameterisedFunc { param: i, result: f }
+}
+
+Func: Func = {
+    "{" <Exprs> "}" => Func::Body(<>),
+    ParameterisedFunc => Func::Func(Box::new(<>))
+}
+
+Op: Op = {
+    "+" => Op::Plus,
+    "-" => Op::Minus,
+    "*" => Op::Times,
+    "/" => Op::DividedBy
+}
+
+Int: i64 = {
+    r"[0-9]+" => i64::from_str(<>).unwrap()
+}
+
+Ident: String = {
+    r"[a-zA-Z][0-9a-zA-Z_]*" => String::from(<>)
+};
