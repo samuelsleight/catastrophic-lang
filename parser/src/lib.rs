@@ -1,17 +1,17 @@
 #[macro_use]
 extern crate lalrpop_util;
 
+pub extern crate catastrophic_ast as ast;
+
 use std::{fs::File, io::Read, path::Path};
 
-use crate::ast::Expr;
 pub use crate::error::Error;
 
-pub mod ast;
 mod error;
 
 lalrpop_mod!(grammar);
 
-pub fn parse<P: AsRef<Path>>(path: P) -> Result<Vec<Expr>, Error> {
+pub fn parse<P: AsRef<Path>>(path: P) -> Result<Vec<ast::Expr>, Error> {
     let contents = {
         let mut buf = String::new();
         let mut file = File::open(path)?;
