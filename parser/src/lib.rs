@@ -19,10 +19,9 @@ pub fn parse<P: AsRef<Path>>(path: P) -> Result<Vec<ast::Expr>, Error> {
         buf
     };
 
-    Ok(grammar::AstParser::new().parse(&contents).map_err(|err| {
-        err.map_token(|token| token.to_string())
-            .map_error(String::from)
-    })?)
+    Ok(grammar::AstParser::new()
+        .parse(&contents)
+        .map_err(|err| err.map_token(|token| token.to_string()).map_error(String::from))?)
 }
 
 #[cfg(test)]

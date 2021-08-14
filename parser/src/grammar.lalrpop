@@ -39,7 +39,9 @@ Op: Op = {
     "+" => Op::Plus,
     "-" => Op::Minus,
     "*" => Op::Times,
-    "/" => Op::DividedBy
+    "/" => Op::DividedBy,
+    "=" => Op::Equals,
+    "?" => Op::IfElse
 }
 
 Int: i64 = {

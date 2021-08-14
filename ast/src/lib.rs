@@ -16,6 +16,8 @@ pub enum Op {
     Minus,
     Times,
     DividedBy,
+    Equals,
+    IfElse
 }
 
 #[derive(Clone, Debug)]
