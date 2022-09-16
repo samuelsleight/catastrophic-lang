@@ -1,0 +1,45 @@
+# This is an example fibonacci function
+# fib(1) = 0
+# fib(2) = 1
+# fib(3) = 1
+# fib(4) = 2
+
+# Define a function that pops one argument of the stack
+fib: n -> {
+    # Recursive function implementation
+    fib_rec: acc2 -> acc1 -> n -> {
+        # Push args on for later
+        n acc1 acc2
+
+        # Push the if false result 
+        acc2 -> acc1 -> n -> {
+            # n -= 1
+            1 n - ()
+
+            # acc1 += acc2
+            acc2 acc1 + ()
+
+            # acc2 = acc1
+            acc1
+
+            fib_rec ()
+        }
+
+        # Push the if true result
+        acc2 -> acc1 -> n -> {
+            acc2
+        }
+
+        # Push a check for zero case
+        n 0 = ()
+        
+        # Apply if/else, then apply result
+        ? () ()
+    }
+
+    # Call recursive implementation
+    # n = n; acc1 = 0; acc2 = 1
+    n 0 1 fib_rec ()
+}
+
+47 fib ()
