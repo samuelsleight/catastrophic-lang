@@ -1,6 +1,12 @@
 [package]
-name = "catastrophic"
+name = "catastrophicc"
 version = "0.1.0"
 edition = "2021"
+
+[dependencies]
+anyhow = "1.0.65"
+catastrophic = { path = "catastrophic" }
+paw = "1.0.0"
+structopt = { version = "0.3.26", features = ["paw"] }
 
 [workspace]
