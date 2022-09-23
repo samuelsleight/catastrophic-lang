@@ -88,7 +88,7 @@ impl State {
 
     fn process_comment(&mut self, input: Span<char>) -> StateResult {
         if let '\n' | '\r' = input.data {
-            self.mode = Mode::Main
+            self.mode = Mode::Main;
         }
 
         (None, Continuation::Consume)
@@ -119,21 +119,21 @@ impl State {
     }
 
     fn process_minus(&mut self, input: Span<char>) -> StateResult {
-        if let '>' = input.data {
-            self.mode = Mode::Main;
+        self.mode = Mode::Main;
+
+        if input.data == '>' {
             (Some(Span::new(self.start, input.end, Token::Arrow)), Continuation::Consume)
         } else {
-            self.mode = Mode::Main;
             (Some(Span::new(self.start, input.start, Token::Minus)), Continuation::Peek)
         }
     }
 
     fn process_lparen(&mut self, input: Span<char>) -> StateResult {
-        if let ')' = input.data {
-            self.mode = Mode::Main;
+        self.mode = Mode::Main;
+
+        if input.data == ')' {
             (Some(Span::new(self.start, input.end, Token::Parens)), Continuation::Consume)
         } else {
-            self.mode = Mode::Main;
             (Some(Span::new(self.start, input.start, Token::LParen)), Continuation::Peek)
         }
     }
@@ -153,7 +153,7 @@ impl State {
         let (token, continuation) = self.process_state(input);
 
         if let Some(token) = token {
-            callback(token)
+            callback(token);
         }
 
         continuation

@@ -49,7 +49,7 @@ impl Display for ParseErrors {
                 ParseError::ArrowWithoutArg(span) => writeln!(f, "Arrow without argument name {:?}", span)?,
                 ParseError::ArrowWithoutBlock(span) => writeln!(f, "Encountered argument without a corresponding block {:?}", span)?,
                 ParseError::DuplicateSymbolError { first, duplicate } => {
-                    writeln!(f, "Duplicate symbol {:?}, first defined at {:?}", duplicate, first)?
+                    writeln!(f, "Duplicate symbol {:?}, first defined at {:?}", duplicate, first)?;
                 }
             }
         }

@@ -40,11 +40,11 @@ impl State {
     }
 
     fn process_ident(&mut self, ident: String, span: Span<()>) {
-        self.stack.push(span.swap(StackItem::Ident(ident)))
+        self.stack.push(span.swap(StackItem::Ident(ident)));
     }
 
     fn process_parens(&mut self, span: Span<()>) {
-        self.stack.push(span.swap(StackItem::Call))
+        self.stack.push(span.swap(StackItem::Call));
     }
 
     fn process_number(&mut self, value: u64, span: Span<()>) {
@@ -57,7 +57,7 @@ impl State {
                     }
                     other => {
                         self.stack.push(item_span.swap(other));
-                        self.stack.push(span.swap(StackItem::Number(value)))
+                        self.stack.push(span.swap(StackItem::Number(value)));
                     }
                 }
             }
@@ -73,7 +73,7 @@ impl State {
                     StackItem::Label(ident) => self.push_symbol(item_span.swap(ident), span.swap(SymbolValue::Builtin(builtin))),
                     other => {
                         self.stack.push(item_span.swap(other));
-                        self.stack.push(span.swap(StackItem::Builtin(builtin)))
+                        self.stack.push(span.swap(StackItem::Builtin(builtin)));
                     }
                 }
             }
@@ -145,7 +145,7 @@ impl State {
                     StackItem::Label(ident) => self.push_symbol(item_span.swap(ident), span.swap(SymbolValue::Block(block))),
                     other => {
                         self.stack.push(item_span.swap(other));
-                        self.stack.push(span.swap(StackItem::Block(block)))
+                        self.stack.push(span.swap(StackItem::Block(block)));
                     }
                 }
             }
@@ -155,7 +155,7 @@ impl State {
 
     fn push_symbol(&mut self, name: Span<String>, value: Span<SymbolValue>) {
         if let Err(e) = self.blocks.last_mut().unwrap().add_symbol(name, value) {
-            self.errors.push(e)
+            self.errors.push(e);
         }
     }
 
@@ -205,7 +205,7 @@ impl State {
         let (block, termination) = self.terminate_block();
 
         if let BlockTermination::Curly(span) = termination {
-            self.errors.push(ParseError::BlockWithoutClosing(span))
+            self.errors.push(ParseError::BlockWithoutClosing(span));
         }
 
         if self.errors.is_empty() {

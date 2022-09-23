@@ -12,11 +12,13 @@ pub enum Error {
 }
 
 impl Error {
-    pub fn file_open(path: PathBuf, source: std::io::Error) -> Error {
+    #[must_use]
+    pub fn file_open(path: PathBuf, source: std::io::Error) -> Self {
         Error::FileOpen { file: path, source }
     }
 
-    pub fn file_read(path: PathBuf, source: std::io::Error) -> Error {
+    #[must_use]
+    pub fn file_read(path: PathBuf, source: std::io::Error) -> Self {
         Error::FileRead { file: path, source }
     }
 }

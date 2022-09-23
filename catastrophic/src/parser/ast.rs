@@ -53,6 +53,7 @@ impl Symbol {
 }
 
 impl Block {
+    #[must_use]
     pub fn no_args() -> Self {
         Self {
             args: Vec::new(),
@@ -61,6 +62,7 @@ impl Block {
         }
     }
 
+    #[must_use]
     pub fn with_args(args: Vec<Span<String>>) -> Self {
         Self {
             args,
@@ -86,6 +88,6 @@ impl Block {
     }
 
     pub fn push_instruction(&mut self, instruction: Span<Instruction>) {
-        self.instrs.push(instruction)
+        self.instrs.push(instruction);
     }
 }
