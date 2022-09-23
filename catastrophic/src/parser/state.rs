@@ -53,14 +53,7 @@ impl State {
                 let item_span = stack_item.swap(());
                 match stack_item.data {
                     StackItem::Label(ident) => {
-                        if let Err(e) = self
-                            .blocks
-                            .last_mut()
-                            .unwrap()
-                            .add_symbol(item_span.swap(ident), span.swap(SymbolValue::Number(value)))
-                        {
-                            self.errors.push(e)
-                        }
+                        self.push_symbol(item_span.swap(ident), span.swap(SymbolValue::Number(value)));
                     }
                     other => {
                         self.stack.push(item_span.swap(other));
@@ -77,16 +70,7 @@ impl State {
             Some(stack_item) => {
                 let item_span = stack_item.swap(());
                 match stack_item.data {
-                    StackItem::Label(ident) => {
-                        if let Err(e) = self
-                            .blocks
-                            .last_mut()
-                            .unwrap()
-                            .add_symbol(item_span.swap(ident), span.swap(SymbolValue::Builtin(builtin)))
-                        {
-                            self.errors.push(e)
-                        }
-                    }
+                    StackItem::Label(ident) => self.push_symbol(item_span.swap(ident), span.swap(SymbolValue::Builtin(builtin))),
                     other => {
                         self.stack.push(item_span.swap(other));
                         self.stack.push(span.swap(StackItem::Builtin(builtin)))
@@ -155,16 +139,7 @@ impl State {
             Some(stack_item) => {
                 let item_span = stack_item.swap(());
                 match stack_item.data {
-                    StackItem::Label(ident) => {
-                        if let Err(e) = self
-                            .blocks
-                            .last_mut()
-                            .unwrap()
-                            .add_symbol(item_span.swap(ident), span.swap(SymbolValue::Block(block)))
-                        {
-                            self.errors.push(e)
-                        }
-                    }
+                    StackItem::Label(ident) => self.push_symbol(item_span.swap(ident), span.swap(SymbolValue::Block(block))),
                     other => {
                         self.stack.push(item_span.swap(other));
                         self.stack.push(span.swap(StackItem::Block(block)))
@@ -172,6 +147,12 @@ impl State {
                 }
             }
             None => self.stack.push(span.swap(StackItem::Block(block))),
+        }
+    }
+
+    fn push_symbol(&mut self, name: Span<String>, value: Span<SymbolValue>) {
+        if let Err(e) = self.blocks.last_mut().unwrap().add_symbol(name, value) {
+            self.errors.push(e)
         }
     }
 
