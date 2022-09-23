@@ -7,3 +7,7 @@ edition = "2021"
 
 [dependencies]
 thiserror = "1.0.35"
+
+[dependencies.unic-emoji]
+git = "https://github.com/eyeplum/rust-unic/"
+branch = "develop"

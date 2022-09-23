@@ -1,5 +1,7 @@
 use crate::span::{Location, Span};
 
+use unic_emoji::char::is_emoji;
+
 use super::{reader::Continuation, token::Token};
 
 #[derive(Debug, Copy, Clone)]
@@ -21,6 +23,22 @@ pub struct State {
 
 type StateResult = (Option<Span<Token>>, Continuation);
 
+fn is_ident_starter(c: char) -> bool {
+    if let 'a'..='z' | 'A'..='Z' | '_' = c {
+        true
+    } else {
+        is_emoji(c)
+    }
+}
+
+fn is_ident_continuation(c: char) -> bool {
+    if let '0'..='9' = c {
+        true
+    } else {
+        is_ident_starter(c)
+    }
+}
+
 impl State {
     pub fn new() -> Self {
         Self {
@@ -38,21 +56,21 @@ impl State {
                 None
             }
 
-            c @ ('a'..='z' | 'A'..='Z') => {
-                self.start = input.start;
-                self.mode = Mode::Ident;
-
-                self.buffer.clear();
-                self.buffer.push(c);
-                None
-            }
-
             c @ '0'..='9' => {
                 self.start = input.start;
                 self.mode = Mode::Number;
 
                 self.number = 0;
                 self.number += c as u64 - '0' as u64;
+                None
+            }
+
+            c if is_ident_starter(c) => {
+                self.start = input.start;
+                self.mode = Mode::Ident;
+
+                self.buffer.clear();
+                self.buffer.push(c);
                 None
             }
 
@@ -95,8 +113,8 @@ impl State {
     }
 
     fn process_ident(&mut self, input: Span<char>) -> StateResult {
-        if let c @ ('a'..='z' | 'A'..='Z' | '0'..='9' | '_') = input.data {
-            self.buffer.push(c);
+        if is_ident_continuation(input.data) {
+            self.buffer.push(input.data);
             (None, Continuation::Consume)
         } else {
             self.mode = Mode::Main;
