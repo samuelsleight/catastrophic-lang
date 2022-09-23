@@ -9,6 +9,7 @@ enum Mode {
     Ident,
     Number,
     Minus,
+    LParen,
 }
 
 pub struct State {
@@ -61,6 +62,12 @@ impl State {
                 None
             }
 
+            '(' => {
+                self.start = input.start;
+                self.mode = Mode::LParen;
+                None
+            }
+
             '+' => Some(input.swap(Token::Plus)),
 
             '=' => Some(input.swap(Token::Equals)),
@@ -71,7 +78,6 @@ impl State {
 
             '{' => Some(input.swap(Token::LCurly)),
             '}' => Some(input.swap(Token::RCurly)),
-            '(' => Some(input.swap(Token::LParen)),
             ')' => Some(input.swap(Token::RParen)),
 
             c => (!c.is_whitespace()).then(|| input.swap(Token::Unexpected(c))),
@@ -94,7 +100,10 @@ impl State {
             (None, Continuation::Consume)
         } else {
             self.mode = Mode::Main;
-            (Some(Span::new(self.start, input.start, Token::Ident(self.buffer.clone()))), Continuation::Peek)
+            (
+                Some(Span::new(self.start, input.start, Token::Ident(self.buffer.clone()))),
+                Continuation::Peek,
+            )
         }
     }
 
@@ -119,6 +128,16 @@ impl State {
         }
     }
 
+    fn process_lparen(&mut self, input: Span<char>) -> StateResult {
+        if let ')' = input.data {
+            self.mode = Mode::Main;
+            (Some(Span::new(self.start, input.end, Token::Parens)), Continuation::Consume)
+        } else {
+            self.mode = Mode::Main;
+            (Some(Span::new(self.start, input.start, Token::LParen)), Continuation::Peek)
+        }
+    }
+
     fn process_state(&mut self, input: Span<char>) -> StateResult {
         match self.mode {
             Mode::Main => self.process_main(input),
@@ -126,6 +145,7 @@ impl State {
             Mode::Ident => self.process_ident(input),
             Mode::Number => self.process_number(input),
             Mode::Minus => self.process_minus(input),
+            Mode::LParen => self.process_lparen(input),
         }
     }
 

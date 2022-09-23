@@ -4,7 +4,7 @@ pub struct Location {
     pub col: usize,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Span<Data> {
     pub start: Location,
     pub end: Location,

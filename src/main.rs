@@ -1,15 +1,17 @@
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
-use catastrophic::lexer::Lexer;
+use catastrophic::parser::Parser;
 use structopt::StructOpt;
 
 #[derive(Debug, Clone, StructOpt)]
 struct Args {
-    input: PathBuf
+    input: PathBuf,
 }
 
 #[paw::main]
 fn main(args: Args) -> Result<()> {
-    Lexer::lex(args.input, |token| println!("{:?}", token)).with_context(|| "Unable to parse input")
+    let block = Parser::parse_file(args.input).with_context(|| "Unable to parse input")?;
+    println!("RESULT: {:#?}", block);
+    Ok(())
 }

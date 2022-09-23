@@ -4,6 +4,7 @@ pub enum Token {
     Integer(u64),
 
     Arrow,
+    Parens,
 
     Plus,
     Minus,
