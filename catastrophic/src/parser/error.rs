@@ -20,8 +20,12 @@ pub struct ParseErrors {
 
 #[derive(Debug)]
 pub enum ParseError {
+    BlockClosedWithoutOpening(Span<()>),
+    BlockWithoutClosing(Span<()>),
     LabelWithoutName(Span<()>),
+    LabelWithoutValue(Span<()>),
     ArrowWithoutArg(Span<()>),
+    ArrowWithoutBlock(Span<()>),
     DuplicateSymbolError { first: Span<()>, duplicate: Span<()> },
 }
 
@@ -38,8 +42,12 @@ impl Display for ParseErrors {
         for error in &self.errors {
             match error {
                 // TODO: Pretty error formatting, inclusing highlighting the span in the input
+                ParseError::BlockClosedWithoutOpening(span) => writeln!(f, "Encountered end of block without corresponding `{{` {:?}", span)?,
+                ParseError::BlockWithoutClosing(span) => writeln!(f, "Encountered block without corresponding `}}` {:?}", span)?,
                 ParseError::LabelWithoutName(span) => writeln!(f, "Label without symbol name {:?}", span)?,
+                ParseError::LabelWithoutValue(span) => writeln!(f, "Label without symbol value {:?}", span)?,
                 ParseError::ArrowWithoutArg(span) => writeln!(f, "Arrow without argument name {:?}", span)?,
+                ParseError::ArrowWithoutBlock(span) => writeln!(f, "Encountered argument without a corresponding block {:?}", span)?,
                 ParseError::DuplicateSymbolError { first, duplicate } => {
                     writeln!(f, "Duplicate symbol {:?}, first defined at {:?}", duplicate, first)?
                 }

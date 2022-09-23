@@ -130,7 +130,10 @@ impl State {
 
         let start_span = match termination {
             BlockTermination::Curly(span) => span,
-            BlockTermination::Eof => todo!("Error! Closed block without open"),
+            BlockTermination::Eof => {
+                self.blocks.push(block);
+                return self.errors.push(ParseError::BlockClosedWithoutOpening(span));
+            }
         };
 
         let span = Span::new(start_span.start, span.end, ());
@@ -168,8 +171,8 @@ impl State {
                 StackItem::Number(value) => block.push_instruction(item_span.swap(Instruction::Push(InstrValue::Number(value)))),
                 StackItem::Builtin(builtin) => block.push_instruction(item_span.swap(Instruction::Push(InstrValue::Builtin(builtin)))),
                 StackItem::Block(value) => block.push_instruction(item_span.swap(Instruction::Push(InstrValue::Block(value)))),
-                StackItem::Label(_) => todo!("Error! Label without value"),
-                StackItem::Arg(_) => todo!("Error! Argument without block"),
+                StackItem::Label(_) => self.errors.push(ParseError::LabelWithoutValue(item_span)),
+                StackItem::Arg(_) => self.errors.push(ParseError::ArrowWithoutBlock(item_span)),
             }
         }
 
@@ -201,12 +204,8 @@ impl State {
     pub fn finish(mut self) -> Result<Block, ParseErrors> {
         let (block, termination) = self.terminate_block();
 
-        if let BlockTermination::Curly(_) = termination {
-            todo!("Error! Unterminated block")
-        }
-
-        if !self.blocks.is_empty() {
-            todo!("Error! Unhandled block")
+        if let BlockTermination::Curly(span) = termination {
+            self.errors.push(ParseError::BlockWithoutClosing(span))
         }
 
         if self.errors.is_empty() {
