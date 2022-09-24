@@ -21,8 +21,8 @@ pub enum SymbolValue {
 
 #[derive(Debug, Clone)]
 pub struct Symbol {
-    name_span: Span<()>,
-    value: Span<SymbolValue>,
+    pub name_span: Span<()>,
+    pub value: Span<SymbolValue>,
 }
 
 #[derive(Debug, Clone)]
@@ -41,9 +41,9 @@ pub enum Instruction {
 
 #[derive(Debug, Clone)]
 pub struct Block {
-    args: Vec<Span<String>>,
-    symbols: HashMap<String, Symbol>,
-    instrs: Vec<Span<Instruction>>,
+    pub args: Vec<Span<String>>,
+    pub symbols: HashMap<String, Symbol>,
+    pub instrs: Vec<Span<Instruction>>,
 }
 
 impl Symbol {

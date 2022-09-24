@@ -2,10 +2,11 @@ use std::path::Path;
 
 use crate::lexer::Lexer;
 
-use self::state::State;
-pub use self::{ast::Block, error::Error};
+pub use self::error::Error;
+use self::{ast::Block, state::State};
 
-mod ast;
+pub mod ast;
+
 mod error;
 mod state;
 pub struct Parser;

@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
-use catastrophic::parser::Parser;
+use catastrophic::{analyser::Analyser, parser::Parser};
 use structopt::StructOpt;
 
 #[derive(Debug, Clone, StructOpt)]
@@ -11,7 +11,12 @@ struct Args {
 
 #[paw::main]
 fn main(args: Args) -> Result<()> {
-    let block = Parser::parse_file(args.input).with_context(|| "Unable to parse input")?;
-    println!("RESULT: {:#?}", block);
+    let ast = Parser::parse_file(args.input).with_context(|| "Unable to parse input")?;
+    let ir = Analyser::analyse_ast(ast);
+
+    for (index, block) in ir.into_iter().enumerate() {
+        println!("BLOCK {}: {:#?}", index, block);
+    }
+
     Ok(())
 }
