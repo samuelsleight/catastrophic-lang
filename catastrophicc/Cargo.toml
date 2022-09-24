@@ -9,3 +9,4 @@ paw.workspace = true
 structopt.workspace = true
 catastrophic-parser = { path = "../libs/parser" }
 catastrophic-analyser = { path = "../libs/analyser" }
+catastrophic-interpreter = { path = "../libs/interpreter" }

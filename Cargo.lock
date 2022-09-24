@@ -51,6 +51,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "catastrophic-interpreter"
+version = "0.1.0"
+dependencies = [
+ "catastrophic-ir",
+ "thiserror",
+]
+
+[[package]]
 name = "catastrophic-ir"
 version = "0.1.0"
 dependencies = [
@@ -76,6 +84,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "catastrophic-analyser",
+ "catastrophic-interpreter",
  "catastrophic-parser",
  "paw",
  "structopt",

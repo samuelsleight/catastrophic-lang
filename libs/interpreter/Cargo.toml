@@ -1,0 +1,8 @@
+[package]
+name = "catastrophic-interpreter"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+thiserror.workspace = true
+catastrophic-ir = { path = "../ir" }

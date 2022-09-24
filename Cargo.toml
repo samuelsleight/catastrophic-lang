@@ -1,5 +1,13 @@
 [workspace]
-members = ["libs/span", "libs/ast", "libs/parser", "libs/ir", "libs/analyser", "catastrophicc"]
+members = [
+    "libs/span", 
+    "libs/parser", 
+    "libs/ast", 
+    "libs/analyser", 
+    "libs/ir", 
+    "libs/interpreter", 
+    "catastrophicc"
+]
 
 [workspace.package]
 version = "0.1.0"

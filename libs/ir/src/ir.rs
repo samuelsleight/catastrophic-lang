@@ -19,11 +19,11 @@ pub enum Instr {
 
 #[derive(Debug, Clone)]
 pub struct Block {
-    offset: usize,
-    args: usize,
-    env: Vec<Value>,
-    symbols: HashMap<String, usize>,
-    instrs: Vec<Instr>,
+    pub offset: usize,
+    pub args: usize,
+    pub env: Vec<Value>,
+    pub symbols: HashMap<String, usize>,
+    pub instrs: Vec<Instr>,
 }
 
 impl Block {
