@@ -26,6 +26,7 @@ pub struct Block {
 }
 
 impl Block {
+    #[must_use]
     pub fn new(args: Vec<Span<String>>, parent: Option<&Block>) -> Self {
         let mut block = parent.map_or_else(
             || Self {
@@ -62,6 +63,7 @@ impl Block {
         self.instrs.push(instr);
     }
 
+    #[must_use]
     pub fn lookup_symbol(&self, name: &String) -> Option<Value> {
         self.symbols.get(name).map(|index| self.env[*index])
     }

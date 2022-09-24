@@ -2,7 +2,10 @@ use std::collections::VecDeque;
 
 use crate::parser::ast;
 
-use super::ir;
+use super::{
+    error::{CompileError, CompileErrors},
+    ir,
+};
 
 pub struct QueuedBlock {
     block: ast::Block,
@@ -12,6 +15,7 @@ pub struct QueuedBlock {
 pub struct State {
     queue: VecDeque<QueuedBlock>,
     ir: Vec<ir::Block>,
+    errors: Vec<CompileError>,
 }
 
 impl QueuedBlock {
@@ -29,6 +33,7 @@ impl State {
         Self {
             queue: VecDeque::from([QueuedBlock::new(top_level)]),
             ir: Vec::new(),
+            errors: Vec::new(),
         }
     }
 
@@ -51,14 +56,22 @@ impl State {
         }
 
         for instr in block.block.instrs.into_iter().rev() {
+            let instr_span = instr.swap(());
             let instr = match instr.data {
                 ast::Instruction::Call => ir::Instr::Call,
                 ast::Instruction::Push(value) => {
                     let value = match value {
                         ast::InstrValue::Number(value) => ir::Value::Number(value),
-                        ast::InstrValue::Ident(ref name) => ir.lookup_symbol(name).expect("TODO: undefined symbol"),
                         ast::InstrValue::Block(block) => ir::Value::Block(self.queue_block(block, index)),
                         ast::InstrValue::Builtin(builtin) => ir::Value::Builtin(builtin),
+                        ast::InstrValue::Ident(ref name) => {
+                            if let Some(value) = ir.lookup_symbol(name) {
+                                value
+                            } else {
+                                self.errors.push(CompileError::UndefinedSymbolError(instr_span.swap(name.clone())));
+                                ir::Value::Number(0)
+                            }
+                        }
                     };
                     ir::Instr::Push(value)
                 }
@@ -70,12 +83,16 @@ impl State {
         ir
     }
 
-    pub fn analyse(mut self) -> Vec<ir::Block> {
+    pub fn analyse(mut self) -> Result<Vec<ir::Block>, CompileErrors> {
         while let Some(block) = self.queue.pop_back() {
             let ir = self.analyse_block(block, self.ir.len());
             self.ir.push(ir);
         }
 
-        self.ir
+        if self.errors.is_empty() {
+            Ok(self.ir)
+        } else {
+            Err(self.errors.into())
+        }
     }
 }

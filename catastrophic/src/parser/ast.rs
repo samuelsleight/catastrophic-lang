@@ -47,6 +47,7 @@ pub struct Block {
 }
 
 impl Symbol {
+    #[must_use]
     pub fn new(name_span: Span<()>, value: Span<SymbolValue>) -> Self {
         Self { name_span, value }
     }
