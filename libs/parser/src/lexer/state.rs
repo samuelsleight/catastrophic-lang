@@ -91,6 +91,7 @@ impl State {
             '+' => Some(input.swap(Token::Plus)),
 
             '=' => Some(input.swap(Token::Equals)),
+            '<' => Some(input.swap(Token::LessThan)),
             '>' => Some(input.swap(Token::GreaterThan)),
 
             ':' => Some(input.swap(Token::Colon)),

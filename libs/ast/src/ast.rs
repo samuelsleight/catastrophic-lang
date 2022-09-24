@@ -7,6 +7,7 @@ pub enum Builtin {
     Plus,
     Minus,
     Equals,
+    LessThan,
     IfThenElse,
 }
 
@@ -72,7 +73,6 @@ impl Block {
 
     pub fn with_symbol(&mut self, name: String) -> Entry<String, Symbol> {
         self.symbols.entry(name)
-
     }
 
     pub fn push_instruction(&mut self, instruction: Span<Instruction>) {

@@ -10,6 +10,7 @@ pub enum Token {
     Minus,
 
     Equals,
+    LessThan,
     GreaterThan,
 
     Colon,

@@ -4,7 +4,7 @@ use catastrophic_ir::ir::{self, Builtin};
 enum Value {
     Builtin(Builtin),
     Block(usize),
-    Number(u64),
+    Number(i64),
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -54,18 +54,25 @@ impl<'a> Env<'a> {
                     todo!("Invalid args for -");
                 }
             }
+            Builtin::LessThan => {
+                if let [Value::Number(a), Value::Number(b)] = args[..] {
+                    self.stack.push(Value::Number(i64::from(a < b)));
+                } else {
+                    todo!("Invalid args for =");
+                }
+            }
             Builtin::Equals => {
                 if let [Value::Number(a), Value::Number(b)] = args[..] {
-                    self.stack.push(Value::Number(u64::from(a == b)));
+                    self.stack.push(Value::Number(i64::from(a == b)));
                 } else {
                     todo!("Invalid args for =");
                 }
             }
             Builtin::IfThenElse => {
                 if let [Value::Number(i), t, e] = args[..] {
-                    self.stack.push(if i == u64::from(false) { e } else { t });
+                    self.stack.push(if i == i64::from(false) { e } else { t });
                 } else {
-                    todo!("Invalid args for +");
+                    todo!("Invalid args for ?");
                 }
             }
         }
@@ -89,7 +96,7 @@ impl<'a> Env<'a> {
             Function::Builtin(builtin) => (
                 0,
                 match builtin {
-                    Builtin::Plus | Builtin::Minus | Builtin::Equals => 2,
+                    Builtin::Plus | Builtin::Minus | Builtin::LessThan | Builtin::Equals => 2,
                     Builtin::IfThenElse => 3,
                 },
             ),
@@ -121,7 +128,7 @@ impl<'a> Env<'a> {
                 ir::Instr::Push(value) => match value {
                     ir::Value::Arg(index) => self.stack.push(self.args[index]),
                     ir::Value::Block(index) => self.stack.push(Value::Block(index)),
-                    ir::Value::Number(value) => self.stack.push(Value::Number(value as u64)),
+                    ir::Value::Number(value) => self.stack.push(Value::Number(value as i64)),
                     ir::Value::Builtin(builtin) => self.stack.push(Value::Builtin(builtin)),
                 },
             };

@@ -204,6 +204,7 @@ impl State {
             Token::Minus => self.process_builtin(Builtin::Minus, span),
             Token::Equals => self.process_builtin(Builtin::Equals, span),
             Token::GreaterThan => todo!("Unsupported >"),
+            Token::LessThan => self.process_builtin(Builtin::LessThan, span),
             Token::Colon => self.process_colon(span),
             Token::Question => self.process_builtin(Builtin::IfThenElse, span),
             Token::LParen => todo!("Unsupported ("),
