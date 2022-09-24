@@ -1,8 +1,10 @@
-use crate::span::{Location, Span};
-
+use catastrophic_ast::{
+    span::{Location, Span},
+    token::Token,
+};
 use unic_emoji::char::is_emoji;
 
-use super::{reader::Continuation, token::Token};
+use super::reader::Continuation;
 
 #[derive(Debug, Copy, Clone)]
 enum Mode {

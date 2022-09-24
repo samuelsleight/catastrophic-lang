@@ -1,8 +1,7 @@
 use std::fmt::Display;
 
+use catastrophic_ast::span::Span;
 use thiserror::Error;
-
-use crate::span::Span;
 
 #[derive(Debug, Error)]
 pub enum Error {

@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::parser::ast;
+use catastrophic_ast::ast;
 
 use super::{
     error::{CompileError, CompileErrors},

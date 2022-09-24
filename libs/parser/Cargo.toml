@@ -1,0 +1,9 @@
+[package]
+name = "catastrophic-parser"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+unic-emoji.workspace = true
+thiserror.workspace = true
+catastrophic-ast = { path = "../ast" }

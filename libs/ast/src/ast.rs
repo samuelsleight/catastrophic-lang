@@ -1,8 +1,6 @@
 use std::collections::{hash_map::Entry, HashMap};
 
-use crate::span::Span;
-
-use super::error::ParseError;
+use catastrophic_span::span::Span;
 
 #[derive(Debug, Copy, Clone)]
 pub enum Builtin {
@@ -72,20 +70,9 @@ impl Block {
         }
     }
 
-    pub fn add_symbol(&mut self, name: Span<String>, value: Span<SymbolValue>) -> Result<(), ParseError> {
-        let name_span = name.swap(());
+    pub fn with_symbol(&mut self, name: String) -> Entry<String, Symbol> {
+        self.symbols.entry(name)
 
-        match self.symbols.entry(name.data) {
-            Entry::Occupied(entry) => Err(ParseError::DuplicateSymbolError {
-                first: entry.get().name_span,
-                duplicate: name_span,
-            }),
-
-            Entry::Vacant(entry) => {
-                entry.insert(Symbol::new(name_span, value));
-                Ok(())
-            }
-        }
     }
 
     pub fn push_instruction(&mut self, instruction: Span<Instruction>) {

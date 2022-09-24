@@ -1,9 +1,10 @@
-use crate::{lexer::Token, span::Span};
+use std::collections::hash_map::Entry;
+
+use catastrophic_ast::{ast, span::Span, token::Token};
 
 use super::{
     ast::{Builtin, InstrValue, Instruction, SymbolValue},
     error::{ParseError, ParseErrors},
-    Block,
 };
 
 #[derive(Debug, Copy, Clone)]
@@ -21,12 +22,12 @@ enum StackItem {
     Builtin(Builtin),
     Label(String),
     Arg(String),
-    Block(Block),
+    Block(ast::Block),
 }
 
 pub struct State {
     stack: Vec<Span<StackItem>>,
-    blocks: Vec<Block>,
+    blocks: Vec<ast::Block>,
     errors: Vec<ParseError>,
 }
 
@@ -34,7 +35,7 @@ impl State {
     pub fn new() -> Self {
         Self {
             stack: Vec::new(),
-            blocks: vec![Block::no_args()],
+            blocks: vec![ast::Block::no_args()],
             errors: Vec::new(),
         }
     }
@@ -121,7 +122,7 @@ impl State {
             }
         }
 
-        self.blocks.push(Block::with_args(args));
+        self.blocks.push(ast::Block::with_args(args));
         self.stack.push(span.swap(StackItem::OpenBlock));
     }
 
@@ -154,12 +155,24 @@ impl State {
     }
 
     fn push_symbol(&mut self, name: Span<String>, value: Span<SymbolValue>) {
-        if let Err(e) = self.blocks.last_mut().unwrap().add_symbol(name, value) {
+        let name_span = name.swap(());
+
+        if let Err(e) = match self.blocks.last_mut().unwrap().with_symbol(name.data) {
+            Entry::Occupied(entry) => Err(ParseError::DuplicateSymbolError {
+                first: entry.get().name_span,
+                duplicate: name_span,
+            }),
+
+            Entry::Vacant(entry) => {
+                entry.insert(ast::Symbol::new(name_span, value));
+                Ok(())
+            }
+        } {
             self.errors.push(e);
         }
     }
 
-    fn terminate_block(&mut self) -> (Block, BlockTermination) {
+    fn terminate_block(&mut self) -> (ast::Block, BlockTermination) {
         let mut block = self.blocks.pop().unwrap();
 
         while let Some(stack_item) = self.stack.pop() {
@@ -201,7 +214,7 @@ impl State {
         }
     }
 
-    pub fn finish(mut self) -> Result<Block, ParseErrors> {
+    pub fn finish(mut self) -> Result<ast::Block, ParseErrors> {
         let (block, termination) = self.terminate_block();
 
         if let BlockTermination::Curly(span) = termination {

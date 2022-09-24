@@ -1,0 +1,4 @@
+[package]
+name = "catastrophic-span"
+version.workspace = true
+edition.workspace = true

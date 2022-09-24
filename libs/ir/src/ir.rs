@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use crate::{parser::ast::Builtin, span::Span};
+pub use catastrophic_ast::ast::Builtin;
+use catastrophic_ast::span::Span;
 
 #[derive(Debug, Copy, Clone)]
 pub enum Value {

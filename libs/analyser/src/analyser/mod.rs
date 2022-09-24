@@ -1,10 +1,9 @@
-use crate::parser::ast;
+use catastrophic_ast::ast;
+use catastrophic_ir::ir;
 
 use self::state::State;
 
 pub use self::error::Error;
-
-pub mod ir;
 
 mod error;
 mod state;

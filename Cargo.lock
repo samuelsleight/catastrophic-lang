@@ -35,19 +35,48 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
-name = "catastrophic"
+name = "catastrophic-analyser"
 version = "0.1.0"
 dependencies = [
+ "catastrophic-ast",
+ "catastrophic-ir",
+ "thiserror",
+]
+
+[[package]]
+name = "catastrophic-ast"
+version = "0.1.0"
+dependencies = [
+ "catastrophic-span",
+]
+
+[[package]]
+name = "catastrophic-ir"
+version = "0.1.0"
+dependencies = [
+ "catastrophic-ast",
+]
+
+[[package]]
+name = "catastrophic-parser"
+version = "0.1.0"
+dependencies = [
+ "catastrophic-ast",
  "thiserror",
  "unic-emoji",
 ]
+
+[[package]]
+name = "catastrophic-span"
+version = "0.1.0"
 
 [[package]]
 name = "catastrophicc"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "catastrophic",
+ "catastrophic-analyser",
+ "catastrophic-parser",
  "paw",
  "structopt",
 ]

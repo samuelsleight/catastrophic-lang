@@ -1,7 +1,8 @@
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
-use catastrophic::{analyser::Analyser, parser::Parser};
+use catastrophic_analyser::analyser::Analyser;
+use catastrophic_parser::parser::Parser;
 use structopt::StructOpt;
 
 #[derive(Debug, Clone, StructOpt)]

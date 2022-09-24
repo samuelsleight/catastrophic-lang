@@ -1,15 +1,14 @@
 use std::path::Path;
 
-use crate::span::Span;
+use catastrophic_ast::{span::Span, token::Token};
 
 use self::{reader::CharReader, state::State};
 
-pub use self::{error::Error, token::Token};
+pub use self::error::Error;
 
 mod error;
 mod reader;
 mod state;
-mod token;
 
 pub struct Lexer;
 
