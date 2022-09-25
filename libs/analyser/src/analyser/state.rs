@@ -58,7 +58,7 @@ impl State {
         for instr in block.block.instrs.into_iter().rev() {
             let instr_span = instr.swap(());
             let instr = match instr.data {
-                ast::Instruction::Call => ir::Instr::Call,
+                ast::Instruction::Command(command) => ir::Instr::Command(command),
                 ast::Instruction::Push(value) => {
                     let value = match value {
                         ast::InstrValue::Number(value) => ir::Value::Number(value),

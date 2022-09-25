@@ -10,6 +10,7 @@ pub enum RuntimeError {
     CalledInvalidBlock(Span<()>),
     InvalidArgsForBuiltin(Span<()>, Builtin),
     InsufficientArgsForFunction(Span<()>),
+    OutputFunction(Span<()>),
 }
 
 impl ErrorProvider for RuntimeError {
@@ -22,6 +23,7 @@ impl ErrorProvider for RuntimeError {
                 writer.error(span, &format!("Invalid args for calling builtin function `{}`", builtin))
             }
             RuntimeError::InsufficientArgsForFunction(span) => writer.error(span, "Attempted to call a function with insufficient arguments"),
+            RuntimeError::OutputFunction(span) => writer.error(span, "Attempted to output a function as a value"),
         }
     }
 }

@@ -1,5 +1,5 @@
 use catastrophic_ir::{
-    ir::{self, Builtin},
+    ir::{self, Builtin, Command},
     span::Span,
 };
 
@@ -18,9 +18,14 @@ enum Function {
     Block(usize),
 }
 
+#[derive(Debug, Clone)]
+struct Stack {
+    stack: Vec<Value>,
+}
+
 struct Env<'a> {
     blocks: &'a [ir::Block],
-    stack: &'a mut Vec<Value>,
+    stack: &'a mut Stack,
     args: Vec<Value>,
     block: usize,
     instr: usize,
@@ -29,11 +34,25 @@ struct Env<'a> {
 #[derive(Debug, Clone)]
 pub struct State {
     blocks: Vec<ir::Block>,
-    stack: Vec<Value>,
+    stack: Stack,
+}
+
+impl Stack {
+    pub fn new() -> Self {
+        Self { stack: Vec::new() }
+    }
+
+    pub fn push(&mut self, value: Value) {
+        self.stack.push(value)
+    }
+
+    pub fn pop(&mut self) -> Value {
+        self.stack.pop().unwrap_or(Value::Number(0))
+    }
 }
 
 impl<'a> Env<'a> {
-    fn new(blocks: &'a [ir::Block], stack: &'a mut Vec<Value>, args: Vec<Value>, block: usize) -> Self {
+    fn new(blocks: &'a [ir::Block], stack: &'a mut Stack, args: Vec<Value>, block: usize) -> Self {
         Self {
             blocks,
             stack,
@@ -93,12 +112,9 @@ impl<'a> Env<'a> {
 
     fn call_instr(&mut self, span: Span<()>) -> Result<(), RuntimeError> {
         let function = match self.stack.pop() {
-            None => return Err(RuntimeError::CalledEmptyStack(span)),
-            Some(value) => match value {
-                Value::Builtin(builtin) => Function::Builtin(builtin),
-                Value::Block(block) => Function::Block(block),
-                Value::Number(_) => return Err(RuntimeError::CalledNumber(span)),
-            },
+            Value::Builtin(builtin) => Function::Builtin(builtin),
+            Value::Block(block) => Function::Block(block),
+            Value::Number(_) => return Err(RuntimeError::CalledNumber(span)),
         };
 
         let (offset_count, args_count) = match function {
@@ -118,10 +134,7 @@ impl<'a> Env<'a> {
         let mut args = self.args[0..offset_count].to_owned();
 
         for _ in 0..args_count {
-            match self.stack.pop() {
-                Some(value) => args.push(value),
-                None => return Err(RuntimeError::InsufficientArgsForFunction(span)),
-            }
+            args.push(self.stack.pop())
         }
 
         match function {
@@ -130,11 +143,36 @@ impl<'a> Env<'a> {
         }
     }
 
+    fn output_char_instr(&mut self, span: Span<()>) -> Result<(), RuntimeError> {
+        match self.stack.pop() {
+            Value::Number(value) => {
+                let value = char::try_from(u32::try_from(value).unwrap_or(0)).unwrap_or('\0');
+                print!("{}", value);
+                Ok(())
+            }
+            _ => Err(RuntimeError::OutputFunction(span)),
+        }
+    }
+
+    fn output_number_instr(&mut self, span: Span<()>) -> Result<(), RuntimeError> {
+        match self.stack.pop() {
+            Value::Number(value) => {
+                print!("{}", value);
+                Ok(())
+            }
+            _ => Err(RuntimeError::OutputFunction(span)),
+        }
+    }
+
     fn run(&mut self) -> Result<(), RuntimeError> {
         while let Some(instr) = self.blocks.get(self.block).and_then(|block| block.instrs.get(self.instr)) {
             let instr_span = instr.swap(());
             match instr.data {
-                ir::Instr::Call => self.call_instr(instr_span)?,
+                ir::Instr::Command(command) => match command {
+                    Command::Call => self.call_instr(instr_span)?,
+                    Command::OutputChar => self.output_char_instr(instr_span)?,
+                    Command::OutputNumber => self.output_number_instr(instr_span)?,
+                },
                 ir::Instr::Push(value) => match value {
                     ir::Value::Arg(index) => self.stack.push(self.args[index]),
                     ir::Value::Block(index) => self.stack.push(Value::Block(index)),
@@ -152,12 +190,10 @@ impl<'a> Env<'a> {
 
 impl State {
     pub fn new(blocks: Vec<ir::Block>) -> Self {
-        Self { blocks, stack: Vec::new() }
+        Self { blocks, stack: Stack::new() }
     }
 
     pub fn interpret(&mut self) -> Result<(), RuntimeError> {
-        Env::new(&self.blocks, &mut self.stack, Vec::new(), 0).run()?;
-        println!("{:?}", self.stack);
-        Ok(())
+        Env::new(&self.blocks, &mut self.stack, Vec::new(), 0).run()
     }
 }

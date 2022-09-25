@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-pub use catastrophic_ast::ast::Builtin;
+pub use catastrophic_ast::ast::{Builtin, Command};
 use catastrophic_ast::span::Span;
 
 #[derive(Debug, Copy, Clone)]
@@ -13,7 +13,7 @@ pub enum Value {
 
 #[derive(Debug, Copy, Clone)]
 pub enum Instr {
-    Call,
+    Command(Command),
     Push(Value),
 }
 

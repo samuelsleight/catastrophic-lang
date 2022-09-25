@@ -1,6 +1,10 @@
 use std::collections::hash_map::Entry;
 
-use catastrophic_ast::{ast, span::Span, token::Token};
+use catastrophic_ast::{
+    ast::{self, Command},
+    span::Span,
+    token::Token,
+};
 
 use super::{
     ast::{Builtin, InstrValue, Instruction, SymbolValue},
@@ -16,7 +20,7 @@ enum BlockTermination {
 #[derive(Debug, Clone)]
 enum StackItem {
     OpenBlock,
-    Call,
+    Command(Command),
     Ident(String),
     Number(u64),
     Builtin(Builtin),
@@ -44,8 +48,8 @@ impl State {
         self.stack.push(span.swap(StackItem::Ident(ident)));
     }
 
-    fn process_parens(&mut self, span: Span<()>) {
-        self.stack.push(span.swap(StackItem::Call));
+    fn process_command(&mut self, command: Command, span: Span<()>) {
+        self.stack.push(span.swap(StackItem::Command(command)));
     }
 
     fn process_number(&mut self, value: u64, span: Span<()>) {
@@ -179,7 +183,7 @@ impl State {
             let item_span = stack_item.swap(());
             match stack_item.data {
                 StackItem::OpenBlock => return (block, BlockTermination::Curly(item_span)),
-                StackItem::Call => block.push_instruction(item_span.swap(Instruction::Call)),
+                StackItem::Command(command) => block.push_instruction(item_span.swap(Instruction::Command(command))),
                 StackItem::Ident(ident) => block.push_instruction(item_span.swap(Instruction::Push(InstrValue::Ident(ident)))),
                 StackItem::Number(value) => block.push_instruction(item_span.swap(Instruction::Push(InstrValue::Number(value)))),
                 StackItem::Builtin(builtin) => block.push_instruction(item_span.swap(Instruction::Push(InstrValue::Builtin(builtin)))),
@@ -199,12 +203,14 @@ impl State {
             Token::Ident(ident) => self.process_ident(ident, span),
             Token::Integer(value) => self.process_number(value, span),
             Token::Arrow => self.process_arrow(span),
-            Token::Parens => self.process_parens(span),
+            Token::Parens => self.process_command(Command::Call, span),
             Token::Plus => self.process_builtin(Builtin::Plus, span),
             Token::Minus => self.process_builtin(Builtin::Minus, span),
             Token::Equals => self.process_builtin(Builtin::Equals, span),
             Token::GreaterThan => todo!("Unsupported >"),
             Token::LessThan => self.process_builtin(Builtin::LessThan, span),
+            Token::Period => self.process_command(Command::OutputNumber, span),
+            Token::Comma => self.process_command(Command::OutputChar, span),
             Token::Colon => self.process_colon(span),
             Token::Question => self.process_builtin(Builtin::IfThenElse, span),
             Token::LParen => todo!("Unsupported ("),

@@ -14,6 +14,13 @@ pub enum Builtin {
     IfThenElse,
 }
 
+#[derive(Debug, Copy, Clone)]
+pub enum Command {
+    Call,
+    OutputChar,
+    OutputNumber,
+}
+
 #[derive(Debug, Clone)]
 pub enum SymbolValue {
     Number(u64),
@@ -37,7 +44,7 @@ pub enum InstrValue {
 
 #[derive(Debug, Clone)]
 pub enum Instruction {
-    Call,
+    Command(Command),
     Push(InstrValue),
 }
 

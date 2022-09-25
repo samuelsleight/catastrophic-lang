@@ -1,5 +1,5 @@
 # Addition function
-add: x -> y -> {
+🐉: x -> y -> {
     # Push the args onto the stack
     x y
 
@@ -7,4 +7,5 @@ add: x -> y -> {
     + ()
 }
 
-5 2 add ()
+15 25 🐉 () .
+10 ,

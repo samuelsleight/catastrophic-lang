@@ -13,6 +13,9 @@ pub enum Token {
     LessThan,
     GreaterThan,
 
+    Period,
+    Comma,
+
     Colon,
     Question,
 

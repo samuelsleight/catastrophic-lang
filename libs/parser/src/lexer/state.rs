@@ -94,6 +94,9 @@ impl State {
             '<' => Some(input.swap(Token::LessThan)),
             '>' => Some(input.swap(Token::GreaterThan)),
 
+            '.' => Some(input.swap(Token::Period)),
+            ',' => Some(input.swap(Token::Comma)),
+
             ':' => Some(input.swap(Token::Colon)),
             '?' => Some(input.swap(Token::Question)),
 
