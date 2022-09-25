@@ -38,18 +38,24 @@ impl<R: BufRead> CharReader<R> {
 
         loop {
             buffer.clear();
+
             match self.input.read_line(&mut buffer) {
                 Ok(0) => return Ok(()),
                 Err(err) => return Err(Error::file_read(self.path, err)),
                 _ => (),
             }
 
-            for char in buffer.chars() {
+            let mut handle_char = |char| {
                 let start = location;
                 location.advance();
-
                 while let Continuation::Peek = callback(Span::new(start, location, char)) {}
+            };
+
+            for char in buffer.trim_end().chars() {
+                handle_char(char);
             }
+
+            handle_char('\n');
 
             location.next_line();
         }
