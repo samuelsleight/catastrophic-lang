@@ -42,5 +42,13 @@ fib: n -> {
     n 0 1 fib_rec ()
 }
 
-90 fib () .
-10 ,
+# Define a function that calls the above and outputs a message to the console
+main: n -> {
+    "Fib(" ,,,,
+    n .
+    ") is " ,,,,,
+    n fib () .
+    19 ,
+}
+
+90 main ()
