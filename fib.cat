@@ -43,7 +43,7 @@ fib: n -> {
 }
 
 # Define a function that calls the above and outputs a message to the console
-main: n -> {
+run: n -> {
     "Fib(" ,,,,
     n .
     ") is " ,,,,,
@@ -51,4 +51,11 @@ main: n -> {
     19 ,
 }
 
-90 main ()
+# Define a function that asks for a number
+choose: {
+    "Enter a number: " ,,,,,,,,,,,,,,,,
+    &
+}
+
+choose ()
+run ()

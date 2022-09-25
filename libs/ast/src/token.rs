@@ -17,6 +17,9 @@ pub enum Token {
     Period,
     Comma,
 
+    Ampersand,
+    Tilde,
+
     Colon,
     Question,
 

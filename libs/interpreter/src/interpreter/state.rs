@@ -1,3 +1,5 @@
+use std::io::{stdin, stdout, Read, Write};
+
 use catastrophic_ir::{
     ir::{self, Builtin, Command},
     span::Span,
@@ -85,6 +87,13 @@ impl<'a> Env<'a> {
                     Err(())
                 }
             }
+            Builtin::GreaterThan => {
+                if let [Value::Number(a), Value::Number(b)] = args[..] {
+                    Ok(Value::Number(i64::from(a > b)))
+                } else {
+                    Err(())
+                }
+            }
             Builtin::Equals => {
                 if let [Value::Number(a), Value::Number(b)] = args[..] {
                     Ok(Value::Number(i64::from(a == b)))
@@ -121,7 +130,7 @@ impl<'a> Env<'a> {
             Function::Builtin(builtin) => (
                 0,
                 match builtin {
-                    Builtin::Plus | Builtin::Minus | Builtin::LessThan | Builtin::Equals => 2,
+                    Builtin::Plus | Builtin::Minus | Builtin::LessThan | Builtin::GreaterThan | Builtin::Equals => 2,
                     Builtin::IfThenElse => 3,
                 },
             ),
@@ -164,6 +173,24 @@ impl<'a> Env<'a> {
         }
     }
 
+    fn input_char_instr(&mut self) -> Result<(), RuntimeError> {
+        // TODO: Error handling here
+        stdout().flush().unwrap();
+        let mut buffer = [b'\0'];
+        stdin().read_exact(&mut buffer).unwrap();
+        self.stack.push(Value::Number(buffer[0] as char as i64));
+        Ok(())
+    }
+
+    fn input_number_instr(&mut self) -> Result<(), RuntimeError> {
+        // TODO: Error handling here
+        stdout().flush().unwrap();
+        let mut buffer = String::new();
+        stdin().read_line(&mut buffer).unwrap();
+        self.stack.push(Value::Number(buffer.trim().parse().unwrap()));
+        Ok(())
+    }
+
     fn run(&mut self) -> Result<(), RuntimeError> {
         while let Some(instr) = self.blocks.get(self.block).and_then(|block| block.instrs.get(self.instr)) {
             let instr_span = instr.swap(());
@@ -172,6 +199,8 @@ impl<'a> Env<'a> {
                     Command::Call => self.call_instr(instr_span)?,
                     Command::OutputChar => self.output_char_instr(instr_span)?,
                     Command::OutputNumber => self.output_number_instr(instr_span)?,
+                    Command::InputChar => self.input_char_instr()?,
+                    Command::InputNumber => self.input_number_instr()?,
                 },
                 ir::Instr::Push(value) => match value {
                     ir::Value::Arg(index) => self.stack.push(self.args[index]),

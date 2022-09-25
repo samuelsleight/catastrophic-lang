@@ -10,6 +10,7 @@ pub enum Builtin {
     Plus,
     Minus,
     Equals,
+    GreaterThan,
     LessThan,
     IfThenElse,
 }
@@ -19,6 +20,8 @@ pub enum Command {
     Call,
     OutputChar,
     OutputNumber,
+    InputChar,
+    InputNumber,
 }
 
 #[derive(Debug, Clone)]
@@ -96,6 +99,7 @@ impl Display for Builtin {
             Builtin::Plus => f.write_str("+"),
             Builtin::Minus => f.write_str("-"),
             Builtin::Equals => f.write_str("="),
+            Builtin::GreaterThan => f.write_str(">"),
             Builtin::LessThan => f.write_str("<"),
             Builtin::IfThenElse => f.write_str("?"),
         }

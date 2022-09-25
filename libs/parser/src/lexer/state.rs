@@ -106,6 +106,9 @@ impl State {
             '.' => Some(input.swap(Token::Period)),
             ',' => Some(input.swap(Token::Comma)),
 
+            '&' => Some(input.swap(Token::Ampersand)),
+            '~' => Some(input.swap(Token::Tilde)),
+
             ':' => Some(input.swap(Token::Colon)),
             '?' => Some(input.swap(Token::Question)),
 
