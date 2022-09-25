@@ -1,0 +1,7 @@
+[package]
+name = "catastrophic-error"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+catastrophic-span = { path = "../span" }

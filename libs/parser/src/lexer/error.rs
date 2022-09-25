@@ -1,13 +1,13 @@
-use std::path::PathBuf;
+use std::{
+    io::{Read, Seek},
+    path::PathBuf,
+};
 
-use thiserror::Error;
+use catastrophic_error::{context::ErrorProvider, writer::ErrorWriter};
 
-#[derive(Debug, Error)]
+#[derive(Debug)]
 pub enum Error {
-    #[error("Unable to open file \"{}\"", .file.display())]
     FileOpen { file: PathBuf, source: std::io::Error },
-
-    #[error("Error reading from file \"{}\"", .file.display())]
     FileRead { file: PathBuf, source: std::io::Error },
 }
 
@@ -20,5 +20,14 @@ impl Error {
     #[must_use]
     pub fn file_read(path: PathBuf, source: std::io::Error) -> Self {
         Error::FileRead { file: path, source }
+    }
+}
+
+impl ErrorProvider for Error {
+    fn write_errors<R: Read + Seek>(&self, writer: &mut ErrorWriter<R>) -> std::fmt::Result {
+        match self {
+            Error::FileOpen { file, source } => writer.error(None, &format!("Unable to open file `{}`: {}", file.display(), source)),
+            Error::FileRead { file, source } => writer.error(None, &format!("Unable to read file `{}`: {}", file.display(), source)),
+        }
     }
 }

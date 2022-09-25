@@ -1,4 +1,7 @@
-use std::collections::{hash_map::Entry, HashMap};
+use std::{
+    collections::{hash_map::Entry, HashMap},
+    fmt::Display,
+};
 
 use catastrophic_span::span::Span;
 
@@ -77,5 +80,17 @@ impl Block {
 
     pub fn push_instruction(&mut self, instruction: Span<Instruction>) {
         self.instrs.push(instruction);
+    }
+}
+
+impl Display for Builtin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Builtin::Plus => f.write_str("+"),
+            Builtin::Minus => f.write_str("-"),
+            Builtin::Equals => f.write_str("="),
+            Builtin::LessThan => f.write_str("<"),
+            Builtin::IfThenElse => f.write_str("?"),
+        }
     }
 }

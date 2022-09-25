@@ -1,15 +1,9 @@
-use std::fmt::Display;
+use std::io::{Read, Seek};
 
+use catastrophic_error::{context::ErrorProvider, writer::ErrorWriter};
 use catastrophic_ir::{ir::Builtin, span::Span};
-use thiserror::Error;
 
-#[derive(Debug, Error)]
-pub enum Error {
-    #[error(transparent)]
-    RuntimeError(#[from] RuntimeError),
-}
-
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum RuntimeError {
     CalledEmptyStack(Span<()>),
     CalledNumber(Span<()>),
@@ -18,19 +12,16 @@ pub enum RuntimeError {
     InsufficientArgsForFunction(Span<()>),
 }
 
-impl std::error::Error for RuntimeError {}
-
-impl Display for RuntimeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            // TODO: Pretty error formatting, inclusing highlighting the span in the input
-            RuntimeError::CalledEmptyStack(span) => writeln!(f, "Attempted to call empty stack at {:?}", span)?,
-            RuntimeError::CalledNumber(span) => writeln!(f, "Attempted to call number at {:?}", span)?,
-            RuntimeError::CalledInvalidBlock(span) => writeln!(f, "Attempted to call invalid block {:?}", span)?,
-            RuntimeError::InvalidArgsForBuiltin(span, builtin) => write!(f, "Invalid args for calling builtin {:?} at {:?}", builtin, span)?,
-            RuntimeError::InsufficientArgsForFunction(span) => write!(f, "Insufficient args on stack for function call at {:?}", span)?,
+impl ErrorProvider for RuntimeError {
+    fn write_errors<R: Read + Seek>(&self, writer: &mut ErrorWriter<R>) -> std::fmt::Result {
+        match *self {
+            RuntimeError::CalledEmptyStack(span) => writer.error(span, "Attempted to call a function with an empty stack"),
+            RuntimeError::CalledNumber(span) => writer.error(span, "Attampted to call a number instead of a function"),
+            RuntimeError::CalledInvalidBlock(span) => writer.error(span, "Attempted to call a block tht does not exist"),
+            RuntimeError::InvalidArgsForBuiltin(span, builtin) => {
+                writer.error(span, &format!("Invalid args for calling builtin function `{}`", builtin))
+            }
+            RuntimeError::InsufficientArgsForFunction(span) => writer.error(span, "Attempted to call a function with insufficient arguments"),
         }
-
-        Ok(())
     }
 }

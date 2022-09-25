@@ -1,17 +1,12 @@
-use std::fmt::Display;
-
 use catastrophic_ast::span::Span;
-use thiserror::Error;
+use catastrophic_error::context::ErrorProvider;
 
 use crate::lexer;
 
-#[derive(Debug, Error)]
+#[derive(Debug)]
 pub enum Error {
-    #[error(transparent)]
-    LexError(#[from] lexer::Error),
-
-    #[error(transparent)]
-    ParseErrors(#[from] ParseErrors),
+    LexError(lexer::Error),
+    ParseErrors(ParseErrors),
 }
 
 #[derive(Debug)]
@@ -30,27 +25,42 @@ pub enum ParseError {
     DuplicateSymbolError { first: Span<()>, duplicate: Span<()> },
 }
 
-impl std::error::Error for ParseErrors {}
-
 impl From<Vec<ParseError>> for ParseErrors {
     fn from(errors: Vec<ParseError>) -> Self {
         Self { errors }
     }
 }
 
-impl Display for ParseErrors {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for error in &self.errors {
-            match error {
-                // TODO: Pretty error formatting, inclusing highlighting the span in the input
-                ParseError::BlockClosedWithoutOpening(span) => writeln!(f, "Encountered end of block without corresponding `{{` {:?}", span)?,
-                ParseError::BlockWithoutClosing(span) => writeln!(f, "Encountered block without corresponding `}}` {:?}", span)?,
-                ParseError::LabelWithoutName(span) => writeln!(f, "Label without symbol name {:?}", span)?,
-                ParseError::LabelWithoutValue(span) => writeln!(f, "Label without symbol value {:?}", span)?,
-                ParseError::ArrowWithoutArg(span) => writeln!(f, "Arrow without argument name {:?}", span)?,
-                ParseError::ArrowWithoutBlock(span) => writeln!(f, "Encountered argument without a corresponding block {:?}", span)?,
-                ParseError::DuplicateSymbolError { first, duplicate } => {
-                    writeln!(f, "Duplicate symbol {:?}, first defined at {:?}", duplicate, first)?;
+impl From<ParseErrors> for Error {
+    fn from(error: ParseErrors) -> Self {
+        Error::ParseErrors(error)
+    }
+}
+
+impl From<lexer::Error> for Error {
+    fn from(error: lexer::Error) -> Self {
+        Error::LexError(error)
+    }
+}
+
+impl ErrorProvider for Error {
+    fn write_errors<R: std::io::Read + std::io::Seek>(&self, writer: &mut catastrophic_error::writer::ErrorWriter<R>) -> std::fmt::Result {
+        match self {
+            Error::LexError(error) => error.write_errors(writer)?,
+            Error::ParseErrors(errors) => {
+                for error in &errors.errors {
+                    match error {
+                        ParseError::BlockClosedWithoutOpening(span) => writer.error(*span, "Encountered `}` with no corresponding `{`")?,
+                        ParseError::BlockWithoutClosing(span) => writer.error(*span, "Encountered `{` without corresponding `}`")?,
+                        ParseError::LabelWithoutName(span) => writer.error(*span, "Encountered `:` without an accompanying symbol name")?,
+                        ParseError::LabelWithoutValue(span) => writer.error(*span, "Encountered `:` without a corresponding symbol value")?,
+                        ParseError::ArrowWithoutArg(span) => writer.error(*span, "Encountered `->` without a corresponding argument")?,
+                        ParseError::ArrowWithoutBlock(span) => writer.error(*span, "Encountered `->` without a corresponding block")?,
+                        ParseError::DuplicateSymbolError { first, duplicate } => {
+                            writer.error(*duplicate, "Encountered a duplicate symbol definition")?;
+                            writer.note(*first, "Symbol was previously defined here:")?;
+                        }
+                    }
                 }
             }
         }

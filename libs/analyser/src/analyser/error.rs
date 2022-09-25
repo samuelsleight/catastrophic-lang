@@ -1,13 +1,7 @@
-use std::fmt::Display;
+use std::io::{Read, Seek};
 
 use catastrophic_ast::span::Span;
-use thiserror::Error;
-
-#[derive(Debug, Error)]
-pub enum Error {
-    #[error(transparent)]
-    CompilerErrors(#[from] CompileErrors),
-}
+use catastrophic_error::{context::ErrorProvider, writer::ErrorWriter};
 
 #[derive(Debug)]
 pub struct CompileErrors {
@@ -19,20 +13,19 @@ pub enum CompileError {
     UndefinedSymbolError(Span<String>),
 }
 
-impl std::error::Error for CompileErrors {}
-
 impl From<Vec<CompileError>> for CompileErrors {
     fn from(errors: Vec<CompileError>) -> Self {
         Self { errors }
     }
 }
 
-impl Display for CompileErrors {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl ErrorProvider for CompileErrors {
+    fn write_errors<R: Read + Seek>(&self, writer: &mut ErrorWriter<R>) -> std::fmt::Result {
         for error in &self.errors {
             match error {
-                // TODO: Pretty error formatting, inclusing highlighting the span in the input
-                CompileError::UndefinedSymbolError(span) => writeln!(f, "Undefined symbol {} at {:?}", span.data, span.swap(()))?,
+                CompileError::UndefinedSymbolError(ref symbol) => {
+                    writer.error(symbol.swap(()), &format!("Use of undefined symbol `{}`", symbol.data))?
+                }
             }
         }
 

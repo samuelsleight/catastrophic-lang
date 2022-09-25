@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "libs/error", 
     "libs/span", 
     "libs/parser", 
     "libs/ast", 
@@ -17,7 +18,6 @@ edition = "2021"
 anyhow = "1.0.65"
 paw = "1.0.0"
 structopt = { version = "0.3.26", features = ["paw"] }
-thiserror = "1.0.35"
 
 [workspace.dependencies.unic-emoji]
 git = "https://github.com/eyeplum/rust-unic/"

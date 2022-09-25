@@ -3,7 +3,7 @@ use catastrophic_ir::ir;
 
 use self::state::State;
 
-pub use self::error::Error;
+pub use self::error::CompileErrors;
 
 mod error;
 mod state;
@@ -11,7 +11,7 @@ mod state;
 pub struct Analyser;
 
 impl Analyser {
-    pub fn analyse_ast(top_level: ast::Block) -> Result<Vec<ir::Block>, Error> {
-        Ok(State::new(top_level).analyse()?)
+    pub fn analyse_ast(top_level: ast::Block) -> Result<Vec<ir::Block>, CompileErrors> {
+        State::new(top_level).analyse()
     }
 }

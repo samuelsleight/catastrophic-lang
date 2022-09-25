@@ -1,3 +1,3 @@
-pub type Error = analyser::Error;
+pub type Error = analyser::CompileErrors;
 
 pub mod analyser;

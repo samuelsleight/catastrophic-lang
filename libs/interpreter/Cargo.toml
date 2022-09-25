@@ -4,5 +4,5 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-thiserror.workspace = true
 catastrophic-ir = { path = "../ir" }
+catastrophic-error = { path = "../error" }

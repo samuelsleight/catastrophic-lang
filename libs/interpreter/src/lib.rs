@@ -1,3 +1,3 @@
-pub type Error = interpreter::Error;
+pub type Error = interpreter::RuntimeError;
 
 pub mod interpreter;
