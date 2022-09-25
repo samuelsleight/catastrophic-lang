@@ -114,7 +114,6 @@ impl State {
 
             '{' => Some(input.swap(Token::LCurly)),
             '}' => Some(input.swap(Token::RCurly)),
-            ')' => Some(input.swap(Token::RParen)),
 
             c => (!c.is_whitespace()).then(|| input.swap(Token::Unexpected(c))),
         };
@@ -183,7 +182,7 @@ impl State {
         if input.data == ')' {
             (Some(Span::new(self.start, input.end, Token::Parens)), Continuation::Consume)
         } else {
-            (Some(Span::new(self.start, input.start, Token::LParen)), Continuation::Peek)
+            (Some(Span::new(self.start, input.start, Token::Unexpected('('))), Continuation::Peek)
         }
     }
 

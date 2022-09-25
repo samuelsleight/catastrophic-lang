@@ -16,6 +16,7 @@ pub struct ParseErrors {
 
 #[derive(Debug)]
 pub enum ParseError {
+    UnexpectedChar(Span<char>),
     BlockClosedWithoutOpening(Span<()>),
     BlockWithoutClosing(Span<()>),
     LabelWithoutName(Span<()>),
@@ -50,6 +51,7 @@ impl ErrorProvider for Error {
             Error::ParseErrors(errors) => {
                 for error in &errors.errors {
                     match error {
+                        ParseError::UnexpectedChar(span) => writer.error(span.swap(()), &format!("Encountered unexpected `{}`", span.data))?,
                         ParseError::BlockClosedWithoutOpening(span) => writer.error(*span, "Encountered `}` with no corresponding `{`")?,
                         ParseError::BlockWithoutClosing(span) => writer.error(*span, "Encountered `{` without corresponding `}`")?,
                         ParseError::LabelWithoutName(span) => writer.error(*span, "Encountered `:` without an accompanying symbol name")?,

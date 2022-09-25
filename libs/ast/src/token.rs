@@ -23,8 +23,6 @@ pub enum Token {
     Colon,
     Question,
 
-    LParen,
-    RParen,
     LCurly,
     RCurly,
 

@@ -222,11 +222,9 @@ impl State {
             Token::Tilde => self.process_command(Command::InputChar, span),
             Token::Colon => self.process_colon(span),
             Token::Question => self.process_builtin(Builtin::IfThenElse, span),
-            Token::LParen => todo!("Unsupported ("),
-            Token::RParen => todo!("Unsupported )"),
             Token::LCurly => self.process_open_block(span),
             Token::RCurly => self.process_close_block(span),
-            Token::Unexpected(c) => todo!("Error! Unexpected character {}", c),
+            Token::Unexpected(c) => self.errors.push(ParseError::UnexpectedChar(span.swap(c))),
         }
     }
 
