@@ -23,7 +23,7 @@ pub struct Block {
     pub args: usize,
     pub env: Vec<Value>,
     pub symbols: HashMap<String, usize>,
-    pub instrs: Vec<Instr>,
+    pub instrs: Vec<Span<Instr>>,
 }
 
 impl Block {
@@ -60,7 +60,7 @@ impl Block {
         self.symbols.insert(name, index);
     }
 
-    pub fn push_instr(&mut self, instr: Instr) {
+    pub fn push_instr(&mut self, instr: Span<Instr>) {
         self.instrs.push(instr);
     }
 

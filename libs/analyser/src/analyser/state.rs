@@ -77,7 +77,7 @@ impl State {
                 }
             };
 
-            ir.push_instr(instr);
+            ir.push_instr(instr_span.swap(instr));
         }
 
         ir
