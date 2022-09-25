@@ -4,7 +4,7 @@ use catastrophic_ast::{
 };
 use unic_emoji::char::is_emoji;
 
-use super::reader::Continuation;
+use super::{error::LexError, reader::Continuation};
 
 #[derive(Debug, Copy, Clone)]
 enum Mode {
@@ -204,5 +204,15 @@ impl State {
         }
 
         continuation
+    }
+
+    pub fn finish(mut self) -> Result<(), LexError> {
+        let start = self.start;
+        self.start.advance();
+
+        match self.mode {
+            Mode::String => Err(LexError::UnterminatedString(Span::new(start, self.start, ()))),
+            _ => Ok(()),
+        }
     }
 }

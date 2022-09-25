@@ -19,6 +19,6 @@ impl Lexer {
 
         reader.read(|span| state.process(span, &mut callback))?;
 
-        Ok(())
+        Ok(state.finish()?)
     }
 }
