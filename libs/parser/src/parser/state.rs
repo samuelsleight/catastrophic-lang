@@ -48,6 +48,12 @@ impl State {
         self.stack.push(span.swap(StackItem::Ident(ident)));
     }
 
+    fn process_string(&mut self, string: String, span: Span<()>) {
+        for char in string.chars().rev() {
+            self.stack.push(span.swap(StackItem::Number(char as u64)))
+        }
+    }
+
     fn process_command(&mut self, command: Command, span: Span<()>) {
         self.stack.push(span.swap(StackItem::Command(command)));
     }
@@ -201,6 +207,7 @@ impl State {
 
         match token.data {
             Token::Ident(ident) => self.process_ident(ident, span),
+            Token::String(string) => self.process_string(string, span),
             Token::Integer(value) => self.process_number(value, span),
             Token::Arrow => self.process_arrow(span),
             Token::Parens => self.process_command(Command::Call, span),

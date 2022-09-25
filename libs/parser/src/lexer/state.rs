@@ -11,6 +11,7 @@ enum Mode {
     Main,
     Comment,
     Ident,
+    String,
     Number,
     Minus,
     LParen,
@@ -76,6 +77,14 @@ impl State {
                 None
             }
 
+            '"' => {
+                self.start = input.start;
+                self.mode = Mode::String;
+
+                self.buffer.clear();
+                None
+            }
+
             '-' => {
                 self.start = input.start;
                 self.mode = Mode::Minus;
@@ -131,6 +140,19 @@ impl State {
         }
     }
 
+    fn process_string(&mut self, input: Span<char>) -> StateResult {
+        if input.data == '"' {
+            self.mode = Mode::Main;
+            (
+                Some(Span::new(self.start, input.end, Token::String(self.buffer.clone()))),
+                Continuation::Consume,
+            )
+        } else {
+            self.buffer.push(input.data);
+            (None, Continuation::Consume)
+        }
+    }
+
     fn process_number(&mut self, input: Span<char>) -> StateResult {
         if let c @ '0'..='9' = input.data {
             self.number *= 10;
@@ -167,6 +189,7 @@ impl State {
             Mode::Main => self.process_main(input),
             Mode::Comment => self.process_comment(input),
             Mode::Ident => self.process_ident(input),
+            Mode::String => self.process_string(input),
             Mode::Number => self.process_number(input),
             Mode::Minus => self.process_minus(input),
             Mode::LParen => self.process_lparen(input),
