@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
 pub use catastrophic_ast::ast::{Builtin, Command};
-use catastrophic_core::span::Span;
+use catastrophic_core::{defines::ValueType, span::Span};
 
 #[derive(Debug, Copy, Clone)]
 pub enum Value {
     Arg(usize),
     Block(usize),
-    Number(u64),
+    Number(ValueType),
     Builtin(Builtin),
 }
 

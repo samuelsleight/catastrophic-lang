@@ -4,7 +4,7 @@ use catastrophic_ast::{
     ast::{self, Command},
     token::Token,
 };
-use catastrophic_core::span::Span;
+use catastrophic_core::{defines::ValueType, span::Span};
 
 use super::{
     ast::{Builtin, InstrValue, Instruction, SymbolValue},
@@ -22,7 +22,7 @@ enum StackItem {
     OpenBlock,
     Command(Command),
     Ident(String),
-    Number(u64),
+    Number(ValueType),
     Builtin(Builtin),
     Label(String),
     Arg(String),
@@ -50,7 +50,7 @@ impl State {
 
     fn process_string(&mut self, string: String, span: Span<()>) {
         for char in string.chars().rev() {
-            self.stack.push(span.swap(StackItem::Number(char as u64)))
+            self.stack.push(span.swap(StackItem::Number(char as ValueType)))
         }
     }
 
@@ -58,7 +58,7 @@ impl State {
         self.stack.push(span.swap(StackItem::Command(command)));
     }
 
-    fn process_number(&mut self, value: u64, span: Span<()>) {
+    fn process_number(&mut self, value: ValueType, span: Span<()>) {
         match self.stack.pop() {
             Some(stack_item) => {
                 let item_span = stack_item.swap(());

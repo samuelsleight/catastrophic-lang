@@ -1,5 +1,8 @@
 use catastrophic_ast::token::Token;
-use catastrophic_core::span::{Location, Span};
+use catastrophic_core::{
+    defines::ValueType,
+    span::{Location, Span},
+};
 use unic_emoji::char::is_emoji;
 
 use super::{error::LexError, reader::Continuation};
@@ -17,7 +20,7 @@ enum Mode {
 
 pub struct State {
     buffer: String,
-    number: u64,
+    number: ValueType,
     mode: Mode,
     start: Location,
 }
@@ -62,7 +65,7 @@ impl State {
                 self.mode = Mode::Number;
 
                 self.number = 0;
-                self.number += c as u64 - '0' as u64;
+                self.number += c as ValueType - '0' as ValueType;
                 None
             }
 
@@ -156,7 +159,7 @@ impl State {
     fn process_number(&mut self, input: Span<char>) -> StateResult {
         if let c @ '0'..='9' = input.data {
             self.number *= 10;
-            self.number += c as u64 - '0' as u64;
+            self.number += c as ValueType - '0' as ValueType;
             (None, Continuation::Consume)
         } else {
             self.mode = Mode::Main;

@@ -1,6 +1,6 @@
 use std::io::{stdin, stdout, Read, Write};
 
-use catastrophic_core::span::Span;
+use catastrophic_core::{defines::ValueType, span::Span};
 use catastrophic_ir::ir::{self, Builtin, Command};
 
 use super::error::RuntimeError;
@@ -9,7 +9,7 @@ use super::error::RuntimeError;
 enum Value {
     Builtin(Builtin),
     Block(usize),
-    Number(i64),
+    Number(ValueType),
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -80,28 +80,28 @@ impl<'a> Env<'a> {
             }
             Builtin::LessThan => {
                 if let [Value::Number(a), Value::Number(b)] = args[..] {
-                    Ok(Value::Number(i64::from(a < b)))
+                    Ok(Value::Number(ValueType::from(a < b)))
                 } else {
                     Err(())
                 }
             }
             Builtin::GreaterThan => {
                 if let [Value::Number(a), Value::Number(b)] = args[..] {
-                    Ok(Value::Number(i64::from(a > b)))
+                    Ok(Value::Number(ValueType::from(a > b)))
                 } else {
                     Err(())
                 }
             }
             Builtin::Equals => {
                 if let [Value::Number(a), Value::Number(b)] = args[..] {
-                    Ok(Value::Number(i64::from(a == b)))
+                    Ok(Value::Number(ValueType::from(a == b)))
                 } else {
                     Err(())
                 }
             }
             Builtin::IfThenElse => {
                 if let [Value::Number(i), t, e] = args[..] {
-                    Ok(if i == i64::from(false) { e } else { t })
+                    Ok(if i == ValueType::from(false) { e } else { t })
                 } else {
                     Err(())
                 }
@@ -176,7 +176,7 @@ impl<'a> Env<'a> {
         stdout().flush().unwrap();
         let mut buffer = [b'\0'];
         stdin().read_exact(&mut buffer).unwrap();
-        self.stack.push(Value::Number(buffer[0] as char as i64));
+        self.stack.push(Value::Number(buffer[0] as char as ValueType));
         Ok(())
     }
 
@@ -203,7 +203,7 @@ impl<'a> Env<'a> {
                 ir::Instr::Push(value) => match value {
                     ir::Value::Arg(index) => self.stack.push(self.args[index]),
                     ir::Value::Block(index) => self.stack.push(Value::Block(index)),
-                    ir::Value::Number(value) => self.stack.push(Value::Number(value as i64)),
+                    ir::Value::Number(value) => self.stack.push(Value::Number(value)),
                     ir::Value::Builtin(builtin) => self.stack.push(Value::Builtin(builtin)),
                 },
             };

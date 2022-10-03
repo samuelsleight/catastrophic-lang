@@ -3,7 +3,7 @@ use std::{
     fmt::Display,
 };
 
-use catastrophic_core::span::Span;
+use catastrophic_core::{defines::ValueType, span::Span};
 
 #[derive(Debug, Copy, Clone)]
 pub enum Builtin {
@@ -26,7 +26,7 @@ pub enum Command {
 
 #[derive(Debug, Clone)]
 pub enum SymbolValue {
-    Number(u64),
+    Number(ValueType),
     Block(Block),
     Builtin(Builtin),
 }
@@ -39,7 +39,7 @@ pub struct Symbol {
 
 #[derive(Debug, Clone)]
 pub enum InstrValue {
-    Number(u64),
+    Number(ValueType),
     Ident(String),
     Block(Block),
     Builtin(Builtin),
