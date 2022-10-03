@@ -1,6 +1,7 @@
 use std::path::Path;
 
-use catastrophic_ast::{span::Span, token::Token};
+use catastrophic_ast::token::Token;
+use catastrophic_core::span::Span;
 
 use self::{reader::CharReader, state::State};
 

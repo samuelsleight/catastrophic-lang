@@ -1,4 +1,4 @@
 [package]
-name = "catastrophic-span"
+name = "catastrophic-core"
 version.workspace = true
 edition.workspace = true

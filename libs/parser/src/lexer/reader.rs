@@ -4,7 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use catastrophic_ast::span::{Location, Span};
+use catastrophic_core::span::{Location, Span};
 
 use super::error::Error;
 

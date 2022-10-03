@@ -1,9 +1,7 @@
 use std::io::{stdin, stdout, Read, Write};
 
-use catastrophic_ir::{
-    ir::{self, Builtin, Command},
-    span::Span,
-};
+use catastrophic_core::span::Span;
+use catastrophic_ir::ir::{self, Builtin, Command};
 
 use super::error::RuntimeError;
 

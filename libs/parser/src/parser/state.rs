@@ -2,9 +2,9 @@ use std::collections::hash_map::Entry;
 
 use catastrophic_ast::{
     ast::{self, Command},
-    span::Span,
     token::Token,
 };
+use catastrophic_core::span::Span;
 
 use super::{
     ast::{Builtin, InstrValue, Instruction, SymbolValue},

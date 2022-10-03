@@ -1,7 +1,5 @@
-use catastrophic_ast::{
-    span::{Location, Span},
-    token::Token,
-};
+use catastrophic_ast::token::Token;
+use catastrophic_core::span::{Location, Span};
 use unic_emoji::char::is_emoji;
 
 use super::{error::LexError, reader::Continuation};

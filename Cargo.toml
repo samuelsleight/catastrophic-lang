@@ -1,7 +1,6 @@
 [workspace]
 members = [
-    "libs/error", 
-    "libs/span", 
+    "libs/core", 
     "libs/parser", 
     "libs/ast", 
     "libs/analyser", 

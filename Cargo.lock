@@ -39,7 +39,7 @@ name = "catastrophic-analyser"
 version = "0.1.0"
 dependencies = [
  "catastrophic-ast",
- "catastrophic-error",
+ "catastrophic-core",
  "catastrophic-ir",
 ]
 
@@ -47,21 +47,18 @@ dependencies = [
 name = "catastrophic-ast"
 version = "0.1.0"
 dependencies = [
- "catastrophic-span",
+ "catastrophic-core",
 ]
 
 [[package]]
-name = "catastrophic-error"
+name = "catastrophic-core"
 version = "0.1.0"
-dependencies = [
- "catastrophic-span",
-]
 
 [[package]]
 name = "catastrophic-interpreter"
 version = "0.1.0"
 dependencies = [
- "catastrophic-error",
+ "catastrophic-core",
  "catastrophic-ir",
 ]
 
@@ -70,6 +67,7 @@ name = "catastrophic-ir"
 version = "0.1.0"
 dependencies = [
  "catastrophic-ast",
+ "catastrophic-core",
 ]
 
 [[package]]
@@ -77,13 +75,9 @@ name = "catastrophic-parser"
 version = "0.1.0"
 dependencies = [
  "catastrophic-ast",
- "catastrophic-error",
+ "catastrophic-core",
  "unic-emoji",
 ]
-
-[[package]]
-name = "catastrophic-span"
-version = "0.1.0"
 
 [[package]]
 name = "catastrophicc"
@@ -91,7 +85,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "catastrophic-analyser",
- "catastrophic-error",
+ "catastrophic-core",
  "catastrophic-interpreter",
  "catastrophic-parser",
  "paw",
@@ -139,9 +133,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.133"
+version = "0.2.134"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c0f80d65747a3e43d1596c7c5492d95d5edddaabd45a7fcdb02b95f644164966"
+checksum = "329c933548736bc49fd575ee68c89e8be4d260064184389a5b77517cddd99ffb"
 
 [[package]]
 name = "paw"
@@ -196,9 +190,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.44"
+version = "1.0.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7bd7356a8122b6c4a24a82b278680c73357984ca2fc79a0f9fa6dea7dced7c58"
+checksum = "94e2ef8dbfc347b10c094890f778ee2e36ca9bb4262e86dc99cd217e35f3470b"
 dependencies = [
  "unicode-ident",
 ]
@@ -245,9 +239,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.100"
+version = "1.0.101"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52205623b1b0f064a4e71182c3b18ae902267282930c6d5462c91b859668426e"
+checksum = "e90cde112c4b9690b8cbe810cba9ddd8bc1d7472e2cae317b69e9438c1cba7d2"
 dependencies = [
  "proc-macro2",
  "quote",

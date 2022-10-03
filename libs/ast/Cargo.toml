@@ -4,4 +4,4 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-catastrophic-span = { path = "../span" }
+catastrophic-core = { path = "../core" }

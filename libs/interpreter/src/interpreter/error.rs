@@ -1,7 +1,10 @@
 use std::io::{Read, Seek};
 
-use catastrophic_error::{context::ErrorProvider, writer::ErrorWriter};
-use catastrophic_ir::{ir::Builtin, span::Span};
+use catastrophic_core::{
+    error::{context::ErrorProvider, writer::ErrorWriter},
+    span::Span,
+};
+use catastrophic_ir::ir::Builtin;
 
 #[derive(Debug, Clone, Copy)]
 pub enum RuntimeError {

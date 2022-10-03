@@ -3,8 +3,10 @@ use std::{
     path::PathBuf,
 };
 
-use catastrophic_ast::span::Span;
-use catastrophic_error::{context::ErrorProvider, writer::ErrorWriter};
+use catastrophic_core::{
+    error::{context::ErrorProvider, writer::ErrorWriter},
+    span::Span,
+};
 
 #[derive(Debug)]
 pub enum Error {

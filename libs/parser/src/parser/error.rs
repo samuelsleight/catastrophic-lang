@@ -1,5 +1,7 @@
-use catastrophic_ast::span::Span;
-use catastrophic_error::context::ErrorProvider;
+use catastrophic_core::{
+    error::{context::ErrorProvider, writer::ErrorWriter},
+    span::Span,
+};
 
 use crate::lexer;
 
@@ -45,7 +47,7 @@ impl From<lexer::Error> for Error {
 }
 
 impl ErrorProvider for Error {
-    fn write_errors<R: std::io::Read + std::io::Seek>(&self, writer: &mut catastrophic_error::writer::ErrorWriter<R>) -> std::fmt::Result {
+    fn write_errors<R: std::io::Read + std::io::Seek>(&self, writer: &mut ErrorWriter<R>) -> std::fmt::Result {
         match self {
             Error::LexError(error) => error.write_errors(writer)?,
             Error::ParseErrors(errors) => {

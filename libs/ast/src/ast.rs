@@ -3,7 +3,7 @@ use std::{
     fmt::Display,
 };
 
-use catastrophic_span::span::Span;
+use catastrophic_core::span::Span;
 
 #[derive(Debug, Copy, Clone)]
 pub enum Builtin {

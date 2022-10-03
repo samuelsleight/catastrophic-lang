@@ -3,9 +3,9 @@ use std::{
     io::{Read, Seek},
 };
 
-use catastrophic_span::span::Span;
+use crate::span::Span;
 
-use crate::context::ErrorContext;
+use super::context::ErrorContext;
 
 pub struct ErrorWriter<'ctx, 'fmt, 'a, R: Read + Seek> {
     context: &'ctx mut ErrorContext<R>,

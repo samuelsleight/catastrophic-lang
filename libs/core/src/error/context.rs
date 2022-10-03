@@ -6,7 +6,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use crate::writer::ErrorWriter;
+use super::writer::ErrorWriter;
 
 pub struct ErrorContext<R: Read + Seek> {
     pub(crate) source: BufReader<R>,

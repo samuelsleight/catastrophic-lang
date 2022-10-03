@@ -5,4 +5,4 @@ edition.workspace = true
 
 [dependencies]
 catastrophic-ir = { path = "../ir" }
-catastrophic-error = { path = "../error" }
+catastrophic-core = { path = "../core" }

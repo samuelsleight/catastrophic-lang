@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 use catastrophic_analyser::analyser::Analyser;
-use catastrophic_error::context::{ErrorContext, PackagedError};
+use catastrophic_core::error::context::{ErrorContext, PackagedError};
 use catastrophic_interpreter::interpreter::Interpreter;
 use catastrophic_parser::parser::Parser;
 use structopt::StructOpt;
