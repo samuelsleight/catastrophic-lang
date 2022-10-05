@@ -142,6 +142,8 @@ impl State {
 
         let block = self.ir[index].clone();
 
+        let args: Vec<_> = (0..block.args).into_iter().map(|_| builder.build_call(&self.pop_fn, ())).collect();
+
         for instr in &block.instrs {
             match instr.data {
                 Instr::Command(command) => match command {
@@ -155,7 +157,7 @@ impl State {
                     catastrophic_ir::ir::Command::InputNumber => (),
                 },
                 Instr::Push(value) => match value {
-                    Value::Arg(arg) => (),
+                    Value::Arg(arg) => builder.build_call(&self.push_fn, (args[arg],)),
                     Value::Number(number) => builder.build_call(&self.push_fn, (llvm::Value::constant(number),)),
                     Value::Block(index) => {
                         let index = self.queue_function(FunctionKey::Block(index)).index as i64;
