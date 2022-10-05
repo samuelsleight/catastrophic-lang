@@ -4,6 +4,6 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-catastrophic-ast = { path = "../ast" }
-catastrophic-ir = { path = "../ir" }
-catastrophic-core = { path = "../core" }
+catastrophic-ast.workspace = true
+catastrophic-ir.workspace = true
+catastrophic-core.workspace = true

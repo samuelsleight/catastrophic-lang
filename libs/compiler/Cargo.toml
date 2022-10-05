@@ -5,5 +5,5 @@ edition.workspace = true
 
 [dependencies]
 dragon-tamer.workspace = true
-catastrophic-core = { path = "../core" }
-catastrophic-ir = { path = "../ir" }
+catastrophic-core.workspace = true
+catastrophic-ir.workspace = true

@@ -16,11 +16,16 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace.dependencies]
+catastrophic-core = { path = "libs/core" }
+catastrophic-parser = { path = "libs/parser" }
+catastrophic-ast = { path = "libs/ast" }
+catastrophic-analyser = { path = "libs/analyser" }
+catastrophic-ir = { path = "libs/ir" }
+catastrophic-interpreter = { path = "libs/interpreter" }
+catastrophic-compiler = { path = "libs/compiler" }
+
 anyhow = "1.0.65"
 paw = "1.0.0"
 structopt = { version = "0.3.26", features = ["paw"] }
 dragon-tamer = { git = "https://github.com/samuelsleight/dragon-tamer" }
-
-[workspace.dependencies.unic-emoji]
-git = "https://github.com/eyeplum/rust-unic/"
-branch = "develop"
+unic-emoji = { git = "https://github.com/eyeplum/rust-unic/", branch = "develop" }

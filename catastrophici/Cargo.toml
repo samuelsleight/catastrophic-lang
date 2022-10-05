@@ -7,7 +7,7 @@ edition.workspace = true
 anyhow.workspace = true
 paw.workspace = true
 structopt.workspace = true
-catastrophic-core = { path = "../libs/core" }
-catastrophic-parser = { path = "../libs/parser" }
-catastrophic-analyser = { path = "../libs/analyser" }
-catastrophic-interpreter = { path = "../libs/interpreter" }
+catastrophic-core.workspace = true
+catastrophic-parser.workspace = true
+catastrophic-analyser.workspace = true
+catastrophic-interpreter.workspace = true

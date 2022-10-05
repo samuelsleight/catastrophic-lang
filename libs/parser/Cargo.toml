@@ -5,5 +5,5 @@ edition.workspace = true
 
 [dependencies]
 unic-emoji.workspace = true
-catastrophic-ast = { path = "../ast" }
-catastrophic-core = { path = "../core" }
+catastrophic-ast.workspace = true
+catastrophic-core.workspace = true
