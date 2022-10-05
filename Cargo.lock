@@ -3,6 +3,15 @@
 version = 3
 
 [[package]]
+name = "aho-corasick"
+version = "0.7.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4f55bd91a0978cbfd91c457a164bab8b4001c833b7f323132c0a4e1922dd44e"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "ansi_term"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -51,6 +60,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "catastrophic-compiler"
+version = "0.1.0"
+dependencies = [
+ "catastrophic-core",
+ "catastrophic-ir",
+ "dragon-tamer",
+]
+
+[[package]]
 name = "catastrophic-core"
 version = "0.1.0"
 
@@ -80,6 +98,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "catastrophicc"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "catastrophic-analyser",
+ "catastrophic-compiler",
+ "catastrophic-core",
+ "catastrophic-parser",
+ "paw",
+ "structopt",
+]
+
+[[package]]
 name = "catastrophici"
 version = "0.1.0"
 dependencies = [
@@ -91,6 +122,12 @@ dependencies = [
  "paw",
  "structopt",
 ]
+
+[[package]]
+name = "cc"
+version = "1.0.73"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2fff2a6927b3bb87f9595d67196a70493f627687a71d87a0d692242c33f58c11"
 
 [[package]]
 name = "clap"
@@ -105,6 +142,14 @@ dependencies = [
  "textwrap",
  "unicode-width",
  "vec_map",
+]
+
+[[package]]
+name = "dragon-tamer"
+version = "0.1.0"
+source = "git+https://github.com/samuelsleight/dragon-tamer#541c636bc6a4627e2b5035d6456790842af0a033"
+dependencies = [
+ "llvm-sys",
 ]
 
 [[package]]
@@ -136,6 +181,25 @@ name = "libc"
 version = "0.2.134"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "329c933548736bc49fd575ee68c89e8be4d260064184389a5b77517cddd99ffb"
+
+[[package]]
+name = "llvm-sys"
+version = "140.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b9eda9cc6f86672152125b1e112d66ab8797b7917fb202e2faee912caa76413"
+dependencies = [
+ "cc",
+ "lazy_static",
+ "libc",
+ "regex",
+ "semver",
+]
+
+[[package]]
+name = "memchr"
+version = "2.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
 
 [[package]]
 name = "paw"
@@ -205,6 +269,29 @@ checksum = "bbe448f377a7d6961e30f5955f9b8d106c3f5e449d493ee1b125c1d43c2b5179"
 dependencies = [
  "proc-macro2",
 ]
+
+[[package]]
+name = "regex"
+version = "1.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4c4eb3267174b8c6c2f654116623910a0fef09c4753f8dd83db29c48a0df988b"
+dependencies = [
+ "aho-corasick",
+ "memchr",
+ "regex-syntax",
+]
+
+[[package]]
+name = "regex-syntax"
+version = "0.6.27"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
+
+[[package]]
+name = "semver"
+version = "1.0.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e25dfac463d778e353db5be2449d1cce89bd6fd23c9f1ea21310ce6e5a1b29c4"
 
 [[package]]
 name = "strsim"

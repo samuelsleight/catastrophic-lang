@@ -1,0 +1,13 @@
+[package]
+name = "catastrophicc"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+paw.workspace = true
+structopt.workspace = true
+catastrophic-core = { path = "../libs/core" }
+catastrophic-parser = { path = "../libs/parser" }
+catastrophic-analyser = { path = "../libs/analyser" }
+catastrophic-compiler = { path = "../libs/compiler" }

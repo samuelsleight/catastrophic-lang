@@ -5,7 +5,7 @@ use std::{
 
 use catastrophic_core::{defines::ValueType, span::Span};
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Builtin {
     Plus,
     Minus,
