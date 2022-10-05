@@ -6,7 +6,7 @@ members = [
     "libs/analyser", 
     "libs/ir", 
     "libs/interpreter", 
-    "catastrophicc"
+    "catastrophici"
 ]
 
 [workspace.package]
