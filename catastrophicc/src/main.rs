@@ -24,7 +24,7 @@ fn main(args: Args) -> Result<()> {
         .map_err(|err| PackagedError::new(error_context.clone(), err))
         .with_context(|| "Unable to compile input")?;
 
-    Compiler::compile(ir.clone());
+    Compiler::compile(ir);
 
     Ok(())
 }

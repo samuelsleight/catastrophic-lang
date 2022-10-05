@@ -1,6 +1,6 @@
 use std::collections::{btree_map::Entry, BTreeMap};
 
-use catastrophic_ir::ir::{Block, Builtin, Instr, Value};
+use catastrophic_ir::ir::{Block, Builtin, Command, Instr, Value};
 use dragon_tamer::{self as llvm, Builder};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -147,14 +147,14 @@ impl State {
         for instr in &block.instrs {
             match instr.data {
                 Instr::Command(command) => match command {
-                    catastrophic_ir::ir::Command::Call => {
+                    Command::Call => {
                         let index = builder.build_call(&self.pop_fn, ());
                         builder.build_call(&self.call_fn, (index,));
                     }
-                    catastrophic_ir::ir::Command::OutputChar => (),
-                    catastrophic_ir::ir::Command::OutputNumber => (),
-                    catastrophic_ir::ir::Command::InputChar => (),
-                    catastrophic_ir::ir::Command::InputNumber => (),
+                    Command::OutputChar => (),
+                    Command::OutputNumber => (),
+                    Command::InputChar => (),
+                    Command::InputNumber => (),
                 },
                 Instr::Push(value) => match value {
                     Value::Arg(arg) => builder.build_call(&self.push_fn, (args[arg],)),
