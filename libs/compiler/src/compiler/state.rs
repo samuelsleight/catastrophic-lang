@@ -124,15 +124,43 @@ impl State {
                 let y = builder.build_call(&self.pop_fn, ());
                 let result = builder.build_add(&x, &y);
                 builder.build_call(&self.push_fn, (result,));
+                builder.build_void_ret();
             }
-            Builtin::Minus => todo!(),
-            Builtin::Equals => todo!(),
+            Builtin::Minus => {
+                let x = builder.build_call(&self.pop_fn, ());
+                let y = builder.build_call(&self.pop_fn, ());
+                let result = builder.build_sub(&x, &y);
+                builder.build_call(&self.push_fn, (result,));
+                builder.build_void_ret();
+            }
+            Builtin::Equals => {
+                let x = builder.build_call(&self.pop_fn, ());
+                let y = builder.build_call(&self.pop_fn, ());
+                let result = builder.build_eq(&x, &y);
+                builder.build_call(&self.push_fn, (result,));
+                builder.build_void_ret();
+            }
             Builtin::GreaterThan => todo!(),
             Builtin::LessThan => todo!(),
-            Builtin::IfThenElse => todo!(),
-        };
+            Builtin::IfThenElse => {
+                let v = builder.build_call(&self.pop_fn, ());
+                let i = builder.build_call(&self.pop_fn, ());
+                let e = builder.build_call(&self.pop_fn, ());
 
-        builder.build_void_ret();
+                let then_block = self.functions[&FunctionKey::Builtin(builtin)].value.add_block("then");
+                let else_block = self.functions[&FunctionKey::Builtin(builtin)].value.add_block("else");
+
+                builder.build_conditional_jump(&v, &else_block, &then_block);
+
+                builder.set_block(&then_block);
+                builder.build_call(&self.push_fn, (i,));
+                builder.build_void_ret();
+
+                builder.set_block(&else_block);
+                builder.build_call(&self.push_fn, (e,));
+                builder.build_void_ret();
+            }
+        };
     }
 
     fn compile_block(&mut self, block_index: usize) {
