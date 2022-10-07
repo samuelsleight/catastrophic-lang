@@ -12,6 +12,7 @@ enum FunctionKey {
 #[derive(Copy, Clone)]
 struct Function {
     index: usize,
+    offset: usize,
     value: llvm::Function<fn()>,
 }
 
@@ -22,7 +23,7 @@ pub struct State {
     module: llvm::Module,
     pop_fn: llvm::Function<fn() -> i64>,
     push_fn: llvm::Function<fn(i64)>,
-    call_fn: llvm::Function<fn(i64)>,
+    call_fn: llvm::Function<fn(i64) -> (fn(), i64)>,
     stack: llvm::Value<*mut [i64; 256]>,
     index: llvm::Value<*mut u32>,
     functions: BTreeMap<FunctionKey, Function>,
@@ -48,8 +49,8 @@ impl FunctionKey {
 }
 
 impl Function {
-    pub fn new(index: usize, value: llvm::Function<fn()>) -> Self {
-        Self { index, value }
+    pub fn new(index: usize, offset: usize, value: llvm::Function<fn()>) -> Self {
+        Self { index, offset, value }
     }
 }
 
@@ -134,22 +135,49 @@ impl State {
         builder.build_void_ret();
     }
 
-    fn compile_block(&mut self, index: usize) {
+    fn compile_block(&mut self, block_index: usize) {
         let builder = Builder::new();
 
-        let entry = self.functions[&FunctionKey::Block(index)].value.add_block("entry");
+        let mut entry = self.functions[&FunctionKey::Block(block_index)].value.add_block("entry");
         builder.set_block(&entry);
 
-        let block = self.ir[index].clone();
+        let block = self.ir[block_index].clone();
 
-        let args: Vec<_> = (0..block.args).into_iter().map(|_| builder.build_call(&self.pop_fn, ())).collect();
+        let args: Vec<_> = (0..block.args + block.offset)
+            .into_iter()
+            .map(|_| builder.build_call(&self.pop_fn, ()))
+            .collect();
 
         for instr in &block.instrs {
             match instr.data {
                 Instr::Command(command) => match command {
                     Command::Call => {
                         let index = builder.build_call(&self.pop_fn, ());
-                        builder.build_call(&self.call_fn, (index,));
+                        let (f, offset) = builder.build_call(&self.call_fn, (index,));
+
+                        let cont = self.functions[&FunctionKey::Block(block_index)].value.add_block("cont");
+
+                        let mut last_block = cont;
+
+                        let mut table = builder.build_jump_table(&offset, &cont);
+
+                        for (i, arg) in args.iter().enumerate() {
+                            let new_block = self.functions[&FunctionKey::Block(block_index)].value.add_block(&format!("block_{}", i));
+                            builder.set_block(&new_block);
+                            builder.build_call(&self.push_fn, (*arg,));
+                            builder.build_jump(&last_block);
+
+                            table = table.case(&llvm::Value::constant((i + 1) as i64), &new_block);
+                            last_block = new_block;
+                        }
+
+                        builder.set_block(&entry);
+                        table.finish();
+
+                        entry = cont;
+
+                        builder.set_block(&entry);
+                        builder.build_call(&f, ());
                     }
                     Command::OutputChar => (),
                     Command::OutputNumber => (),
@@ -187,8 +215,14 @@ impl State {
         match self.functions.entry(function) {
             Entry::Vacant(entry) => {
                 self.queue.push(function);
+
                 let llvm_function = self.module.add_function(function.llvm_name());
-                *entry.insert(Function::new(count, llvm_function))
+                let offset = match function {
+                    FunctionKey::Builtin(_) => 0,
+                    FunctionKey::Block(idx) => self.ir[idx].offset,
+                };
+
+                *entry.insert(Function::new(count, offset, llvm_function))
             }
             Entry::Occupied(occupied) => *occupied.get(),
         }
@@ -207,15 +241,16 @@ impl State {
             .map(|(_, f)| {
                 let block = self.call_fn.add_block(&format!("block_{}", f.index));
                 builder.set_block(&block);
-                builder.build_call(&f.value, ());
-                builder.build_void_ret();
+                let value = builder.build_struct(&f.value.as_value(), &llvm::Value::constant(f.offset as i64));
+                let value = builder.build_load(&value);
+                builder.build_ret(&value);
                 (f.index, block)
             })
             .collect();
 
         let default = self.call_fn.add_block("default");
         builder.set_block(&default);
-        builder.build_void_ret();
+        builder.build_unreachable();
 
         builder.set_block(&entry);
         let mut table = builder.build_jump_table(&value, &default);
