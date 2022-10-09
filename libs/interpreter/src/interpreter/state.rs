@@ -47,7 +47,9 @@ impl Stack {
     }
 
     pub fn pop(&mut self) -> Value {
-        self.stack.pop().unwrap_or(Value::Number(0))
+        self.stack
+            .pop()
+            .unwrap_or(Value::Number(0))
     }
 }
 
@@ -176,7 +178,8 @@ impl<'a> Env<'a> {
         stdout().flush().unwrap();
         let mut buffer = [b'\0'];
         stdin().read_exact(&mut buffer).unwrap();
-        self.stack.push(Value::Number(buffer[0] as char as ValueType));
+        self.stack
+            .push(Value::Number(buffer[0] as char as ValueType));
         Ok(())
     }
 
@@ -185,12 +188,17 @@ impl<'a> Env<'a> {
         stdout().flush().unwrap();
         let mut buffer = String::new();
         stdin().read_line(&mut buffer).unwrap();
-        self.stack.push(Value::Number(buffer.trim().parse().unwrap()));
+        self.stack
+            .push(Value::Number(buffer.trim().parse().unwrap()));
         Ok(())
     }
 
     fn run(&mut self) -> Result<(), RuntimeError> {
-        while let Some(instr) = self.blocks.get(self.block).and_then(|block| block.instrs.get(self.instr)) {
+        while let Some(instr) = self
+            .blocks
+            .get(self.block)
+            .and_then(|block| block.instrs.get(self.instr))
+        {
             let instr_span = instr.swap(());
             match instr.data {
                 ir::Instr::Command(command) => match command {

@@ -38,12 +38,18 @@ impl State {
     }
 
     fn queue_block(&mut self, block: ast::Block, parent: usize) -> usize {
-        self.queue.push_front(QueuedBlock::new_with_parent(block, parent));
+        self.queue
+            .push_front(QueuedBlock::new_with_parent(block, parent));
         self.queue.len() + self.ir.len()
     }
 
     fn analyse_block(&mut self, block: QueuedBlock, index: usize) -> ir::Block {
-        let mut ir = ir::Block::new(block.block.args, block.parent.map(|index| &self.ir[index]));
+        let mut ir = ir::Block::new(
+            block.block.args,
+            block
+                .parent
+                .map(|index| &self.ir[index]),
+        );
 
         for (name, symbol) in block.block.symbols {
             let symbol = match symbol.value.data {
@@ -68,7 +74,8 @@ impl State {
                             if let Some(value) = ir.lookup_symbol(name) {
                                 value
                             } else {
-                                self.errors.push(CompileError::UndefinedSymbolError(instr_span.swap(name.clone())));
+                                self.errors
+                                    .push(CompileError::UndefinedSymbolError(instr_span.swap(name.clone())));
                                 ir::Value::Number(0)
                             }
                         }

@@ -47,8 +47,12 @@ impl Block {
         );
 
         for (index, arg) in args.into_iter().enumerate() {
-            block.symbols.insert(arg.data, block.env.len());
-            block.env.push(Value::Arg(block.offset + index));
+            block
+                .symbols
+                .insert(arg.data, block.env.len());
+            block
+                .env
+                .push(Value::Arg(block.offset + index));
         }
 
         block
@@ -66,6 +70,8 @@ impl Block {
 
     #[must_use]
     pub fn lookup_symbol(&self, name: &String) -> Option<Value> {
-        self.symbols.get(name).map(|index| self.env[*index])
+        self.symbols
+            .get(name)
+            .map(|index| self.env[*index])
     }
 }

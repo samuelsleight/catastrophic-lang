@@ -22,7 +22,9 @@ impl<'ctx, 'fmt, 'a, R: Read + Seek> ErrorWriter<'ctx, 'fmt, 'a, R> {
             write!(
                 self.fmt,
                 "\n\t> {}\n\t> ",
-                self.context.line(span.start.line).map_err(|_| std::fmt::Error::default())?,
+                self.context
+                    .line(span.start.line)
+                    .map_err(|_| std::fmt::Error::default())?,
             )?;
 
             for _ in 0..span.start.col {
