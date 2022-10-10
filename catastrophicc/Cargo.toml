@@ -10,4 +10,5 @@ structopt.workspace = true
 catastrophic-core.workspace = true
 catastrophic-parser.workspace = true
 catastrophic-analyser.workspace = true
+catastrophic-hir-optimizer.workspace = true
 catastrophic-compiler.workspace = true

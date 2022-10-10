@@ -81,6 +81,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "catastrophic-hir-optimizer"
+version = "0.1.0"
+dependencies = [
+ "catastrophic-core",
+ "catastrophic-hir",
+ "catastrophic-mir",
+]
+
+[[package]]
 name = "catastrophic-interpreter"
 version = "0.1.0"
 dependencies = [
@@ -113,6 +122,7 @@ dependencies = [
  "catastrophic-analyser",
  "catastrophic-compiler",
  "catastrophic-core",
+ "catastrophic-hir-optimizer",
  "catastrophic-parser",
  "paw",
  "structopt",
@@ -155,7 +165,7 @@ dependencies = [
 [[package]]
 name = "dragon-tamer"
 version = "0.2.0"
-source = "git+https://github.com/samuelsleight/dragon-tamer#365c1e946390b80dab792f7620a9d264d2799b4c"
+source = "git+https://github.com/samuelsleight/dragon-tamer#176d6867523c899ae4f8cb9d86e3c7bb79e03e69"
 dependencies = [
  "llvm-sys",
 ]

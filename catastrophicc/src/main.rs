@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 use catastrophic_analyser::analyser::Analyser;
 use catastrophic_compiler::compiler::Compiler;
 use catastrophic_core::error::context::{ErrorContext, PackagedError};
+use catastrophic_hir_optimizer::optimizer::Optimizer;
 use catastrophic_parser::parser::Parser;
 use structopt::StructOpt;
 
@@ -20,11 +21,13 @@ fn main(args: Args) -> Result<()> {
         .map_err(|err| PackagedError::new(error_context.clone(), err))
         .with_context(|| "Unable to parse input")?;
 
-    let ir = Analyser::analyse_ast(ast)
+    let hir = Analyser::analyse_ast(ast)
         .map_err(|err| PackagedError::new(error_context.clone(), err))
         .with_context(|| "Unable to compile input")?;
 
-    Compiler::compile(ir);
+    let mir = Optimizer::optimize_hir(hir);
+
+    Compiler::compile(mir);
 
     Ok(())
 }
