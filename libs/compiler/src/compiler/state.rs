@@ -147,7 +147,15 @@ impl State {
                     .build_void_ret();
             }
             Builtin::GreaterThan => todo!(),
-            Builtin::LessThan => todo!(),
+            Builtin::LessThan => {
+                let (x, builder) = builder.build_call(&self.pop_fn, ());
+                let (y, builder) = builder.build_call(&self.pop_fn, ());
+                let (result, builder) = builder.build_lt(&x, &y);
+                builder
+                    .build_call(&self.push_fn, (result,))
+                    .1
+                    .build_void_ret();
+            }
             Builtin::IfThenElse => {
                 let (value, builder) = builder.build_call(&self.pop_fn, ());
                 let (then_result, builder) = builder.build_call(&self.pop_fn, ());
