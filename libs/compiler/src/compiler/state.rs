@@ -1,6 +1,6 @@
 use std::collections::{btree_map::Entry, BTreeMap};
 
-use catastrophic_mir::mir::{Block, Builtin, Command, Instr, Value};
+use catastrophic_mir::mir::{Block, Builtin, Command, Function, Instr, Value};
 use dragon_tamer as llvm;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -10,7 +10,7 @@ enum FunctionKey {
 }
 
 #[derive(Copy, Clone)]
-struct Function {
+struct FunctionInfo {
     index: usize,
     offset: usize,
     value: llvm::Function<fn()>,
@@ -26,10 +26,16 @@ pub struct State {
     call_fn: llvm::Function<fn(i64) -> (fn(), i64)>,
     stack: llvm::Value<*mut [i64; 256]>,
     index: llvm::Value<*mut u32>,
-    functions: BTreeMap<FunctionKey, Function>,
+    functions: BTreeMap<FunctionKey, FunctionInfo>,
 }
 
 impl FunctionKey {
+    fn from_function(function: &Function) -> Self {
+        match function {
+            Function::Block(index) => FunctionKey::Block(*index),
+            Function::Builtin(builtin) => FunctionKey::Builtin(*builtin),
+        }
+    }
     fn llvm_name(&self) -> String {
         match self {
             FunctionKey::Builtin(builtin) => format!(
@@ -48,7 +54,7 @@ impl FunctionKey {
     }
 }
 
-impl Function {
+impl FunctionInfo {
     pub fn new(index: usize, offset: usize, value: llvm::Function<fn()>) -> Self {
         Self { index, offset, value }
     }
@@ -254,23 +260,28 @@ impl State {
                             .build_call(&self.push_fn, (llvm::Value::constant(number),))
                             .1
                     }
-                    Value::Block(index) => {
+                    Value::Function(function) => {
                         let index = self
-                            .queue_function(FunctionKey::Block(index))
-                            .index as i64;
-                        block_builder = block_builder
-                            .build_call(&self.push_fn, (llvm::Value::constant(index),))
-                            .1;
-                    }
-                    Value::Builtin(builtin) => {
-                        let index = self
-                            .queue_function(FunctionKey::Builtin(builtin))
+                            .queue_function(FunctionKey::from_function(&function))
                             .index as i64;
                         block_builder = block_builder
                             .build_call(&self.push_fn, (llvm::Value::constant(index),))
                             .1;
                     }
                 },
+                Instr::ImmediateCall(function) => {
+                    let info = self.queue_function(FunctionKey::from_function(&function));
+
+                    for arg in args.iter().take(info.offset) {
+                        block_builder = block_builder
+                            .build_call(&self.push_fn, (*arg,))
+                            .1;
+                    }
+
+                    block_builder = block_builder
+                        .build_call(&info.value, ())
+                        .1;
+                }
             }
         }
 
@@ -284,7 +295,7 @@ impl State {
         }
     }
 
-    fn queue_function(&mut self, function: FunctionKey) -> Function {
+    fn queue_function(&mut self, function: FunctionKey) -> FunctionInfo {
         let count = self.functions.len();
 
         match self.functions.entry(function) {
@@ -299,7 +310,7 @@ impl State {
                     FunctionKey::Block(idx) => self.ir[idx].offset,
                 };
 
-                *entry.insert(Function::new(count, offset, llvm_function))
+                *entry.insert(FunctionInfo::new(count, offset, llvm_function))
             }
             Entry::Occupied(occupied) => *occupied.get(),
         }

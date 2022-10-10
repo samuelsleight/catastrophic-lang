@@ -52,8 +52,8 @@ impl State {
         for (name, symbol) in block.block.symbols {
             let symbol = match symbol.value.data {
                 ast::SymbolValue::Number(value) => hir::Value::Number(value),
-                ast::SymbolValue::Block(block) => hir::Value::Block(self.queue_block(block, index)),
-                ast::SymbolValue::Builtin(builtin) => hir::Value::Builtin(builtin),
+                ast::SymbolValue::Block(block) => hir::Value::Function(hir::Function::Block(self.queue_block(block, index))),
+                ast::SymbolValue::Builtin(builtin) => hir::Value::Function(hir::Function::Builtin(builtin)),
             };
 
             ir.push_symbol(name, symbol);
@@ -66,8 +66,8 @@ impl State {
                 ast::Instruction::Push(value) => {
                     let value = match value {
                         ast::InstrValue::Number(value) => hir::Value::Number(value),
-                        ast::InstrValue::Block(block) => hir::Value::Block(self.queue_block(block, index)),
-                        ast::InstrValue::Builtin(builtin) => hir::Value::Builtin(builtin),
+                        ast::InstrValue::Block(block) => hir::Value::Function(hir::Function::Block(self.queue_block(block, index))),
+                        ast::InstrValue::Builtin(builtin) => hir::Value::Function(hir::Function::Builtin(builtin)),
                         ast::InstrValue::Ident(ref name) => {
                             if let Some(value) = ir.lookup_symbol(name) {
                                 value

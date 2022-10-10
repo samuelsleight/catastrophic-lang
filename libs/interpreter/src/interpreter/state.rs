@@ -210,9 +210,11 @@ impl<'a> Env<'a> {
                 },
                 hir::Instr::Push(value) => match value {
                     hir::Value::Arg(index) => self.stack.push(self.args[index]),
-                    hir::Value::Block(index) => self.stack.push(Value::Block(index)),
                     hir::Value::Number(value) => self.stack.push(Value::Number(value)),
-                    hir::Value::Builtin(builtin) => self.stack.push(Value::Builtin(builtin)),
+                    hir::Value::Function(function) => match function {
+                        hir::Function::Builtin(builtin) => self.stack.push(Value::Builtin(builtin)),
+                        hir::Function::Block(index) => self.stack.push(Value::Block(index)),
+                    },
                 },
             };
 

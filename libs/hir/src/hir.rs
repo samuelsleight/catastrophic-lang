@@ -4,11 +4,16 @@ pub use catastrophic_ast::ast::{Builtin, Command};
 use catastrophic_core::{defines::ValueType, span::Span};
 
 #[derive(Debug, Copy, Clone)]
+pub enum Function {
+    Block(usize),
+    Builtin(Builtin),
+}
+
+#[derive(Debug, Copy, Clone)]
 pub enum Value {
     Arg(usize),
-    Block(usize),
     Number(ValueType),
-    Builtin(Builtin),
+    Function(Function),
 }
 
 #[derive(Debug, Copy, Clone)]
