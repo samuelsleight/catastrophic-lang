@@ -6,6 +6,7 @@ members = [
     "libs/analyser", 
     "libs/hir", 
     "libs/interpreter", 
+    "libs/mir", 
     "libs/compiler", 
     "catastrophici",
     "catastrophicc"
@@ -22,6 +23,7 @@ catastrophic-ast = { path = "libs/ast" }
 catastrophic-analyser = { path = "libs/analyser" }
 catastrophic-hir = { path = "libs/hir" }
 catastrophic-interpreter = { path = "libs/interpreter" }
+catastrophic-mir = { path = "libs/mir" }
 catastrophic-compiler = { path = "libs/compiler" }
 
 anyhow = "1.0.65"

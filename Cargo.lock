@@ -64,7 +64,7 @@ name = "catastrophic-compiler"
 version = "0.1.0"
 dependencies = [
  "catastrophic-core",
- "catastrophic-hir",
+ "catastrophic-mir",
  "dragon-tamer",
 ]
 
@@ -82,6 +82,14 @@ dependencies = [
 
 [[package]]
 name = "catastrophic-interpreter"
+version = "0.1.0"
+dependencies = [
+ "catastrophic-core",
+ "catastrophic-hir",
+]
+
+[[package]]
+name = "catastrophic-mir"
 version = "0.1.0"
 dependencies = [
  "catastrophic-core",

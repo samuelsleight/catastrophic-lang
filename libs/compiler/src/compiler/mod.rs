@@ -1,4 +1,4 @@
-use catastrophic_hir::hir::Block;
+use catastrophic_mir::mir::Block;
 
 use self::state::State;
 

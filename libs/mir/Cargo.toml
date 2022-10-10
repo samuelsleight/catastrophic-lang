@@ -1,9 +1,8 @@
 [package]
-name = "catastrophic-compiler"
+name = "catastrophic-mir"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
-dragon-tamer.workspace = true
+catastrophic-hir.workspace = true
 catastrophic-core.workspace = true
-catastrophic-mir.workspace = true
