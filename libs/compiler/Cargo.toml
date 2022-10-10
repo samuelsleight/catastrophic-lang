@@ -6,4 +6,4 @@ edition.workspace = true
 [dependencies]
 dragon-tamer.workspace = true
 catastrophic-core.workspace = true
-catastrophic-ir.workspace = true
+catastrophic-hir.workspace = true

@@ -4,7 +4,7 @@ members = [
     "libs/parser", 
     "libs/ast", 
     "libs/analyser", 
-    "libs/ir", 
+    "libs/hir", 
     "libs/interpreter", 
     "libs/compiler", 
     "catastrophici",
@@ -20,7 +20,7 @@ catastrophic-core = { path = "libs/core" }
 catastrophic-parser = { path = "libs/parser" }
 catastrophic-ast = { path = "libs/ast" }
 catastrophic-analyser = { path = "libs/analyser" }
-catastrophic-ir = { path = "libs/ir" }
+catastrophic-hir = { path = "libs/hir" }
 catastrophic-interpreter = { path = "libs/interpreter" }
 catastrophic-compiler = { path = "libs/compiler" }
 

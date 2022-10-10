@@ -1,7 +1,7 @@
 use std::io::{stdin, stdout, Read, Write};
 
 use catastrophic_core::{defines::ValueType, span::Span};
-use catastrophic_ir::ir::{self, Builtin, Command};
+use catastrophic_hir::hir::{self, Builtin, Command};
 
 use super::error::RuntimeError;
 
@@ -24,7 +24,7 @@ struct Stack {
 }
 
 struct Env<'a> {
-    blocks: &'a [ir::Block],
+    blocks: &'a [hir::Block],
     stack: &'a mut Stack,
     args: Vec<Value>,
     block: usize,
@@ -33,7 +33,7 @@ struct Env<'a> {
 
 #[derive(Debug, Clone)]
 pub struct State {
-    blocks: Vec<ir::Block>,
+    blocks: Vec<hir::Block>,
     stack: Stack,
 }
 
@@ -54,7 +54,7 @@ impl Stack {
 }
 
 impl<'a> Env<'a> {
-    fn new(blocks: &'a [ir::Block], stack: &'a mut Stack, args: Vec<Value>, block: usize) -> Self {
+    fn new(blocks: &'a [hir::Block], stack: &'a mut Stack, args: Vec<Value>, block: usize) -> Self {
         Self {
             blocks,
             stack,
@@ -201,18 +201,18 @@ impl<'a> Env<'a> {
         {
             let instr_span = instr.swap(());
             match instr.data {
-                ir::Instr::Command(command) => match command {
+                hir::Instr::Command(command) => match command {
                     Command::Call => self.call_instr(instr_span)?,
                     Command::OutputChar => self.output_char_instr(instr_span)?,
                     Command::OutputNumber => self.output_number_instr(instr_span)?,
                     Command::InputChar => self.input_char_instr()?,
                     Command::InputNumber => self.input_number_instr()?,
                 },
-                ir::Instr::Push(value) => match value {
-                    ir::Value::Arg(index) => self.stack.push(self.args[index]),
-                    ir::Value::Block(index) => self.stack.push(Value::Block(index)),
-                    ir::Value::Number(value) => self.stack.push(Value::Number(value)),
-                    ir::Value::Builtin(builtin) => self.stack.push(Value::Builtin(builtin)),
+                hir::Instr::Push(value) => match value {
+                    hir::Value::Arg(index) => self.stack.push(self.args[index]),
+                    hir::Value::Block(index) => self.stack.push(Value::Block(index)),
+                    hir::Value::Number(value) => self.stack.push(Value::Number(value)),
+                    hir::Value::Builtin(builtin) => self.stack.push(Value::Builtin(builtin)),
                 },
             };
 
@@ -224,7 +224,7 @@ impl<'a> Env<'a> {
 }
 
 impl State {
-    pub fn new(blocks: Vec<ir::Block>) -> Self {
+    pub fn new(blocks: Vec<hir::Block>) -> Self {
         Self { blocks, stack: Stack::new() }
     }
 

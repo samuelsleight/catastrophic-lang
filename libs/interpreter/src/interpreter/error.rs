@@ -4,7 +4,7 @@ use catastrophic_core::{
     error::{context::ErrorProvider, writer::ErrorWriter},
     span::Span,
 };
-use catastrophic_ir::ir::Builtin;
+use catastrophic_hir::hir::Builtin;
 
 #[derive(Debug, Clone, Copy)]
 pub enum RuntimeError {

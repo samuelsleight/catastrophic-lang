@@ -1,5 +1,5 @@
 [package]
-name = "catastrophic-ir"
+name = "catastrophic-hir"
 version.workspace = true
 edition.workspace = true
 

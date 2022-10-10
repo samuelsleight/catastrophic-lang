@@ -1,4 +1,4 @@
-use catastrophic_ir::ir;
+use catastrophic_hir::hir;
 
 use self::state::State;
 
@@ -10,7 +10,7 @@ mod state;
 pub struct Interpreter;
 
 impl Interpreter {
-    pub fn interpret(ir: Vec<ir::Block>) -> Result<(), RuntimeError> {
+    pub fn interpret(ir: Vec<hir::Block>) -> Result<(), RuntimeError> {
         State::new(ir).interpret()
     }
 }

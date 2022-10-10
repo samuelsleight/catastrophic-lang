@@ -49,7 +49,7 @@ version = "0.1.0"
 dependencies = [
  "catastrophic-ast",
  "catastrophic-core",
- "catastrophic-ir",
+ "catastrophic-hir",
 ]
 
 [[package]]
@@ -64,7 +64,7 @@ name = "catastrophic-compiler"
 version = "0.1.0"
 dependencies = [
  "catastrophic-core",
- "catastrophic-ir",
+ "catastrophic-hir",
  "dragon-tamer",
 ]
 
@@ -73,19 +73,19 @@ name = "catastrophic-core"
 version = "0.1.0"
 
 [[package]]
-name = "catastrophic-interpreter"
-version = "0.1.0"
-dependencies = [
- "catastrophic-core",
- "catastrophic-ir",
-]
-
-[[package]]
-name = "catastrophic-ir"
+name = "catastrophic-hir"
 version = "0.1.0"
 dependencies = [
  "catastrophic-ast",
  "catastrophic-core",
+]
+
+[[package]]
+name = "catastrophic-interpreter"
+version = "0.1.0"
+dependencies = [
+ "catastrophic-core",
+ "catastrophic-hir",
 ]
 
 [[package]]
@@ -147,7 +147,7 @@ dependencies = [
 [[package]]
 name = "dragon-tamer"
 version = "0.2.0"
-source = "git+https://github.com/samuelsleight/dragon-tamer#1c99c1d35f446733241dfccf836295ce06d58e55"
+source = "git+https://github.com/samuelsleight/dragon-tamer#365c1e946390b80dab792f7620a9d264d2799b4c"
 dependencies = [
  "llvm-sys",
 ]
@@ -178,9 +178,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.134"
+version = "0.2.135"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "329c933548736bc49fd575ee68c89e8be4d260064184389a5b77517cddd99ffb"
+checksum = "68783febc7782c6c5cb401fbda4de5a9898be1762314da0bb2c10ced61f18b0c"
 
 [[package]]
 name = "llvm-sys"

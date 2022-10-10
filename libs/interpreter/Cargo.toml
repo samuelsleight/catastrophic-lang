@@ -4,5 +4,5 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-catastrophic-ir.workspace = true
+catastrophic-hir.workspace = true
 catastrophic-core.workspace = true

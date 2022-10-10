@@ -1,6 +1,6 @@
 use std::collections::{btree_map::Entry, BTreeMap};
 
-use catastrophic_ir::ir::{Block, Builtin, Command, Instr, Value};
+use catastrophic_hir::hir::{Block, Builtin, Command, Instr, Value};
 use dragon_tamer as llvm;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]

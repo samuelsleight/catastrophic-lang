@@ -1,11 +1,9 @@
 use std::collections::VecDeque;
 
 use catastrophic_ast::ast;
+use catastrophic_hir::hir;
 
-use super::{
-    error::{CompileError, CompileErrors},
-    ir,
-};
+use super::error::{CompileError, CompileErrors};
 
 pub struct QueuedBlock {
     block: ast::Block,
@@ -14,7 +12,7 @@ pub struct QueuedBlock {
 
 pub struct State {
     queue: VecDeque<QueuedBlock>,
-    ir: Vec<ir::Block>,
+    ir: Vec<hir::Block>,
     errors: Vec<CompileError>,
 }
 
@@ -43,8 +41,8 @@ impl State {
         self.queue.len() + self.ir.len()
     }
 
-    fn analyse_block(&mut self, block: QueuedBlock, index: usize) -> ir::Block {
-        let mut ir = ir::Block::new(
+    fn analyse_block(&mut self, block: QueuedBlock, index: usize) -> hir::Block {
+        let mut ir = hir::Block::new(
             block.block.args,
             block
                 .parent
@@ -53,9 +51,9 @@ impl State {
 
         for (name, symbol) in block.block.symbols {
             let symbol = match symbol.value.data {
-                ast::SymbolValue::Number(value) => ir::Value::Number(value),
-                ast::SymbolValue::Block(block) => ir::Value::Block(self.queue_block(block, index)),
-                ast::SymbolValue::Builtin(builtin) => ir::Value::Builtin(builtin),
+                ast::SymbolValue::Number(value) => hir::Value::Number(value),
+                ast::SymbolValue::Block(block) => hir::Value::Block(self.queue_block(block, index)),
+                ast::SymbolValue::Builtin(builtin) => hir::Value::Builtin(builtin),
             };
 
             ir.push_symbol(name, symbol);
@@ -64,23 +62,23 @@ impl State {
         for instr in block.block.instrs.into_iter().rev() {
             let instr_span = instr.swap(());
             let instr = match instr.data {
-                ast::Instruction::Command(command) => ir::Instr::Command(command),
+                ast::Instruction::Command(command) => hir::Instr::Command(command),
                 ast::Instruction::Push(value) => {
                     let value = match value {
-                        ast::InstrValue::Number(value) => ir::Value::Number(value),
-                        ast::InstrValue::Block(block) => ir::Value::Block(self.queue_block(block, index)),
-                        ast::InstrValue::Builtin(builtin) => ir::Value::Builtin(builtin),
+                        ast::InstrValue::Number(value) => hir::Value::Number(value),
+                        ast::InstrValue::Block(block) => hir::Value::Block(self.queue_block(block, index)),
+                        ast::InstrValue::Builtin(builtin) => hir::Value::Builtin(builtin),
                         ast::InstrValue::Ident(ref name) => {
                             if let Some(value) = ir.lookup_symbol(name) {
                                 value
                             } else {
                                 self.errors
                                     .push(CompileError::UndefinedSymbolError(instr_span.swap(name.clone())));
-                                ir::Value::Number(0)
+                                hir::Value::Number(0)
                             }
                         }
                     };
-                    ir::Instr::Push(value)
+                    hir::Instr::Push(value)
                 }
             };
 
@@ -90,7 +88,7 @@ impl State {
         ir
     }
 
-    pub fn analyse(mut self) -> Result<Vec<ir::Block>, CompileErrors> {
+    pub fn analyse(mut self) -> Result<Vec<hir::Block>, CompileErrors> {
         while let Some(block) = self.queue.pop_back() {
             let ir = self.analyse_block(block, self.ir.len());
             self.ir.push(ir);
