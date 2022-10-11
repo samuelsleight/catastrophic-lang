@@ -1,12 +1,13 @@
 use std::collections::{btree_map::Entry, BTreeMap};
 
-use catastrophic_mir::mir::{Block, Builtin, Command, Function, Instr, Value};
+use catastrophic_mir::mir::{BinOp, Block, Command, Function, Instr, TriOp, Value};
 use dragon_tamer as llvm;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 enum FunctionKey {
-    Builtin(Builtin),
     Block(usize),
+    BinOp(BinOp),
+    TriOp(TriOp),
 }
 
 #[derive(Copy, Clone)]
@@ -33,23 +34,29 @@ impl FunctionKey {
     fn from_function(function: &Function) -> Self {
         match function {
             Function::Block(index) => FunctionKey::Block(*index),
-            Function::Builtin(builtin) => FunctionKey::Builtin(*builtin),
+            Function::BinOp(bin_op) => FunctionKey::BinOp(*bin_op),
+            Function::TriOp(tri_op) => FunctionKey::TriOp(*tri_op),
         }
     }
     fn llvm_name(&self) -> String {
         match self {
-            FunctionKey::Builtin(builtin) => format!(
+            FunctionKey::Block(index) => format!("block_{}", index),
+            FunctionKey::BinOp(builtin) => format!(
                 "builtin_{}",
                 match builtin {
-                    Builtin::Plus => "plus",
-                    Builtin::Minus => "minus",
-                    Builtin::Equals => "equals",
-                    Builtin::GreaterThan => "greater_than",
-                    Builtin::LessThan => "less_than",
-                    Builtin::IfThenElse => "if_then_else",
+                    BinOp::Plus => "plus",
+                    BinOp::Minus => "minus",
+                    BinOp::Equals => "equals",
+                    BinOp::GreaterThan => "greater_than",
+                    BinOp::LessThan => "less_than",
                 }
             ),
-            FunctionKey::Block(index) => format!("block_{}", index),
+            FunctionKey::TriOp(builtin) => format!(
+                "builtin_{}",
+                match builtin {
+                    TriOp::IfThenElse => "if_then_else",
+                }
+            ),
         }
     }
 }
@@ -118,59 +125,51 @@ impl State {
             .build_ret(&value);
     }
 
-    fn compile_builtin(&mut self, builtin: Builtin) {
-        let entry = self.functions[&FunctionKey::Builtin(builtin)]
+    fn compile_bin_op(&mut self, bin_op: BinOp) {
+        let entry = self.functions[&FunctionKey::BinOp(bin_op)]
             .value
             .add_block("entry");
         let builder = entry.build();
 
-        match builtin {
-            Builtin::Plus => {
-                let (x, builder) = builder.build_call(&self.pop_fn, ());
-                let (y, builder) = builder.build_call(&self.pop_fn, ());
-                let (result, builder) = builder.build_add(&x, &y);
-                builder
-                    .build_call(&self.push_fn, (result,))
-                    .1
-                    .build_void_ret();
-            }
-            Builtin::Minus => {
-                let (x, builder) = builder.build_call(&self.pop_fn, ());
-                let (y, builder) = builder.build_call(&self.pop_fn, ());
-                let (result, builder) = builder.build_sub(&x, &y);
-                builder
-                    .build_call(&self.push_fn, (result,))
-                    .1
-                    .build_void_ret();
-            }
-            Builtin::Equals => {
-                let (x, builder) = builder.build_call(&self.pop_fn, ());
-                let (y, builder) = builder.build_call(&self.pop_fn, ());
-                let (result, builder) = builder.build_eq(&x, &y);
-                builder
-                    .build_call(&self.push_fn, (result,))
-                    .1
-                    .build_void_ret();
-            }
-            Builtin::GreaterThan => todo!(),
-            Builtin::LessThan => {
-                let (x, builder) = builder.build_call(&self.pop_fn, ());
-                let (y, builder) = builder.build_call(&self.pop_fn, ());
-                let (result, builder) = builder.build_lt(&x, &y);
-                builder
-                    .build_call(&self.push_fn, (result,))
-                    .1
-                    .build_void_ret();
-            }
-            Builtin::IfThenElse => {
-                let (value, builder) = builder.build_call(&self.pop_fn, ());
+        let (x, builder) = builder.build_call(&self.pop_fn, ());
+        let (y, builder) = builder.build_call(&self.pop_fn, ());
+
+        let (result, builder) = self.build_bin_op(builder, bin_op, x, y);
+
+        builder
+            .build_call(&self.push_fn, (result,))
+            .1
+            .build_void_ret();
+    }
+
+    fn build_bin_op(&self, builder: llvm::Builder, bin_op: BinOp, x: llvm::Value<i64>, y: llvm::Value<i64>) -> (llvm::Value<i64>, llvm::Builder) {
+        match bin_op {
+            BinOp::Plus => builder.build_add(&x, &y),
+            BinOp::Minus => builder.build_sub(&x, &y),
+            BinOp::Equals => builder.build_eq(&x, &y),
+            BinOp::GreaterThan => todo!(),
+            BinOp::LessThan => builder.build_lt(&x, &y),
+        }
+    }
+
+    fn compile_tri_op(&mut self, tri_op: TriOp) {
+        let entry = self.functions[&FunctionKey::TriOp(tri_op)]
+            .value
+            .add_block("entry");
+
+        match tri_op {
+            TriOp::IfThenElse => {
+                let (value, builder) = entry
+                    .build()
+                    .build_call(&self.pop_fn, ());
+
                 let (then_result, builder) = builder.build_call(&self.pop_fn, ());
                 let (else_result, builder) = builder.build_call(&self.pop_fn, ());
 
-                let then_block = self.functions[&FunctionKey::Builtin(builtin)]
+                let then_block = self.functions[&FunctionKey::TriOp(tri_op)]
                     .value
                     .add_block("then");
-                let else_block = self.functions[&FunctionKey::Builtin(builtin)]
+                let else_block = self.functions[&FunctionKey::TriOp(tri_op)]
                     .value
                     .add_block("else");
 
@@ -188,7 +187,27 @@ impl State {
                     .1
                     .build_void_ret();
             }
-        };
+        }
+    }
+
+    fn build_value(&mut self, builder: llvm::Builder, args: &[llvm::Value<i64>], value: &Value) -> (llvm::Value<i64>, llvm::Builder) {
+        match value {
+            Value::Arg(arg) => (args[*arg], builder),
+            Value::Number(number) => (llvm::Value::constant(*number), builder),
+            Value::Function(function) => (
+                llvm::Value::constant(
+                    self.queue_function(FunctionKey::from_function(function))
+                        .index as i64,
+                ),
+                builder,
+            ),
+            Value::ImmediateBinOp(bin_op, ref x, ref y) => {
+                let (x, builder) = self.build_value(builder, args, x);
+                let (y, builder) = self.build_value(builder, args, y);
+
+                self.build_bin_op(builder, *bin_op, x, y)
+            }
+        }
     }
 
     fn compile_block(&mut self, block_index: usize) {
@@ -211,7 +230,7 @@ impl State {
         block_builder = builder;
 
         for instr in &block.instrs {
-            match instr.data {
+            match &instr.data {
                 Instr::Command(command) => match command {
                     Command::Call => {
                         let (index, builder) = block_builder.build_call(&self.pop_fn, ());
@@ -249,28 +268,38 @@ impl State {
                     Command::InputChar => (),
                     Command::InputNumber => (),
                 },
-                Instr::Push(value) => match value {
+                Instr::Push(ref value) => match value {
                     Value::Arg(arg) => {
                         block_builder = block_builder
-                            .build_call(&self.push_fn, (args[arg],))
+                            .build_call(&self.push_fn, (args[*arg],))
                             .1
                     }
                     Value::Number(number) => {
                         block_builder = block_builder
-                            .build_call(&self.push_fn, (llvm::Value::constant(number),))
+                            .build_call(&self.push_fn, (llvm::Value::constant(*number),))
                             .1
                     }
                     Value::Function(function) => {
                         let index = self
-                            .queue_function(FunctionKey::from_function(&function))
+                            .queue_function(FunctionKey::from_function(function))
                             .index as i64;
                         block_builder = block_builder
                             .build_call(&self.push_fn, (llvm::Value::constant(index),))
                             .1;
                     }
+                    Value::ImmediateBinOp(bin_op, x, y) => {
+                        let (x, builder) = self.build_value(block_builder, &args, x);
+                        let (y, builder) = self.build_value(builder, &args, y);
+
+                        let (result, builder) = self.build_bin_op(builder, *bin_op, x, y);
+
+                        block_builder = builder
+                            .build_call(&self.push_fn, (result,))
+                            .1;
+                    }
                 },
                 Instr::ImmediateCall(function) => {
-                    let info = self.queue_function(FunctionKey::from_function(&function));
+                    let info = self.queue_function(FunctionKey::from_function(function));
 
                     for arg in args.iter().take(info.offset) {
                         block_builder = block_builder
@@ -290,8 +319,9 @@ impl State {
 
     fn compile_function(&mut self, function: FunctionKey) {
         match function {
-            FunctionKey::Builtin(builtin) => self.compile_builtin(builtin),
             FunctionKey::Block(index) => self.compile_block(index),
+            FunctionKey::BinOp(bin_op) => self.compile_bin_op(bin_op),
+            FunctionKey::TriOp(tri_op) => self.compile_tri_op(tri_op),
         }
     }
 
@@ -306,8 +336,8 @@ impl State {
                     .module
                     .add_function(function.llvm_name());
                 let offset = match function {
-                    FunctionKey::Builtin(_) => 0,
                     FunctionKey::Block(idx) => self.ir[idx].offset,
+                    _ => 0,
                 };
 
                 *entry.insert(FunctionInfo::new(count, offset, llvm_function))

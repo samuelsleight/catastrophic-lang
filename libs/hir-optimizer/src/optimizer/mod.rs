@@ -1,6 +1,9 @@
 use catastrophic_hir::hir;
 use catastrophic_mir::mir;
 
+use self::context::OptimizationContext;
+
+mod context;
 mod convert;
 mod pass;
 
@@ -11,8 +14,10 @@ impl Optimizer {
         let mut mir = convert::convert_blocks(hir);
 
         for pass in pass::passes() {
-            for block in &mut mir {
-                pass.run(block)
+            for index in 0..mir.len() {
+                let context = OptimizationContext::new(&mir[index]);
+                let instrs = pass.run(&context);
+                mir[index].instrs = instrs;
             }
         }
 
