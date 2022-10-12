@@ -28,6 +28,7 @@ pub enum Value {
     Number(ValueType),
     Function(Function),
     ImmediateBinOp(BinOp, Box<Value>, Box<Value>),
+    ImmediateTriOp(TriOp, Box<Value>, Box<Value>, Box<Value>),
 }
 
 #[derive(Debug, Clone)]

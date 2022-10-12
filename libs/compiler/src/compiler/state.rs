@@ -157,36 +157,30 @@ impl State {
             .value
             .add_block("entry");
 
+        let builder = entry.build();
+
+        let (x, builder) = builder.build_call(&self.pop_fn, ());
+        let (y, builder) = builder.build_call(&self.pop_fn, ());
+        let (z, builder) = builder.build_call(&self.pop_fn, ());
+
+        let (result, builder) = self.build_tri_op(builder, tri_op, x, y, z);
+
+        builder
+            .build_call(&self.push_fn, (result,))
+            .1
+            .build_void_ret();
+    }
+
+    fn build_tri_op(
+        &self,
+        builder: llvm::Builder,
+        tri_op: TriOp,
+        x: llvm::Value<i64>,
+        y: llvm::Value<i64>,
+        z: llvm::Value<i64>,
+    ) -> (llvm::Value<i64>, llvm::Builder) {
         match tri_op {
-            TriOp::IfThenElse => {
-                let (value, builder) = entry
-                    .build()
-                    .build_call(&self.pop_fn, ());
-
-                let (then_result, builder) = builder.build_call(&self.pop_fn, ());
-                let (else_result, builder) = builder.build_call(&self.pop_fn, ());
-
-                let then_block = self.functions[&FunctionKey::TriOp(tri_op)]
-                    .value
-                    .add_block("then");
-                let else_block = self.functions[&FunctionKey::TriOp(tri_op)]
-                    .value
-                    .add_block("else");
-
-                builder.build_conditional_jump(&value, &else_block, &then_block);
-
-                then_block
-                    .build()
-                    .build_call(&self.push_fn, (then_result,))
-                    .1
-                    .build_void_ret();
-
-                else_block
-                    .build()
-                    .build_call(&self.push_fn, (else_result,))
-                    .1
-                    .build_void_ret();
-            }
+            TriOp::IfThenElse => builder.build_conditional_value(&x, &y, &z),
         }
     }
 
@@ -206,6 +200,13 @@ impl State {
                 let (y, builder) = self.build_value(builder, args, y);
 
                 self.build_bin_op(builder, *bin_op, x, y)
+            }
+            Value::ImmediateTriOp(tri_op, ref x, ref y, ref z) => {
+                let (x, builder) = self.build_value(builder, args, x);
+                let (y, builder) = self.build_value(builder, args, y);
+                let (z, builder) = self.build_value(builder, args, z);
+
+                self.build_tri_op(builder, *tri_op, x, y, z)
             }
         }
     }
@@ -292,6 +293,17 @@ impl State {
                         let (y, builder) = self.build_value(builder, &args, y);
 
                         let (result, builder) = self.build_bin_op(builder, *bin_op, x, y);
+
+                        block_builder = builder
+                            .build_call(&self.push_fn, (result,))
+                            .1;
+                    }
+                    Value::ImmediateTriOp(tri_op, x, y, z) => {
+                        let (x, builder) = self.build_value(block_builder, &args, x);
+                        let (y, builder) = self.build_value(builder, &args, y);
+                        let (z, builder) = self.build_value(builder, &args, z);
+
+                        let (result, builder) = self.build_tri_op(builder, *tri_op, x, y, z);
 
                         block_builder = builder
                             .build_call(&self.push_fn, (result,))

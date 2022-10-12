@@ -165,7 +165,7 @@ dependencies = [
 [[package]]
 name = "dragon-tamer"
 version = "0.2.0"
-source = "git+https://github.com/samuelsleight/dragon-tamer#176d6867523c899ae4f8cb9d86e3c7bb79e03e69"
+source = "git+https://github.com/samuelsleight/dragon-tamer#48e74f784902c3fa9a3a9dcf994151d66a6de4d1"
 dependencies = [
  "llvm-sys",
 ]
