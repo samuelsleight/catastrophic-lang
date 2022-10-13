@@ -1,1 +1,14 @@
+# Rust build output
 /target
+
+# Editor files
+*.code-workspace
+/.fleet
+
+# Test source/build files
+*.c
+*.cat
+*.ll
+*.ir
+*.s
+a.out
