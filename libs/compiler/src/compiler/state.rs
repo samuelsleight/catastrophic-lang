@@ -323,6 +323,53 @@ impl State {
                         .build_call(&info.value, ())
                         .1;
                 }
+                Instr::ImmediateConditionalCall(value, x, y) => {
+                    let x = self.queue_function(FunctionKey::from_function(x));
+                    let y = self.queue_function(FunctionKey::from_function(y));
+
+                    let cont = self.functions[&FunctionKey::Block(block_index)]
+                        .value
+                        .add_block("cont");
+
+                    let x_block = self.functions[&FunctionKey::Block(block_index)]
+                        .value
+                        .add_block("x");
+
+                    let mut builder = x_block.build();
+
+                    for arg in args.iter().take(x.offset) {
+                        builder = builder
+                            .build_call(&self.push_fn, (*arg,))
+                            .1;
+                    }
+
+                    builder
+                        .build_call(&x.value, ())
+                        .1
+                        .build_jump(&cont);
+
+                    let y_block = self.functions[&FunctionKey::Block(block_index)]
+                        .value
+                        .add_block("y");
+
+                    let mut builder = y_block.build();
+
+                    for arg in args.iter().take(y.offset) {
+                        builder = builder
+                            .build_call(&self.push_fn, (*arg,))
+                            .1;
+                    }
+
+                    builder
+                        .build_call(&y.value, ())
+                        .1
+                        .build_jump(&cont);
+
+                    let (value, builder) = self.build_value(block_builder, &args, value);
+                    builder.build_conditional_jump(&value, &y_block, &x_block);
+
+                    block_builder = cont.build()
+                }
             }
         }
 

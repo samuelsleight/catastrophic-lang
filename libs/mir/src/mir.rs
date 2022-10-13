@@ -36,6 +36,7 @@ pub enum Instr {
     Command(Command),
     Push(Value),
     ImmediateCall(Function),
+    ImmediateConditionalCall(Value, Function, Function),
 }
 
 #[derive(Debug, Clone)]

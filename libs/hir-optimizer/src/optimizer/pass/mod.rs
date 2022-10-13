@@ -1,11 +1,12 @@
 use catastrophic_core::span::Span;
 use catastrophic_mir::mir;
 
-use self::{immediate_calls::ImmediateCalls, immediate_operations::ImmediateOperations};
+use self::{immediate_calls::ImmediateCalls, immediate_conditional_calls::ImmediateConditionalCalls, immediate_operations::ImmediateOperations};
 
 use super::context::OptimizationContext;
 
 mod immediate_calls;
+mod immediate_conditional_calls;
 mod immediate_operations;
 
 pub trait OptimizationPass {
@@ -13,5 +14,9 @@ pub trait OptimizationPass {
 }
 
 pub fn passes() -> Vec<Box<dyn OptimizationPass>> {
-    vec![Box::new(ImmediateCalls), Box::new(ImmediateOperations)]
+    vec![
+        Box::new(ImmediateCalls),
+        Box::new(ImmediateOperations),
+        Box::new(ImmediateConditionalCalls),
+    ]
 }
