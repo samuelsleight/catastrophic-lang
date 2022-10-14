@@ -25,6 +25,9 @@ pub struct State {
 
     putchar_fn: llvm::Function<fn(i64)>,
 
+    printf_str: llvm::Value<String>,
+    printf_fn: llvm::Function<fn(String, llvm::Variadic)>,
+
     pop_fn: llvm::Function<fn() -> i64>,
     push_fn: llvm::Function<fn(i64)>,
     call_fn: llvm::Function<fn(i64) -> (fn(), i64)>,
@@ -76,6 +79,8 @@ impl State {
     pub fn new(ir: Vec<Block>) -> Self {
         let module = llvm::Module::new("test", "test");
         let putchar_fn = module.add_function("putchar");
+        let printf_str = module.add_string("%lld");
+        let printf_fn = module.add_function("printf");
         let pop_fn = module.add_function("stack_pop");
         let push_fn = module.add_function("stack_push");
         let call_fn = module.add_function("call_index");
@@ -87,6 +92,8 @@ impl State {
             queue: Vec::new(),
             module,
             putchar_fn,
+            printf_str,
+            printf_fn,
             pop_fn,
             push_fn,
             call_fn,
@@ -277,7 +284,12 @@ impl State {
                             .build_call(&self.putchar_fn, (value,))
                             .1;
                     }
-                    Command::OutputNumber => (),
+                    Command::OutputNumber => {
+                        let (value, builder) = block_builder.build_call(&self.pop_fn, ());
+                        block_builder = builder
+                            .build_variadic_call(&self.printf_fn, (self.printf_str.clone(),), &[value.untyped()])
+                            .1;
+                    }
                     Command::InputChar => (),
                     Command::InputNumber => (),
                 },
