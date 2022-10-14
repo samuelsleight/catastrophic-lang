@@ -22,11 +22,16 @@ pub struct State {
     queue: Vec<FunctionKey>,
 
     module: llvm::Module,
+
+    putchar_fn: llvm::Function<fn(i64)>,
+
     pop_fn: llvm::Function<fn() -> i64>,
     push_fn: llvm::Function<fn(i64)>,
     call_fn: llvm::Function<fn(i64) -> (fn(), i64)>,
+
     stack: llvm::Value<*mut [i64; 256]>,
     index: llvm::Value<*mut u32>,
+
     functions: BTreeMap<FunctionKey, FunctionInfo>,
 }
 
@@ -70,6 +75,7 @@ impl FunctionInfo {
 impl State {
     pub fn new(ir: Vec<Block>) -> Self {
         let module = llvm::Module::new("test", "test");
+        let putchar_fn = module.add_function("putchar");
         let pop_fn = module.add_function("stack_pop");
         let push_fn = module.add_function("stack_push");
         let call_fn = module.add_function("call_index");
@@ -80,6 +86,7 @@ impl State {
             ir,
             queue: Vec::new(),
             module,
+            putchar_fn,
             pop_fn,
             push_fn,
             call_fn,
@@ -264,7 +271,12 @@ impl State {
 
                         block_builder = cont.build().build_call(&f, ()).1;
                     }
-                    Command::OutputChar => (),
+                    Command::OutputChar => {
+                        let (value, builder) = block_builder.build_call(&self.pop_fn, ());
+                        block_builder = builder
+                            .build_call(&self.putchar_fn, (value,))
+                            .1;
+                    }
                     Command::OutputNumber => (),
                     Command::InputChar => (),
                     Command::InputNumber => (),
