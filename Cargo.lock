@@ -71,6 +71,9 @@ dependencies = [
 [[package]]
 name = "catastrophic-core"
 version = "0.1.0"
+dependencies = [
+ "ruinous-util",
+]
 
 [[package]]
 name = "catastrophic-hir"
@@ -111,6 +114,7 @@ version = "0.1.0"
 dependencies = [
  "catastrophic-ast",
  "catastrophic-core",
+ "ruinous",
  "unic-emoji",
 ]
 
@@ -304,6 +308,19 @@ name = "regex-syntax"
 version = "0.6.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
+
+[[package]]
+name = "ruinous"
+version = "0.1.0"
+source = "git+https://github.com/samuelsleight/ruinous#776e7420d58f58d649a2adae411fd03f59627360"
+dependencies = [
+ "ruinous-util",
+]
+
+[[package]]
+name = "ruinous-util"
+version = "0.1.0"
+source = "git+https://github.com/samuelsleight/ruinous#776e7420d58f58d649a2adae411fd03f59627360"
 
 [[package]]
 name = "semver"

@@ -4,6 +4,7 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+ruinous.workspace = true
 unic-emoji.workspace = true
 catastrophic-ast.workspace = true
 catastrophic-core.workspace = true

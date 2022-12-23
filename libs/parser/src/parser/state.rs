@@ -5,10 +5,11 @@ use catastrophic_ast::{
     token::Token,
 };
 use catastrophic_core::{defines::ValueType, span::Span};
+use ruinous::parser::{state::State as ParserState, ParseErrors};
 
 use super::{
     ast::{Builtin, InstrValue, Instruction, SymbolValue},
-    error::{ParseError, ParseErrors},
+    error::ParseError,
 };
 
 #[derive(Debug, Copy, Clone)]
@@ -267,7 +268,7 @@ impl State {
         }
     }
 
-    pub fn finish(mut self) -> Result<ast::Block, ParseErrors> {
+    pub fn finish(mut self) -> Result<ast::Block, ParseErrors<ParseError>> {
         let (block, termination) = self.terminate_block();
 
         if let BlockTermination::Curly(span) = termination {
@@ -280,5 +281,18 @@ impl State {
         } else {
             Err(self.errors.into())
         }
+    }
+}
+
+impl ParserState<Token> for State {
+    type Ast = ast::Block;
+    type Error = ParseError;
+
+    fn process(&mut self, token: Span<Token>) {
+        self.process(token)
+    }
+
+    fn finish(self) -> Result<Self::Ast, ParseErrors<Self::Error>> {
+        self.finish()
     }
 }

@@ -2,24 +2,18 @@ use std::path::Path;
 
 use catastrophic_ast::token::Token;
 use catastrophic_core::span::Span;
+use ruinous::lexer::{Error as RuinousError, Lexer as RuinousLexer};
 
-use self::{reader::CharReader, state::State};
-
-pub use self::error::Error;
+pub use self::state::State;
+pub type Error = RuinousError<State>;
 
 mod error;
-mod reader;
 mod state;
 
 pub struct Lexer;
 
 impl Lexer {
-    pub fn lex_file<P: AsRef<Path>, Callback: FnMut(Span<Token>)>(path: P, mut callback: Callback) -> Result<(), Error> {
-        let reader = CharReader::from_file(path)?;
-        let mut state = State::new();
-
-        reader.read(|span| state.process(span, &mut callback))?;
-
-        Ok(state.finish()?)
+    pub fn lex_file<P: AsRef<Path>, Callback: FnMut(Span<Token>)>(path: P, callback: Callback) -> Result<(), Error> {
+        RuinousLexer::lex_file(path, State::new(), callback)
     }
 }

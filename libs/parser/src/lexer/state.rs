@@ -3,9 +3,10 @@ use catastrophic_core::{
     defines::ValueType,
     span::{Location, Span},
 };
+use ruinous::lexer::state::{Continuation, State as LexerState};
 use unic_emoji::char::is_emoji;
 
-use super::{error::LexError, reader::Continuation};
+use super::error::LexError;
 
 #[derive(Debug, Copy, Clone)]
 enum Mode {
@@ -217,5 +218,18 @@ impl State {
             Mode::String => Err(LexError::UnterminatedString(Span::new(start, self.start, ()))),
             _ => Ok(()),
         }
+    }
+}
+
+impl LexerState for State {
+    type Token = Token;
+    type Error = LexError;
+
+    fn process<Callback: FnMut(Span<Self::Token>)>(&mut self, input: Span<char>, callback: &mut Callback) -> Continuation {
+        self.process(input, callback)
+    }
+
+    fn finish(self) -> Result<(), Self::Error> {
+        self.finish()
     }
 }
