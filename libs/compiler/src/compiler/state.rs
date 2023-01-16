@@ -23,10 +23,12 @@ pub struct State {
 
     module: llvm::Module,
 
-    putchar_fn: llvm::Function<fn(i64)>,
+    putchar_fn: llvm::Function<fn(i32)>,
 
     printf_str: llvm::Value<String>,
     printf_fn: llvm::Function<fn(String, llvm::Variadic)>,
+
+    getchar_fn: llvm::Function<fn() -> i32>,
 
     pop_fn: llvm::Function<fn() -> i64>,
     push_fn: llvm::Function<fn(i64)>,
@@ -81,6 +83,7 @@ impl State {
         let putchar_fn = module.add_function("putchar");
         let printf_str = module.add_string("%lld");
         let printf_fn = module.add_function("printf");
+        let getchar_fn = module.add_function("getchar");
         let pop_fn = module.add_function("stack_pop");
         let push_fn = module.add_function("stack_push");
         let call_fn = module.add_function("call_index");
@@ -94,6 +97,7 @@ impl State {
             putchar_fn,
             printf_str,
             printf_fn,
+            getchar_fn,
             pop_fn,
             push_fn,
             call_fn,
@@ -280,6 +284,7 @@ impl State {
                     }
                     Command::OutputChar => {
                         let (value, builder) = block_builder.build_call(&self.pop_fn, ());
+                        let (value, builder) = builder.build_int_cast(&value);
                         block_builder = builder
                             .build_call(&self.putchar_fn, (value,))
                             .1;
@@ -290,7 +295,13 @@ impl State {
                             .build_variadic_call(&self.printf_fn, (self.printf_str.clone(),), &[value.untyped()])
                             .1;
                     }
-                    Command::InputChar => (),
+                    Command::InputChar => {
+                        let (value, builder) = block_builder.build_call(&self.getchar_fn, ());
+                        let (value, builder) = builder.build_int_cast(&value);
+                        block_builder = builder
+                            .build_call(&self.push_fn, (value,))
+                            .1;
+                    }
                     Command::InputNumber => (),
                 },
                 Instr::Push(ref value) => match value {
@@ -437,8 +448,8 @@ impl State {
 
         let blocks: Vec<_> = self
             .functions
-            .iter()
-            .map(|(_, f)| {
+            .values()
+            .map(|f| {
                 let block = self
                     .call_fn
                     .add_block(&format!("block_{}", f.index));
