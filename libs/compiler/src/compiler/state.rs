@@ -361,7 +361,7 @@ impl State {
 
                     let mut builder = x_block.build();
 
-                    for arg in args.iter().take(x.offset) {
+                    for arg in args.iter().take(x.offset).rev() {
                         builder = builder
                             .build_call(&self.push_fn, (*arg,))
                             .1;
@@ -378,7 +378,7 @@ impl State {
 
                     let mut builder = y_block.build();
 
-                    for arg in args.iter().take(y.offset) {
+                    for arg in args.iter().take(y.offset).rev() {
                         builder = builder
                             .build_call(&self.push_fn, (*arg,))
                             .1;
