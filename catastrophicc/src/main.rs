@@ -17,7 +17,8 @@ struct Args {
 fn main(args: Args) -> Result<()> {
     let error_context = ErrorContext::from_file(&args.input)?;
 
-    let ast = Parser::parse_file(args.input)
+    let ast = Parser::from_file(args.input)
+        .and_then(Parser::parse)
         .map_err(|err| PackagedError::new(error_context.clone(), err))
         .with_context(|| "Unable to parse input")?;
 

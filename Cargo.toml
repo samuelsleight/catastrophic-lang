@@ -27,6 +27,7 @@ catastrophic-interpreter = { path = "libs/interpreter" }
 catastrophic-hir-optimizer = { path = "libs/hir-optimizer" }
 catastrophic-mir = { path = "libs/mir" }
 catastrophic-compiler = { path = "libs/compiler" }
+
 ruinous = { git = "https://github.com/samuelsleight/ruinous" }
 ruinous-util = { git = "https://github.com/samuelsleight/ruinous" }
 
