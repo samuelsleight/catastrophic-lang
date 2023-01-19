@@ -1,6 +1,6 @@
 use catastrophic_core::defines::ValueType;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Token {
     Ident(String),
     String(String),
