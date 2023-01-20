@@ -15,7 +15,7 @@ pub enum Builtin {
     IfThenElse,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Command {
     Call,
     OutputChar,
@@ -24,20 +24,20 @@ pub enum Command {
     InputNumber,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SymbolValue {
     Number(ValueType),
     Block(Block),
     Builtin(Builtin),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Symbol {
     pub name_span: Span<()>,
     pub value: Span<SymbolValue>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum InstrValue {
     Number(ValueType),
     Ident(String),
@@ -45,13 +45,13 @@ pub enum InstrValue {
     Builtin(Builtin),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Instruction {
     Command(Command),
     Push(InstrValue),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Block {
     pub args: Vec<Span<String>>,
     pub symbols: HashMap<String, Symbol>,
