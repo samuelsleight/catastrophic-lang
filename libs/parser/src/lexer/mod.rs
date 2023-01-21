@@ -12,7 +12,8 @@ pub(crate) use self::state::State;
 
 pub type Error = RuinousError<State>;
 
-mod error;
+pub mod error;
+
 mod state;
 
 pub struct Lexer<R> {
