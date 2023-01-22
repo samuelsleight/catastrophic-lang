@@ -34,7 +34,11 @@ fn combined_test(input1: &str, expected1: &[Span<Token>], input2: &str, expected
             (last.end.line, last.end.col + 1)
         }
     } else {
-        (0, 0)
+        if new_line {
+            (1, 1)
+        } else {
+            (0, 1)
+        }
     };
 
     for item in expected2 {
@@ -135,4 +139,5 @@ test_cases! {
     r_curly("}", &[span(Token::RCurly, 0, 0, 0, 1)])
     l_paren("(", &[span(Token::Unexpected('('), 0, 0, 0, 1)])
     r_paren(")", &[span(Token::Unexpected(')'), 0, 0, 0, 1)])
+    comment("# comment\n", &[])
 }
