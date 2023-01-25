@@ -3,26 +3,26 @@ use std::collections::HashMap;
 pub use catastrophic_ast::ast::{Builtin, Command};
 use catastrophic_core::{defines::ValueType, span::Span};
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Function {
     Block(usize),
     Builtin(Builtin),
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Value {
     Arg(usize),
     Number(ValueType),
     Function(Function),
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Instr {
     Command(Command),
     Push(Value),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Block {
     pub offset: usize,
     pub args: usize,

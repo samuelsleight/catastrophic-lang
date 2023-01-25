@@ -7,6 +7,7 @@ pub use self::error::CompileErrors;
 
 mod error;
 mod state;
+mod test;
 
 pub struct Analyser;
 

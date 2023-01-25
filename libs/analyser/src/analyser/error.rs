@@ -5,12 +5,12 @@ use catastrophic_core::{
     span::Span,
 };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CompileErrors {
-    errors: Vec<CompileError>,
+    pub errors: Vec<CompileError>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CompileError {
     UndefinedSymbolError(Span<String>),
 }
