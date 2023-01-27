@@ -5,15 +5,16 @@ use catastrophic_analyser::analyser::Analyser;
 use catastrophic_core::error::context::{ErrorContext, PackagedError};
 use catastrophic_interpreter::interpreter::Interpreter;
 use catastrophic_parser::parser::Parser;
-use structopt::StructOpt;
+use clap::Parser as ArgParser;
 
-#[derive(Debug, Clone, StructOpt)]
+#[derive(Debug, Clone, ArgParser)]
 struct Args {
     input: PathBuf,
 }
 
-#[paw::main]
-fn main(args: Args) -> Result<()> {
+fn main() -> Result<()> {
+    let args = Args::try_parse()?;
+
     let error_context = ErrorContext::from_file(&args.input)?;
 
     let ast = Parser::from_file(args.input)

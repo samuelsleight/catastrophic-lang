@@ -5,8 +5,7 @@ edition.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-paw.workspace = true
-structopt.workspace = true
+clap.workspace = true
 catastrophic-core.workspace = true
 catastrophic-parser.workspace = true
 catastrophic-analyser.workspace = true

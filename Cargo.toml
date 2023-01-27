@@ -32,8 +32,7 @@ ruinous = { git = "https://github.com/samuelsleight/ruinous" }
 ruinous-util = { git = "https://github.com/samuelsleight/ruinous" }
 
 anyhow = "1.0.65"
-paw = "1.0.0"
-structopt = { version = "0.3.26", features = ["paw"] }
+clap = { version="4.1.4", features=["derive"] }
 dragon-tamer = { git = "https://github.com/samuelsleight/dragon-tamer" }
 unic-emoji = { git = "https://github.com/eyeplum/rust-unic/", branch = "develop" }
 paste = "1.0.11"
