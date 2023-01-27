@@ -12,3 +12,7 @@
 *.ir
 *.s
 a.out
+
+# Test/profiling files
+flamegraph.svg
+*.profraw
