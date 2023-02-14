@@ -1,3 +1,4 @@
+use catastrophic_core::profiling::TimeScope;
 use catastrophic_hir::hir;
 use catastrophic_mir::mir;
 
@@ -10,10 +11,15 @@ mod pass;
 pub struct Optimizer;
 
 impl Optimizer {
-    pub fn optimize_hir(hir: Vec<hir::Block>) -> Vec<mir::Block> {
-        let mut mir = convert::convert_blocks(hir);
+    pub fn optimize_hir<'a, 'b: 'a>(hir: Vec<hir::Block>, time_scope: &'a mut TimeScope<'b>) -> Vec<mir::Block> {
+        let mut mir = {
+            let _scope = time_scope.scope("Conversion");
+            convert::convert_blocks(hir)
+        };
 
         for pass in pass::passes() {
+            let _scope = time_scope.scope(pass.name());
+
             for index in 0..mir.len() {
                 let context = OptimizationContext::new(&mir[index]);
                 let instrs = pass.run(&context);

@@ -10,6 +10,7 @@ mod immediate_conditional_calls;
 mod immediate_operations;
 
 pub trait OptimizationPass {
+    fn name(&self) -> &'static str;
     fn run(&self, context: &OptimizationContext) -> Vec<Span<mir::Instr>>;
 }
 

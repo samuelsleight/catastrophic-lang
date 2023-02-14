@@ -16,8 +16,8 @@ impl Stage<Vec<hir::Block>> for OptimizationStage {
     type Output = Vec<mir::Block>;
     type Error = NoError;
 
-    fn run(self, input: Vec<hir::Block>, _: &mut TimeScope) -> Result<Self::Output, Self::Error> {
-        Ok(Optimizer::optimize_hir(input))
+    fn run(self, input: Vec<hir::Block>, time_scope: &mut TimeScope) -> Result<Self::Output, Self::Error> {
+        Ok(Optimizer::optimize_hir(input, time_scope))
     }
 
     fn name() -> &'static str {

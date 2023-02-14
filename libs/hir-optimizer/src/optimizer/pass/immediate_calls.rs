@@ -8,6 +8,10 @@ use super::OptimizationPass;
 pub struct ImmediateCalls;
 
 impl OptimizationPass for ImmediateCalls {
+    fn name(&self) -> &'static str {
+        "Immediate Call Pass"
+    }
+
     fn run(&self, context: &OptimizationContext) -> Vec<Span<mir::Instr>> {
         let mut instrs: Vec<Span<mir::Instr>> = Vec::with_capacity(context.current_len());
 

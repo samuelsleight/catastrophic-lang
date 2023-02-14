@@ -66,6 +66,10 @@ fn run_pass<'a>(input: impl Iterator<Item = &'a Span<mir::Instr>>, len: usize) -
 }
 
 impl OptimizationPass for ImmediateOperations {
+    fn name(&self) -> &'static str {
+        "Immediate Operation Pass"
+    }
+
     fn run(&self, context: &OptimizationContext) -> Vec<Span<mir::Instr>> {
         let (mut changes_made, mut instrs) = run_pass(context.current_instrs(), context.current_len());
 

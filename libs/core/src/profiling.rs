@@ -46,7 +46,7 @@ impl TimeKeeper {
 }
 
 impl<'keeper> TimeScope<'keeper> {
-    pub fn scope<'this: 'keeper, S: ToString>(&'this mut self, label: S) -> Self {
+    pub fn scope<S: ToString>(&mut self, label: S) -> TimeScope {
         Self::make(self.entries, self.indent + 1, label.to_string())
     }
 
