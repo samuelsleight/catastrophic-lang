@@ -35,4 +35,4 @@ anyhow = "1.0.65"
 clap = { version="4.1.4", features=["derive"] }
 dragon-tamer = { git = "https://github.com/samuelsleight/dragon-tamer" }
 unic-emoji = { git = "https://github.com/eyeplum/rust-unic/", branch = "develop" }
-paste = "1.0.11"
+pipeline = { git = "https://github.com/samuelsleight/pipelines" }
