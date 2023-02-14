@@ -255,14 +255,10 @@ fn parse_unterminated_string_fails() {
     let parser = Parser::from_str("\"hello");
     let result = parser.parse();
 
-    if let Err(err) = result {
-        if let RuinousError::LexError(lex_err) = err {
-            if let ruinous::lexer::Error::LexError(err) = lex_err {
-                match err {
-                    LexError::UnterminatedString(s) if s == span((), 0, 0, 0, 1) => return,
-                    _ => (),
-                }
-            }
+    if let Err(RuinousError::LexError(ruinous::lexer::Error::LexError(err))) = result {
+        match err {
+            LexError::UnterminatedString(s) if s == span((), 0, 0, 0, 1) => return,
+            _ => (),
         }
     }
 

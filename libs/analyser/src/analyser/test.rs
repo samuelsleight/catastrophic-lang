@@ -192,7 +192,7 @@ fn analyse_symbol_number() {
     let mut input = ast::Block::no_args();
     input
         .with_symbol("sym".to_string())
-        .or_insert(ast::Symbol::new(span((), 0, 0, 0, 3), span(ast::SymbolValue::Number(24680), 0, 4, 0, 9)));
+        .or_insert_with(|| ast::Symbol::new(span((), 0, 0, 0, 3), span(ast::SymbolValue::Number(24680), 0, 4, 0, 9)));
 
     let mut expected = hir::Block::new(vec![], None);
     expected.push_symbol("sym".to_string(), hir::Value::Number(24680));
@@ -205,10 +205,7 @@ fn analyse_symbol_builtin() {
     let mut input = ast::Block::no_args();
     input
         .with_symbol("sym".to_string())
-        .or_insert(ast::Symbol::new(
-            span((), 0, 0, 0, 3),
-            span(ast::SymbolValue::Builtin(ast::Builtin::Equals), 0, 4, 0, 5),
-        ));
+        .or_insert_with(|| ast::Symbol::new(span((), 0, 0, 0, 3), span(ast::SymbolValue::Builtin(ast::Builtin::Equals), 0, 4, 0, 5)));
 
     let mut expected = hir::Block::new(vec![], None);
     expected.push_symbol("sym".to_string(), hir::Value::Function(hir::Function::Builtin(hir::Builtin::Equals)));
@@ -223,7 +220,7 @@ fn analyse_symbol_block() {
     let mut input = ast::Block::no_args();
     input
         .with_symbol("sym".to_string())
-        .or_insert(ast::Symbol::new(span((), 0, 0, 0, 3), span(ast::SymbolValue::Block(block), 0, 4, 0, 6)));
+        .or_insert_with(|| ast::Symbol::new(span((), 0, 0, 0, 3), span(ast::SymbolValue::Block(block), 0, 4, 0, 6)));
 
     let mut expected1 = hir::Block::new(vec![], None);
     expected1.push_symbol("sym".to_string(), hir::Value::Function(hir::Function::Block(1)));
@@ -254,7 +251,7 @@ fn analyse_symbol_and_valid_ident() {
     let mut input = ast::Block::no_args();
     input
         .with_symbol("sym".to_string())
-        .or_insert(ast::Symbol::new(span((), 0, 0, 0, 3), span(ast::SymbolValue::Number(24680), 0, 4, 0, 9)));
+        .or_insert_with(|| ast::Symbol::new(span((), 0, 0, 0, 3), span(ast::SymbolValue::Number(24680), 0, 4, 0, 9)));
     input.push_instruction(span(ast::Instruction::Push(ast::InstrValue::Ident("sym".to_string())), 1, 0, 1, 3));
 
     let mut expected = hir::Block::new(vec![], None);
@@ -304,7 +301,7 @@ fn analyse_block_and_valid_parent_symbol() {
     let mut input = ast::Block::no_args();
     input
         .with_symbol("sym".to_string())
-        .or_insert(ast::Symbol::new(span((), 0, 0, 0, 3), span(ast::SymbolValue::Number(24680), 0, 4, 0, 9)));
+        .or_insert_with(|| ast::Symbol::new(span((), 0, 0, 0, 3), span(ast::SymbolValue::Number(24680), 0, 4, 0, 9)));
     input.push_instruction(span(ast::Instruction::Push(ast::InstrValue::Block(block)), 2, 0, 4, 1));
 
     let mut expected1 = hir::Block::new(vec![], None);

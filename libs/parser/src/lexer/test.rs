@@ -33,12 +33,10 @@ fn combined_test(input1: &str, expected1: &[Span<Token>], input2: &str, expected
         } else {
             (last.end.line, last.end.col + 1)
         }
+    } else if new_line {
+        (1, 1)
     } else {
-        if new_line {
-            (1, 1)
-        } else {
-            (0, 1)
-        }
+        (0, 1)
     };
 
     for item in expected2 {

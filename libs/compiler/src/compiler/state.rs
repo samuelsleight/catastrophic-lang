@@ -266,7 +266,7 @@ impl State {
                         for (i, arg) in args.iter().enumerate() {
                             let new_block = self.functions[&FunctionKey::Block(block_index)]
                                 .value
-                                .add_block(&format!("block_{}", i));
+                                .add_block(format!("block_{}", i));
 
                             new_block
                                 .build()
@@ -452,7 +452,7 @@ impl State {
             .map(|f| {
                 let block = self
                     .call_fn
-                    .add_block(&format!("block_{}", f.index));
+                    .add_block(format!("block_{}", f.index));
                 let (value, builder) = block
                     .build()
                     .build_struct(&f.value.as_value(), &llvm::Value::constant(f.offset as i64));
