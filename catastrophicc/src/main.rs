@@ -5,6 +5,7 @@ use catastrophic_analyser::stage::AnalysisStage;
 use catastrophic_compiler::stage::CompilationStage;
 use catastrophic_core::{
     error::context::ErrorContext,
+    pretty::{PrettyDebug, PrettyDebugger},
     profiling::TimeKeeper,
     stage::{pipeline, Continue, Pipeline, PipelineError, RunPipeline, Stage, StageContext},
 };
@@ -23,6 +24,9 @@ pub enum DebugMode {
 struct Args {
     #[arg(long)]
     debug: Option<DebugMode>,
+
+    #[arg(short, long)]
+    pretty: bool,
 
     #[arg(short, long)]
     profile: bool,
@@ -61,15 +65,18 @@ impl App {
             .and_then(CompilationStage.stage(), |_| ())
     }
 
-    fn debug_callback<Input: Debug>(&self, debug: DebugMode) -> impl FnOnce(&StageContext<Input>) -> Continue {
-        let debug = self.args.debug == Some(debug);
-
-        move |input| {
-            if debug {
+    fn debug_callback<Input: Debug + PrettyDebug>(&self, debug: DebugMode) -> for<'a> fn(&'a StageContext<Input>) -> Continue {
+        if self.args.debug != Some(debug) {
+            |_| Continue::Continue
+        } else if self.args.pretty {
+            |input| {
+                println!("{}", PrettyDebugger(&input.input));
+                Continue::Cancel
+            }
+        } else {
+            |input| {
                 println!("{:#?}", input.input);
                 Continue::Cancel
-            } else {
-                Continue::Continue
             }
         }
     }
