@@ -1,6 +1,7 @@
 use std::{fmt::Debug, path::PathBuf};
 
 use anyhow::Result;
+use args::{flags::DebugMode, Args};
 use catastrophic_analyser::stage::AnalysisStage;
 use catastrophic_compiler::stage::CompilationStage;
 use catastrophic_core::{
@@ -9,48 +10,10 @@ use catastrophic_core::{
     profiling::TimeKeeper,
     stage::{pipeline, Continue, Pipeline, PipelineError, RunPipeline, Stage, StageContext},
 };
-use catastrophic_hir_optimizer::{optimizer::Optimization, stage::OptimizationStage};
+use catastrophic_hir_optimizer::stage::OptimizationStage;
 use catastrophic_parser::stage::ParseStage;
-use clap::{Parser as ArgParser, ValueEnum};
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
-pub enum DebugMode {
-    Ast,
-    Hir,
-    Mir,
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
-pub enum OptimizationFlag {
-    None,
-    All,
-}
-
-impl From<OptimizationFlag> for Optimization {
-    fn from(value: OptimizationFlag) -> Self {
-        match value {
-            OptimizationFlag::None => Optimization::None,
-            OptimizationFlag::All => Optimization::All,
-        }
-    }
-}
-
-#[derive(Debug, Clone, ArgParser)]
-struct Args {
-    #[arg(long)]
-    debug: Option<DebugMode>,
-
-    #[arg(short, long)]
-    pretty: bool,
-
-    #[arg(short, long)]
-    profile: bool,
-
-    #[arg(long = "opt", default_value = "all")]
-    opt: OptimizationFlag,
-
-    input: PathBuf,
-}
+mod args;
 
 struct App {
     args: Args,
