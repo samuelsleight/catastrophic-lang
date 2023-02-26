@@ -9,7 +9,7 @@ use catastrophic_core::{
     profiling::TimeKeeper,
     stage::{pipeline, Continue, Pipeline, PipelineError, RunPipeline, Stage, StageContext},
 };
-use catastrophic_hir_optimizer::stage::OptimizationStage;
+use catastrophic_hir_optimizer::{optimizer::Optimization, stage::OptimizationStage};
 use catastrophic_parser::stage::ParseStage;
 use clap::{Parser as ArgParser, ValueEnum};
 
@@ -18,6 +18,21 @@ pub enum DebugMode {
     Ast,
     Hir,
     Mir,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+pub enum OptimizationFlag {
+    None,
+    All,
+}
+
+impl From<OptimizationFlag> for Optimization {
+    fn from(value: OptimizationFlag) -> Self {
+        match value {
+            OptimizationFlag::None => Optimization::None,
+            OptimizationFlag::All => Optimization::All,
+        }
+    }
 }
 
 #[derive(Debug, Clone, ArgParser)]
@@ -30,6 +45,9 @@ struct Args {
 
     #[arg(short, long)]
     profile: bool,
+
+    #[arg(long = "opt", default_value = "all")]
+    opt: OptimizationFlag,
 
     input: PathBuf,
 }
@@ -61,7 +79,7 @@ impl App {
     fn make_pipeline(&self) -> impl RunPipeline<anyhow::Error, Start = StageContext<PathBuf>, End = StageContext<()>> {
         pipeline(ParseStage.stage(), self.debug_callback(DebugMode::Ast))
             .and_then(AnalysisStage.stage(), self.debug_callback(DebugMode::Hir))
-            .and_then(OptimizationStage.stage(), self.debug_callback(DebugMode::Mir))
+            .and_then(OptimizationStage::new(self.args.opt.into()).stage(), self.debug_callback(DebugMode::Mir))
             .and_then(CompilationStage.stage(), |_| ())
     }
 
