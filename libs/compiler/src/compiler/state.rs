@@ -17,6 +17,8 @@ struct FunctionInfo {
     value: llvm::Function<fn()>,
 }
 
+pub type FunctionMetadata = (fn(), i64);
+
 pub struct State {
     ir: Vec<Block>,
     queue: Vec<FunctionKey>,
@@ -32,7 +34,7 @@ pub struct State {
 
     pop_fn: llvm::Function<fn() -> i64>,
     push_fn: llvm::Function<fn(i64)>,
-    call_fn: llvm::Function<fn(i64) -> (fn(), i64)>,
+    call_fn: llvm::Function<fn(i64) -> FunctionMetadata>,
 
     stack: llvm::Value<*mut [i64; 256]>,
     index: llvm::Value<*mut u32>,
@@ -48,6 +50,7 @@ impl FunctionKey {
             Function::TriOp(tri_op) => FunctionKey::TriOp(*tri_op),
         }
     }
+
     fn llvm_name(&self) -> String {
         match self {
             FunctionKey::Block(index) => format!("block_{}", index),

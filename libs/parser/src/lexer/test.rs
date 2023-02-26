@@ -9,7 +9,7 @@ fn span<D>(data: D, from_line: usize, from_col: usize, to_line: usize, to_col: u
 }
 
 fn lexer_test(input: &str, expected: &[Span<Token>]) {
-    let lexer = Lexer::from_str(input);
+    let lexer = Lexer::with_str(input);
     let result = lexer.collect().unwrap();
 
     assert_eq!(result, expected);

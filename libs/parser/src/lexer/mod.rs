@@ -22,14 +22,14 @@ pub struct Lexer<R> {
 }
 
 impl Lexer<BufReader<File>> {
-    pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, Error> {
+    pub fn with_file<P: AsRef<Path>>(path: P) -> Result<Self, Error> {
         let lexer = RuinousLexer::from_file(path)?;
         Ok(Self { lexer })
     }
 }
 
 impl<'a> Lexer<Cursor<&'a str>> {
-    pub fn from_str(input: &'a str) -> Self {
+    pub fn with_str(input: &'a str) -> Self {
         let lexer = RuinousLexer::from_str(input);
         Self { lexer }
     }

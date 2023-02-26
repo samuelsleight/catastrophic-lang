@@ -23,14 +23,14 @@ pub struct Parser<R> {
 }
 
 impl Parser<BufReader<File>> {
-    pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, Error> {
+    pub fn with_file<P: AsRef<Path>>(path: P) -> Result<Self, Error> {
         let parser = RuinousParser::from_file(path)?;
         Ok(Self { parser })
     }
 }
 
 impl<'a> Parser<Cursor<&'a str>> {
-    pub fn from_str(input: &'a str) -> Self {
+    pub fn with_str(input: &'a str) -> Self {
         let parser = RuinousParser::from_str(input);
         Self { parser }
     }

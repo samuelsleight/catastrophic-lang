@@ -31,7 +31,7 @@ fn symbol(block: &mut Block, name: Span<String>, value: Span<SymbolValue>) {
 }
 
 fn parser_test(input: &str, expected: &Block) {
-    let parser = Parser::from_str(input);
+    let parser = Parser::with_str(input);
     let result = parser.parse().unwrap();
 
     assert_eq!(&result, expected);
@@ -252,7 +252,7 @@ test_cases! {
 
 #[test]
 fn parse_unterminated_string_fails() {
-    let parser = Parser::from_str("\"hello");
+    let parser = Parser::with_str("\"hello");
     let result = parser.parse();
 
     if let Err(RuinousError::LexError(ruinous::lexer::Error::LexError(err))) = result {
@@ -267,7 +267,7 @@ fn parse_unterminated_string_fails() {
 
 #[test]
 fn parse_unexpected_char_fails() {
-    let parser = Parser::from_str("(");
+    let parser = Parser::with_str("(");
     let result = parser.parse();
 
     if let Err(err) = result {
@@ -285,7 +285,7 @@ fn parse_unexpected_char_fails() {
 
 #[test]
 fn parse_unclosed_block_fails() {
-    let parser = Parser::from_str("{");
+    let parser = Parser::with_str("{");
     let result = parser.parse();
 
     if let Err(err) = result {
@@ -303,7 +303,7 @@ fn parse_unclosed_block_fails() {
 
 #[test]
 fn parse_unopened_block_fails() {
-    let parser = Parser::from_str("}");
+    let parser = Parser::with_str("}");
     let result = parser.parse();
 
     if let Err(err) = result {
@@ -321,7 +321,7 @@ fn parse_unopened_block_fails() {
 
 #[test]
 fn parse_solo_arrow_fails() {
-    let parser = Parser::from_str("->");
+    let parser = Parser::with_str("->");
     let result = parser.parse();
 
     if let Err(err) = result {
@@ -339,7 +339,7 @@ fn parse_solo_arrow_fails() {
 
 #[test]
 fn parse_value_prefixed_arrow_fails() {
-    let parser = Parser::from_str("5 ->");
+    let parser = Parser::with_str("5 ->");
     let result = parser.parse();
 
     if let Err(err) = result {
@@ -357,7 +357,7 @@ fn parse_value_prefixed_arrow_fails() {
 
 #[test]
 fn parse_unblocked_arrow_fails() {
-    let parser = Parser::from_str("a ->");
+    let parser = Parser::with_str("a ->");
     let result = parser.parse();
 
     if let Err(err) = result {
@@ -375,7 +375,7 @@ fn parse_unblocked_arrow_fails() {
 
 #[test]
 fn parse_solo_colon_fails() {
-    let parser = Parser::from_str(":");
+    let parser = Parser::with_str(":");
     let result = parser.parse();
 
     if let Err(err) = result {
@@ -393,7 +393,7 @@ fn parse_solo_colon_fails() {
 
 #[test]
 fn parse_value_prefixed_name_fails() {
-    let parser = Parser::from_str("5 :");
+    let parser = Parser::with_str("5 :");
     let result = parser.parse();
 
     if let Err(err) = result {
@@ -411,7 +411,7 @@ fn parse_value_prefixed_name_fails() {
 
 #[test]
 fn parse_unvalued_label_fails() {
-    let parser = Parser::from_str("bad:");
+    let parser = Parser::with_str("bad:");
     let result = parser.parse();
 
     if let Err(err) = result {
@@ -429,7 +429,7 @@ fn parse_unvalued_label_fails() {
 
 #[test]
 fn parse_duplicate_label_fails() {
-    let parser = Parser::from_str("a: 5\na: 6");
+    let parser = Parser::with_str("a: 5\na: 6");
     let result = parser.parse();
 
     if let Err(err) = result {

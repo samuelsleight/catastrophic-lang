@@ -27,10 +27,10 @@ impl Optimizer {
             for pass in pass::passes() {
                 let _scope = time_scope.scope(pass.name());
 
-                for index in 0..mir.len() {
-                    let context = OptimizationContext::new(&mir[index]);
+                for input in &mut mir {
+                    let context = OptimizationContext::new(input);
                     let instrs = pass.run(&context);
-                    mir[index].instrs = instrs;
+                    input.instrs = instrs;
                 }
             }
         }

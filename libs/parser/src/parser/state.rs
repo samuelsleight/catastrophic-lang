@@ -36,6 +36,12 @@ pub struct State {
     errors: Vec<ParseError>,
 }
 
+impl Default for State {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl State {
     pub fn new() -> Self {
         Self {
