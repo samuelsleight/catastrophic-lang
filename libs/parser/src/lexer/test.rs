@@ -124,6 +124,7 @@ test_cases! {
     parens("()", &[span(Token::Parens, 0, 0, 0, 2)])
     plus("+", &[span(Token::Plus, 0, 0, 0, 1)])
     minus("-", &[span(Token::Minus, 0, 0, 0, 1)])
+    multiply("*", &[span(Token::Multiply, 0, 0, 0, 1)])
     equals("=", &[span(Token::Equals, 0, 0, 0, 1)])
     less_than("<", &[span(Token::LessThan, 0, 0, 0, 1)])
     greater_than(">", &[span(Token::GreaterThan, 0, 0, 0, 1)])

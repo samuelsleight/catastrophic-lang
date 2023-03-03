@@ -67,24 +67,6 @@ impl State {
                 None
             }
 
-            c @ '0'..='9' => {
-                self.start = input.start;
-                self.mode = Mode::Number;
-
-                self.number = 0;
-                self.number += c as ValueType - '0' as ValueType;
-                None
-            }
-
-            c if is_ident_starter(c) => {
-                self.start = input.start;
-                self.mode = Mode::Ident;
-
-                self.buffer.clear();
-                self.buffer.push(c);
-                None
-            }
-
             '"' => {
                 self.start = input.start;
                 self.mode = Mode::String;
@@ -106,6 +88,7 @@ impl State {
             }
 
             '+' => Some(input.swap(Token::Plus)),
+            '*' => Some(input.swap(Token::Multiply)),
 
             '=' => Some(input.swap(Token::Equals)),
             '<' => Some(input.swap(Token::LessThan)),
@@ -122,6 +105,24 @@ impl State {
 
             '{' => Some(input.swap(Token::LCurly)),
             '}' => Some(input.swap(Token::RCurly)),
+
+            c @ '0'..='9' => {
+                self.start = input.start;
+                self.mode = Mode::Number;
+
+                self.number = 0;
+                self.number += c as ValueType - '0' as ValueType;
+                None
+            }
+
+            c if is_ident_starter(c) => {
+                self.start = input.start;
+                self.mode = Mode::Ident;
+
+                self.buffer.clear();
+                self.buffer.push(c);
+                None
+            }
 
             c => (!c.is_whitespace()).then(|| input.swap(Token::Unexpected(c))),
         };

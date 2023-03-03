@@ -9,6 +9,7 @@ use catastrophic_core::{defines::ValueType, span::Span};
 pub enum Builtin {
     Plus,
     Minus,
+    Multiply,
     Equals,
     GreaterThan,
     LessThan,
@@ -98,6 +99,7 @@ impl Display for Builtin {
         match self {
             Builtin::Plus => f.write_str("+"),
             Builtin::Minus => f.write_str("-"),
+            Builtin::Multiply => f.write_str("*"),
             Builtin::Equals => f.write_str("="),
             Builtin::GreaterThan => f.write_str(">"),
             Builtin::LessThan => f.write_str("<"),

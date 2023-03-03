@@ -257,6 +257,7 @@ impl State {
             Token::Parens => self.process_command(Command::Call, span),
             Token::Plus => self.process_builtin(Builtin::Plus, span),
             Token::Minus => self.process_builtin(Builtin::Minus, span),
+            Token::Multiply => self.process_builtin(Builtin::Multiply, span),
             Token::Equals => self.process_builtin(Builtin::Equals, span),
             Token::GreaterThan => self.process_builtin(Builtin::GreaterThan, span),
             Token::LessThan => self.process_builtin(Builtin::LessThan, span),

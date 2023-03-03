@@ -59,6 +59,7 @@ impl FunctionKey {
                 match builtin {
                     BinOp::Plus => "plus",
                     BinOp::Minus => "minus",
+                    BinOp::Multiply => "multiply",
                     BinOp::Equals => "equals",
                     BinOp::GreaterThan => "greater_than",
                     BinOp::LessThan => "less_than",
@@ -167,6 +168,7 @@ impl State {
         match bin_op {
             BinOp::Plus => builder.build_add(&x, &y),
             BinOp::Minus => builder.build_sub(&x, &y),
+            BinOp::Multiply => builder.build_mul(&x, &y),
             BinOp::Equals => builder.build_eq(&x, &y),
             BinOp::GreaterThan => todo!(),
             BinOp::LessThan => builder.build_lt(&x, &y),

@@ -5,6 +5,7 @@ pub use catastrophic_hir::hir::*;
 pub enum BinOp {
     Plus,
     Minus,
+    Multiply,
     Equals,
     GreaterThan,
     LessThan,

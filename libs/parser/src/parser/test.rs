@@ -145,6 +145,13 @@ test_cases! {
             |block| {
                 block.push_instruction(span(Instruction::Push(InstrValue::Builtin(Builtin::Minus)), 0, 0, 0, 1));
             }))
+    single_mul(
+        "*",
+        &block(
+            Block::no_args(),
+            |block| {
+                block.push_instruction(span(Instruction::Push(InstrValue::Builtin(Builtin::Multiply)), 0, 0, 0, 1));
+            }))
     single_equals_builtin(
         "=",
         &block(

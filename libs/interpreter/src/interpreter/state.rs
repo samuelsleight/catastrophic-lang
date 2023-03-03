@@ -80,6 +80,13 @@ impl<'a> Env<'a> {
                     Err(())
                 }
             }
+            Builtin::Multiply => {
+                if let [Value::Number(a), Value::Number(b)] = args[..] {
+                    Ok(Value::Number(a * b))
+                } else {
+                    Err(())
+                }
+            }
             Builtin::LessThan => {
                 if let [Value::Number(a), Value::Number(b)] = args[..] {
                     Ok(Value::Number(ValueType::from(a < b)))
@@ -130,7 +137,7 @@ impl<'a> Env<'a> {
             Function::Builtin(builtin) => (
                 0,
                 match builtin {
-                    Builtin::Plus | Builtin::Minus | Builtin::LessThan | Builtin::GreaterThan | Builtin::Equals => 2,
+                    Builtin::Plus | Builtin::Minus | Builtin::Multiply | Builtin::LessThan | Builtin::GreaterThan | Builtin::Equals => 2,
                     Builtin::IfThenElse => 3,
                 },
             ),
