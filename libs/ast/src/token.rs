@@ -12,6 +12,7 @@ pub enum Token {
     Plus,
     Minus,
     Multiply,
+    Divide,
 
     Equals,
     LessThan,

@@ -89,6 +89,7 @@ impl State {
 
             '+' => Some(input.swap(Token::Plus)),
             '*' => Some(input.swap(Token::Multiply)),
+            '/' => Some(input.swap(Token::Divide)),
 
             '=' => Some(input.swap(Token::Equals)),
             '<' => Some(input.swap(Token::LessThan)),

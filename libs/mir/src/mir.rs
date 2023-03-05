@@ -6,6 +6,7 @@ pub enum BinOp {
     Plus,
     Minus,
     Multiply,
+    Divide,
     Equals,
     GreaterThan,
     LessThan,

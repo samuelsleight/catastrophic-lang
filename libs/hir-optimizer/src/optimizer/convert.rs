@@ -15,6 +15,7 @@ fn convert_instr(hir: Span<hir::Instr>) -> Span<mir::Instr> {
                     hir::Builtin::Plus => mir::Function::BinOp(mir::BinOp::Plus),
                     hir::Builtin::Minus => mir::Function::BinOp(mir::BinOp::Minus),
                     hir::Builtin::Multiply => mir::Function::BinOp(mir::BinOp::Multiply),
+                    hir::Builtin::Divide => mir::Function::BinOp(mir::BinOp::Divide),
                     hir::Builtin::Equals => mir::Function::BinOp(mir::BinOp::Equals),
                     hir::Builtin::GreaterThan => mir::Function::BinOp(mir::BinOp::GreaterThan),
                     hir::Builtin::LessThan => mir::Function::BinOp(mir::BinOp::LessThan),
