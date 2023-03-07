@@ -1,5 +1,3 @@
-use std::io::{Read, Seek};
-
 use catastrophic_core::{
     error::{context::ErrorProvider, writer::ErrorWriter},
     span::Span,
@@ -22,11 +20,11 @@ impl From<Vec<CompileError>> for CompileErrors {
 }
 
 impl ErrorProvider for CompileErrors {
-    fn write_errors<R: Read + Seek>(&self, writer: &mut ErrorWriter<R>) -> std::fmt::Result {
+    fn write_errors(&self, writer: &mut dyn ErrorWriter) -> std::fmt::Result {
         for error in &self.errors {
             match error {
                 CompileError::UndefinedSymbolError(ref symbol) => {
-                    writer.error(symbol.swap(()), &format!("Use of undefined symbol `{}`", symbol.data))?
+                    writer.error(Some(symbol.swap(())), &format!("Use of undefined symbol `{}`", symbol.data))?
                 }
             }
         }

@@ -1,5 +1,3 @@
-use std::io::{Read, Seek};
-
 use catastrophic_core::{
     error::{context::ErrorProvider, writer::ErrorWriter},
     span::Span,
@@ -11,9 +9,9 @@ pub enum LexError {
 }
 
 impl ErrorProvider for LexError {
-    fn write_errors<R: Read + Seek>(&self, writer: &mut ErrorWriter<R>) -> std::fmt::Result {
+    fn write_errors(&self, writer: &mut dyn ErrorWriter) -> std::fmt::Result {
         match self {
-            LexError::UnterminatedString(span) => writer.error(*span, "Unterminated string literal"),
+            LexError::UnterminatedString(span) => writer.error(Some(*span), "Unterminated string literal"),
         }
     }
 }

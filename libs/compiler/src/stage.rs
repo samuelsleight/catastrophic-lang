@@ -1,5 +1,3 @@
-use std::io::{Read, Seek};
-
 use catastrophic_core::{
     error::{context::ErrorProvider, writer::ErrorWriter},
     profiling::TimeScope,
@@ -33,7 +31,7 @@ impl Stage<Vec<mir::Block>> for CompilationStage {
 pub enum NoError {}
 
 impl ErrorProvider for NoError {
-    fn write_errors<R: Read + Seek>(&self, _: &mut ErrorWriter<R>) -> std::fmt::Result {
+    fn write_errors(&self, _: &mut dyn ErrorWriter) -> std::fmt::Result {
         Ok(())
     }
 }

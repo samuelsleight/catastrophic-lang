@@ -172,6 +172,7 @@ dependencies = [
 [[package]]
 name = "dragon-tamer"
 version = "0.2.0"
+source = "git+https://github.com/samuelsleight/dragon-tamer#fb027d933d75e89af88b0235583a2ce1c5cb2057"
 dependencies = [
  "llvm-sys",
 ]
@@ -353,7 +354,7 @@ checksum = "456c603be3e8d448b072f410900c09faf164fbce2d480456f50eea6e25f9c848"
 [[package]]
 name = "ruinous"
 version = "0.1.0"
-source = "git+https://github.com/samuelsleight/ruinous#6538d1f6182e0690a72fad85f4aa3934e22f3da0"
+source = "git+https://github.com/samuelsleight/ruinous#8e77ded9c9bdfb44f4eb55ecd9bce86af621aefe"
 dependencies = [
  "ruinous-util",
 ]
@@ -361,7 +362,7 @@ dependencies = [
 [[package]]
 name = "ruinous-util"
 version = "0.1.0"
-source = "git+https://github.com/samuelsleight/ruinous#6538d1f6182e0690a72fad85f4aa3934e22f3da0"
+source = "git+https://github.com/samuelsleight/ruinous#8e77ded9c9bdfb44f4eb55ecd9bce86af621aefe"
 
 [[package]]
 name = "rustix"

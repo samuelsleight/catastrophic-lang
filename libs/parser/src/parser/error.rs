@@ -16,17 +16,17 @@ pub enum ParseError {
 }
 
 impl ErrorProvider for ParseError {
-    fn write_errors<R: std::io::Read + std::io::Seek>(&self, writer: &mut ErrorWriter<R>) -> std::fmt::Result {
+    fn write_errors(&self, writer: &mut dyn ErrorWriter) -> std::fmt::Result {
         match self {
-            ParseError::UnexpectedChar(span) => writer.error(span.swap(()), &format!("Encountered unexpected `{}`", span.data))?,
-            ParseError::BlockClosedWithoutOpening(span) => writer.error(*span, "Encountered `}` with no corresponding `{`")?,
-            ParseError::BlockWithoutClosing(span) => writer.error(*span, "Encountered `{` without corresponding `}`")?,
-            ParseError::LabelWithoutName(span) => writer.error(*span, "Encountered `:` without an accompanying symbol name")?,
-            ParseError::LabelWithoutValue(span) => writer.error(*span, "Encountered `:` without a corresponding symbol value")?,
-            ParseError::ArrowWithoutArg(span) => writer.error(*span, "Encountered `->` without a corresponding argument")?,
-            ParseError::ArrowWithoutBlock(span) => writer.error(*span, "Encountered `->` without a corresponding block")?,
+            ParseError::UnexpectedChar(span) => writer.error(Some(span.swap(())), &format!("Encountered unexpected `{}`", span.data))?,
+            ParseError::BlockClosedWithoutOpening(span) => writer.error(Some(*span), "Encountered `}` with no corresponding `{`")?,
+            ParseError::BlockWithoutClosing(span) => writer.error(Some(*span), "Encountered `{` without corresponding `}`")?,
+            ParseError::LabelWithoutName(span) => writer.error(Some(*span), "Encountered `:` without an accompanying symbol name")?,
+            ParseError::LabelWithoutValue(span) => writer.error(Some(*span), "Encountered `:` without a corresponding symbol value")?,
+            ParseError::ArrowWithoutArg(span) => writer.error(Some(*span), "Encountered `->` without a corresponding argument")?,
+            ParseError::ArrowWithoutBlock(span) => writer.error(Some(*span), "Encountered `->` without a corresponding block")?,
             ParseError::DuplicateSymbolError { first, duplicate } => {
-                writer.error(*duplicate, "Encountered a duplicate symbol definition")?;
+                writer.error(Some(*duplicate), "Encountered a duplicate symbol definition")?;
                 writer.note(*first, "Symbol was previously defined here:")?;
             }
         }
