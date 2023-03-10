@@ -27,6 +27,7 @@ enum StackItem {
     Builtin(Builtin),
     Label(String),
     Arg(String),
+    Comment(String),
     Block(ast::Block),
 }
 
@@ -66,6 +67,11 @@ impl State {
     fn process_command(&mut self, command: Command, span: Span<()>) {
         self.stack
             .push(span.swap(StackItem::Command(command)));
+    }
+
+    fn process_comment(&mut self, comment: String, span: Span<()>) {
+        self.stack
+            .push(span.swap(StackItem::Comment(comment)))
     }
 
     fn process_number(&mut self, value: ValueType, span: Span<()>) {
@@ -234,6 +240,9 @@ impl State {
                 StackItem::Number(value) => block.push_instruction(item_span.swap(Instruction::Push(InstrValue::Number(value)))),
                 StackItem::Builtin(builtin) => block.push_instruction(item_span.swap(Instruction::Push(InstrValue::Builtin(builtin)))),
                 StackItem::Block(value) => block.push_instruction(item_span.swap(Instruction::Push(InstrValue::Block(value)))),
+                StackItem::Comment(comment) => block
+                    .comments
+                    .push(item_span.swap(comment)),
                 StackItem::Label(_) => self
                     .errors
                     .push(ParseError::LabelWithoutValue(item_span)),
@@ -270,6 +279,7 @@ impl State {
             Token::Question => self.process_builtin(Builtin::IfThenElse, span),
             Token::LCurly => self.process_open_block(span),
             Token::RCurly => self.process_close_block(span),
+            Token::Comment(comment) => self.process_comment(comment, span),
             Token::Unexpected(c) => self
                 .errors
                 .push(ParseError::UnexpectedChar(span.swap(c))),

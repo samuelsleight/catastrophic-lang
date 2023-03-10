@@ -58,6 +58,7 @@ pub struct Block {
     pub args: Vec<Span<String>>,
     pub symbols: HashMap<String, Symbol>,
     pub instrs: Vec<Span<Instruction>>,
+    pub comments: Vec<Span<String>>,
 }
 
 impl Symbol {
@@ -74,16 +75,13 @@ impl Block {
             args: Vec::new(),
             symbols: HashMap::new(),
             instrs: Vec::new(),
+            comments: Vec::new(),
         }
     }
 
     #[must_use]
     pub fn with_args(args: Vec<Span<String>>) -> Self {
-        Self {
-            args,
-            symbols: HashMap::new(),
-            instrs: Vec::new(),
-        }
+        Self { args, ..Self::no_args() }
     }
 
     pub fn with_symbol(&mut self, name: String) -> Entry<String, Symbol> {

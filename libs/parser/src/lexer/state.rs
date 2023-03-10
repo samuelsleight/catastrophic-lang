@@ -63,7 +63,10 @@ impl State {
     fn process_main(&mut self, input: Span<char>) -> StateResult {
         let token = match input.data {
             '#' => {
+                self.start = input.start;
                 self.mode = Mode::Comment;
+
+                self.buffer.clear();
                 None
             }
 
@@ -132,11 +135,17 @@ impl State {
     }
 
     fn process_comment(&mut self, input: Span<char>) -> StateResult {
+        self.buffer.push(input.data);
+
         if let '\n' | '\r' = input.data {
             self.mode = Mode::Main;
+            (
+                Some(Span::new(self.start, input.end, Token::Comment(self.buffer.clone()))),
+                Continuation::Consume,
+            )
+        } else {
+            (None, Continuation::Consume)
         }
-
-        (None, Continuation::Consume)
     }
 
     fn process_ident(&mut self, input: Span<char>) -> StateResult {

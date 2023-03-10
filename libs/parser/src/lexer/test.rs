@@ -139,5 +139,5 @@ test_cases! {
     r_curly("}", &[span(Token::RCurly, 0, 0, 0, 1)])
     l_paren("(", &[span(Token::Unexpected('('), 0, 0, 0, 1)])
     r_paren(")", &[span(Token::Unexpected(')'), 0, 0, 0, 1)])
-    comment("# comment\n", &[])
+    comment("# comment\n", &[span(Token::Comment(" comment\n".to_owned()), 0, 0, 0, 10)])
 }

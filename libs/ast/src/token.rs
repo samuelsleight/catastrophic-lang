@@ -30,5 +30,6 @@ pub enum Token {
     LCurly,
     RCurly,
 
+    Comment(String),
     Unexpected(char),
 }
