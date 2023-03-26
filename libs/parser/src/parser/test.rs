@@ -34,7 +34,7 @@ fn parser_test(input: &str, expected: &Block) {
     let parser = Parser::with_str(input);
     let result = parser.parse().unwrap();
 
-    assert_eq!(&result, expected);
+    assert_eq!(&result.ast, expected);
 }
 
 macro_rules! test_cases {

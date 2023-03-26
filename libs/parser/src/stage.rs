@@ -12,7 +12,7 @@ impl<P: AsRef<Path>> Stage<P> for ParseStage {
     type Error = Error;
 
     fn run(self, input: P, _: &mut TimeScope) -> Result<Self::Output, Self::Error> {
-        Parser::with_file(input)?.parse()
+        Ok(Parser::with_file(input)?.parse()?.ast)
     }
 
     fn name() -> &'static str {

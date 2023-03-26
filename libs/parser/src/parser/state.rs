@@ -10,6 +10,7 @@ use ruinous::parser::{state::State as ParserState, ParseErrors};
 use super::{
     ast::{Builtin, InstrValue, Instruction, SymbolValue},
     error::ParseError,
+    output::ParseOutput,
 };
 
 #[derive(Debug, Copy, Clone)]
@@ -35,20 +36,18 @@ pub struct State {
     stack: Vec<Span<StackItem>>,
     blocks: Vec<ast::Block>,
     errors: Vec<ParseError>,
-}
 
-impl Default for State {
-    fn default() -> Self {
-        Self::new()
-    }
+    permissive: bool,
 }
 
 impl State {
-    pub fn new() -> Self {
+    pub fn new(permissive: bool) -> Self {
         Self {
             stack: Vec::new(),
             blocks: vec![ast::Block::no_args()],
             errors: Vec::new(),
+
+            permissive,
         }
     }
 
@@ -286,7 +285,7 @@ impl State {
         }
     }
 
-    pub fn finish(mut self) -> Result<ast::Block, ParseErrors<ParseError>> {
+    pub fn finish(mut self) -> Result<ParseOutput, ParseErrors<ParseError>> {
         let (block, termination) = self.terminate_block();
 
         if let BlockTermination::Curly(span) = termination {
@@ -294,16 +293,21 @@ impl State {
                 .push(ParseError::BlockWithoutClosing(span));
         }
 
-        if self.errors.is_empty() {
-            Ok(block)
+        let output = ParseOutput {
+            ast: block,
+            errors: self.errors,
+        };
+
+        if self.permissive || output.errors.is_empty() {
+            Ok(output)
         } else {
-            Err(self.errors.into())
+            Err(output.errors.into())
         }
     }
 }
 
 impl ParserState<Token> for State {
-    type Ast = ast::Block;
+    type Ast = ParseOutput;
     type Error = ParseError;
 
     fn process(&mut self, token: Span<Token>) {
