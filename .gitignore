@@ -3,7 +3,8 @@
 
 # Editor files
 *.code-workspace
-/.fleet
+.fleet
+.idea
 
 # Test source/build files
 *.c
@@ -16,3 +17,4 @@ a.out
 # Test/profiling files
 flamegraph.svg
 *.profraw
+tarpaulin-report.html
