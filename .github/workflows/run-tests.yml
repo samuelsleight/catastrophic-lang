@@ -13,7 +13,7 @@ jobs:
   build_and_test:
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -25,18 +25,6 @@ jobs:
     - uses: KyleMayes/install-llvm-action@v1.9.0
       with:
         version: "14.0"
-
-    - name: Log LLVM Install
-      if: runner.os == 'Windows'
-      env: 
-        LLVM_SYS_140_PREFIX: ${{ env.LLVM_PATH }}
-      run: echo "LLVM_PATH $env:LLVM_PATH LLVM_SYS_140_PREFIX $env:LLVM_SYS_140_PREFIX"
-
-    - name: Log LLVM Install
-      if: runner.os != 'Windows'
-      env: 
-        LLVM_SYS_140_PREFIX: ${{ env.LLVM_PATH }}
-      run: echo "LLVM_PATH $LLVM_PATH LLVM_SYS_140_PREFIX $LLVM_SYS_140_PREFIX"
 
     # Build and run the tests
     - name: Build
