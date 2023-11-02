@@ -18,8 +18,18 @@ jobs:
     runs-on: ${{matrix.os}}
 
     steps:
+    # Checkout the repository
     - uses: actions/checkout@v3
+
+    # Install an appropriate version of llvm
+    - uses: KyleMayes/install-llvm-action@v1.9.0
+      with:
+        version: "14.0"
+
+    # Build and run the tests
     - name: Build
+      env: 
+        LLVM_SYS_140_PREFIX: ${{env.LLVM_PATH}}
       run: cargo build --verbose
     - name: Run Tests
       run: cargo test --verbose --workspace
