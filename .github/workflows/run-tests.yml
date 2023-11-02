@@ -15,7 +15,7 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
 
-    runs-on: ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
 
     steps:
     # Checkout the repository
@@ -26,10 +26,13 @@ jobs:
       with:
         version: "14.0"
 
+    - name: Log LLVM Install
+      env: 
+        LLVM_SYS_140_PREFIX: ${{ env.LLVM_PATH }}
+      run: echo "LLVM_PATH $LLVM_PATH LLVM_SYS_140_PREFIX $LLVM_SYS_140_PREFIX"
+
     # Build and run the tests
     - name: Build
-      env: 
-        LLVM_SYS_140_PREFIX: ${{env.LLVM_PATH}}
       run: cargo build --verbose
     - name: Run Tests
       run: cargo test --verbose --workspace
