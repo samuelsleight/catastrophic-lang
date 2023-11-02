@@ -27,6 +27,13 @@ jobs:
         version: "14.0"
 
     - name: Log LLVM Install
+      if: runner.os == 'Windows'
+      env: 
+        LLVM_SYS_140_PREFIX: ${{ env.LLVM_PATH }}
+      run: echo "LLVM_PATH $env:LLVM_PATH LLVM_SYS_140_PREFIX $env:LLVM_SYS_140_PREFIX"
+
+    - name: Log LLVM Install
+      if: runner.os != 'Windows'
       env: 
         LLVM_SYS_140_PREFIX: ${{ env.LLVM_PATH }}
       run: echo "LLVM_PATH $LLVM_PATH LLVM_SYS_140_PREFIX $LLVM_SYS_140_PREFIX"
