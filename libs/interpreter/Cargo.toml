@@ -6,3 +6,4 @@ edition.workspace = true
 [dependencies]
 catastrophic-hir.workspace = true
 catastrophic-core.workspace = true
+rand.workspace = true

@@ -11,7 +11,7 @@ members = [
     "libs/mir", 
     "libs/compiler", 
     "catastrophici",
-    "catastrophicc"
+    "catastrophicc",
 ]
 
 [workspace.package]
@@ -37,4 +37,5 @@ clap = { version="4.1.4", features=["derive"] }
 dragon-tamer = { git = "https://github.com/samuelsleight/dragon-tamer" }
 paste = "1.0.11"
 pipeline = { git = "https://github.com/samuelsleight/pipelines" }
+rand = "0.8.5"
 unic-emoji = { git = "https://github.com/eyeplum/rust-unic/", branch = "develop" }
