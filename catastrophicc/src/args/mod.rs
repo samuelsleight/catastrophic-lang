@@ -10,10 +10,10 @@ pub struct Args {
     #[arg(long)]
     pub debug: Option<flags::DebugMode>,
 
-    #[arg(short, long)]
+    #[arg(long)]
     pub pretty: bool,
 
-    #[arg(short, long)]
+    #[arg(long)]
     pub profile: bool,
 
     #[arg(long = "opt", default_value = "all")]
