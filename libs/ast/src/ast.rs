@@ -15,6 +15,7 @@ pub enum Builtin {
     GreaterThan,
     LessThan,
     IfThenElse,
+    Random,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -104,6 +105,7 @@ impl Display for Builtin {
             Builtin::GreaterThan => f.write_str(">"),
             Builtin::LessThan => f.write_str("<"),
             Builtin::IfThenElse => f.write_str("?"),
+            Builtin::Random => f.write_str("!"),
         }
     }
 }

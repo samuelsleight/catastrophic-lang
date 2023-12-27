@@ -122,6 +122,9 @@ impl<'a> Env<'a> {
                     Err(())
                 }
             }
+            Builtin::Random => {
+                unimplemented!()
+            }
         }
         .map_err(|_| RuntimeError::InvalidArgsForBuiltin(span, builtin))?;
 
@@ -150,7 +153,8 @@ impl<'a> Env<'a> {
                     | Builtin::Divide
                     | Builtin::LessThan
                     | Builtin::GreaterThan
-                    | Builtin::Equals => 2,
+                    | Builtin::Equals
+                    | Builtin::Random => 2,
 
                     Builtin::IfThenElse => 3,
                 },

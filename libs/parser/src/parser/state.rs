@@ -276,6 +276,7 @@ impl State {
             Token::Tilde => self.process_command(Command::InputChar, span),
             Token::Colon => self.process_colon(span),
             Token::Question => self.process_builtin(Builtin::IfThenElse, span),
+            Token::Exclamation => self.process_builtin(Builtin::Random, span),
             Token::LCurly => self.process_open_block(span),
             Token::RCurly => self.process_close_block(span),
             Token::Comment(comment) => self.process_comment(comment, span),

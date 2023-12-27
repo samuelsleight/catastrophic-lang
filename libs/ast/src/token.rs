@@ -26,6 +26,7 @@ pub enum Token {
 
     Colon,
     Question,
+    Exclamation,
 
     LCurly,
     RCurly,

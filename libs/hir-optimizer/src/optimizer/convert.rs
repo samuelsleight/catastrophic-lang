@@ -19,6 +19,7 @@ fn convert_instr(hir: Span<hir::Instr>) -> Span<mir::Instr> {
                     hir::Builtin::Equals => mir::Function::BinOp(mir::BinOp::Equals),
                     hir::Builtin::GreaterThan => mir::Function::BinOp(mir::BinOp::GreaterThan),
                     hir::Builtin::LessThan => mir::Function::BinOp(mir::BinOp::LessThan),
+                    hir::Builtin::Random => mir::Function::BinOp(mir::BinOp::Random),
                     hir::Builtin::IfThenElse => mir::Function::TriOp(mir::TriOp::IfThenElse),
                 },
             }),
