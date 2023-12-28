@@ -9,9 +9,12 @@ members = [
     "libs/interpreter", 
     "libs/hir-optimizer", 
     "libs/mir", 
-    "libs/compiler", 
+    "libs/compiler",
+
     "catastrophici",
     "catastrophicc",
+
+    "integration_tests",
 ]
 
 [workspace.package]

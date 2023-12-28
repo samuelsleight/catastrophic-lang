@@ -1,0 +1,6 @@
+[package]
+name = "catastrophic_integration_tests"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

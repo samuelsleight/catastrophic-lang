@@ -145,6 +145,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "catastrophic_integration_tests"
+version = "0.1.0"
+
+[[package]]
 name = "catastrophicc"
 version = "0.1.0"
 dependencies = [
