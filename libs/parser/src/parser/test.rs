@@ -180,6 +180,13 @@ test_cases! {
             |block| {
                 block.push_instruction(span(Instruction::Push(InstrValue::Builtin(Builtin::GreaterThan)), 0, 0, 0, 1));
             }))
+    single_random_builtin(
+        "!",
+        &block(
+            Block::no_args(),
+            |block| {
+                block.push_instruction(span(Instruction::Push(InstrValue::Builtin(Builtin::Random)), 0, 0, 0, 1));
+            }))
     single_ite_builtin(
         "?",
         &block(
