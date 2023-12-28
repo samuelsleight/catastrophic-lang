@@ -135,6 +135,7 @@ test_cases! {
     tilde("~", &[span(Token::Tilde, 0, 0, 0, 1)])
     colon(":", &[span(Token::Colon, 0, 0, 0, 1)])
     question("?", &[span(Token::Question, 0, 0, 0, 1)])
+    exclamation("!", &[span(Token::Exclamation, 0, 0, 0, 1)])
     l_curly("{", &[span(Token::LCurly, 0, 0, 0, 1)])
     r_curly("}", &[span(Token::RCurly, 0, 0, 0, 1)])
     l_paren("(", &[span(Token::Unexpected('('), 0, 0, 0, 1)])

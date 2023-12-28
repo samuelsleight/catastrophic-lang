@@ -1,5 +1,7 @@
 use std::io::{stdin, stdout, Read, Write};
 
+use rand::prelude::*;
+
 use catastrophic_core::{defines::ValueType, span::Span};
 use catastrophic_hir::hir::{self, Builtin, Command};
 
@@ -115,6 +117,14 @@ impl<'a> Env<'a> {
                     Err(())
                 }
             }
+            Builtin::Random => {
+                if let [Value::Number(a), Value::Number(b)] = args[..] {
+                    let mut rng = thread_rng();
+                    Ok(Value::Number(ValueType::from(rng.gen_range(a..=b))))
+                } else {
+                    Err(())
+                }
+            }
             Builtin::IfThenElse => {
                 if let [Value::Number(i), t, e] = args[..] {
                     Ok(if i == ValueType::from(false) { e } else { t })
@@ -150,7 +160,8 @@ impl<'a> Env<'a> {
                     | Builtin::Divide
                     | Builtin::LessThan
                     | Builtin::GreaterThan
-                    | Builtin::Equals => 2,
+                    | Builtin::Equals
+                    | Builtin::Random => 2,
 
                     Builtin::IfThenElse => 3,
                 },

@@ -64,6 +64,7 @@ impl FunctionKey {
                     BinOp::Equals => "equals",
                     BinOp::GreaterThan => "greater_than",
                     BinOp::LessThan => "less_than",
+                    BinOp::Random => "random",
                 }
             ),
             FunctionKey::TriOp(builtin) => format!(
@@ -174,6 +175,7 @@ impl State {
             BinOp::Equals => builder.build_eq(&x, &y),
             BinOp::GreaterThan => todo!(),
             BinOp::LessThan => builder.build_lt(&x, &y),
+            BinOp::Random => unimplemented!(),
         }
     }
 

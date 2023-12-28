@@ -106,6 +106,7 @@ impl State {
 
             ':' => Some(input.swap(Token::Colon)),
             '?' => Some(input.swap(Token::Question)),
+            '!' => Some(input.swap(Token::Exclamation)),
 
             '{' => Some(input.swap(Token::LCurly)),
             '}' => Some(input.swap(Token::RCurly)),

@@ -10,6 +10,7 @@ pub enum BinOp {
     Equals,
     GreaterThan,
     LessThan,
+    Random,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
