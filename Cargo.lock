@@ -68,7 +68,7 @@ checksum = "a4668cab20f66d8d020e1fbc0ebe47217433c1b6c8f2040faf858554e394ace6"
 [[package]]
 name = "bintest"
 version = "1.0.3"
-source = "git+https://github.com/samuelsleight/bintest?branch=workspace-options#bcb2114f51feba6e972ea8768c4c824c59bda055"
+source = "git+https://github.com/samuelsleight/bintest?branch=workspace-options#62920f54d281aa098cf1c43a0b96e22b2d9dc8d8"
 dependencies = [
  "cargo_metadata",
 ]
