@@ -42,3 +42,5 @@ paste = "1.0.11"
 pipeline = { git = "https://github.com/samuelsleight/pipelines" }
 rand = "0.8.5"
 unic-emoji = { git = "https://github.com/eyeplum/rust-unic/", branch = "develop" }
+
+bintest = { git = "https://github.com/samuelsleight/bintest", branch = "workspace-options" }

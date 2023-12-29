@@ -3,4 +3,5 @@ name = "catastrophic_integration_tests"
 version.workspace = true
 edition.workspace = true
 
-[dependencies]
+[dev-dependencies]
+bintest.workspace = true
