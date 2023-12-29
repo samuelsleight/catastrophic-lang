@@ -1,0 +1,39 @@
+# Define a function that pops one argument of the stack
+fib: n -> {
+    # Recursive function implementation
+    fib_rec: n -> acc1 -> acc2 -> {
+        # Push args on for later
+        n acc1 acc2
+
+        # Push the if false result 
+        n -> acc1 -> acc2 -> {
+            # n -= 1
+            1 n - ()
+
+            # acc1 += acc2
+            acc2 acc1 + ()
+
+            # acc2 = acc1
+            acc1
+
+            fib_rec ()
+        }
+
+        # Push the if true result
+        n -> acc1 -> acc2 -> {
+            acc1
+        }
+
+        # Push a check for zero case
+        n 0 = ()
+        
+        # Apply if/else, then apply result
+        ? () ()
+    }
+
+    # Call recursive implementation
+    # n = n; acc1 = 0; acc2 = 1
+    n 0 1 fib_rec ()
+}
+
+10 fib () .

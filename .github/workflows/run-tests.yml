@@ -1,35 +1,39 @@
 name: Run Tests
 
-on:
-  push:
+on: 
+  push: 
     branches: [ "main" ]
-  pull_request:
+  pull_request: 
     branches: [ "main" ]
 
-env:
+env: 
   CARGO_TERM_COLOR: always
 
-jobs:
-  build_and_test:
-    strategy:
-      matrix:
+jobs: 
+  build_and_test: 
+    strategy: 
+      matrix: 
         os: [macos-latest, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
-    steps:
-    # Checkout the repository
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+    steps: 
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    # Install an appropriate version of llvm
-    - name: Install LLVM
-      uses: KyleMayes/install-llvm-action@v1.9.0
-      with:
-        version: "14.0"
+      # Install an appropriate version of llvm
+      - name: Install LLVM
+        uses: KyleMayes/install-llvm-action@v1.9.0
+        with: 
+          version: "14.0"
 
-    # Build and run the tests
-    - name: Build
-      run: cargo build --verbose
-    - name: Run Tests
-      run: cargo test --verbose --workspace
+      # Build and run the tests
+      - name: Build
+        env: 
+          LLVM_SYS_140_PREFIX: ${{ env.LLVM_PATH }}
+        run: cargo build --verbose
+      - name: Run Tests
+        env: 
+          LLVM_SYS_140_PREFIX: ${{ env.LLVM_PATH }}
+        run: cargo test --verbose --workspace
