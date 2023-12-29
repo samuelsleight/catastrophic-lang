@@ -22,7 +22,11 @@ macro_rules! test_cases {
     ($binary:ident, $runner:ident) => {
         test_cases!(simple_addition, $binary, $runner);
         test_cases!(simple_subtraction, $binary, $runner);
-
+        test_cases!(simple_multiplication, $binary, $runner);
+        test_cases!(simple_division, $binary, $runner);
+        test_cases!(simple_inequality, $binary, $runner);
+        test_cases!(ite_equality, $binary, $runner);
+        test_cases!(ite_inequality, $binary, $runner);
         test_cases!(fib_divergent, $binary, $runner);
         test_cases!(fib_tail_recursive, $binary, $runner);
     };
