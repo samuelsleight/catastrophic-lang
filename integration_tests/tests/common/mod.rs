@@ -61,6 +61,7 @@ fn get_test_binary(binary: TestBinary) -> Command {
     let bintest = BinTestBuilder::new()
         .build_workspace(true)
         .build_executable(test_binary_name(binary))
+        .quiet(true)
         .build();
 
     bintest.command(test_binary_name(binary))
