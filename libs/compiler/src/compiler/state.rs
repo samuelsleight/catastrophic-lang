@@ -173,7 +173,7 @@ impl State {
             BinOp::Multiply => builder.build_mul(&x, &y),
             BinOp::Divide => builder.build_sdiv(&x, &y),
             BinOp::Equals => builder.build_eq(&x, &y),
-            BinOp::GreaterThan => todo!(),
+            BinOp::GreaterThan => builder.build_gt(&x, &y),
             BinOp::LessThan => builder.build_lt(&x, &y),
             BinOp::Random => unimplemented!(),
         }
