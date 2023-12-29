@@ -15,6 +15,21 @@ pub struct TestCase {
     pub expected: PathBuf,
 }
 
+#[macro_export]
+macro_rules! test_cases {
+    ($binary:ident, $runner:ident) => {
+        test_cases!(simple_addition, $binary, $runner);
+        test_cases!(simple_subtraction, $binary, $runner);
+    };
+
+    ($name:ident, $binary:ident, $runner:ident) => {
+        #[test]
+        fn $name() {
+            $runner(get_test_case(TestBinary::$binary, std::stringify!($name)))
+        }
+    };
+}
+
 static TEST_CASE_DIR: Lazy<PathBuf> = Lazy::new(|| Path::new(std::env!("CARGO_MANIFEST_DIR")).join("test_cases"));
 static LLVM_DIR: Lazy<PathBuf> = Lazy::new(|| Path::new(std::env!("LLVM_SYS_140_PREFIX")).join("bin"));
 
