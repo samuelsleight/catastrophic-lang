@@ -16,6 +16,7 @@ pub struct TestCase {
 }
 
 static TEST_CASE_DIR: Lazy<PathBuf> = Lazy::new(|| Path::new(std::env!("CARGO_MANIFEST_DIR")).join("test_cases"));
+static LLVM_DIR: Lazy<PathBuf> = Lazy::new(|| Path::new(std::env!("LLVM_SYS_140_PREFIX")).join("bin"));
 
 pub fn get_test_case(binary: TestBinary, name: &str) -> TestCase {
     let test_case_path = TEST_CASE_DIR.join(name);
@@ -25,6 +26,10 @@ pub fn get_test_case(binary: TestBinary, name: &str) -> TestCase {
         input: test_case_path.join("input.cat"),
         expected: test_case_path.join("output.txt"),
     }
+}
+
+pub fn get_llvm_binary(bin: &str) -> Command {
+    Command::new(LLVM_DIR.join(bin))
 }
 
 fn test_binary_name(binary: TestBinary) -> &'static str {
