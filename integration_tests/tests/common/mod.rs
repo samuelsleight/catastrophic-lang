@@ -20,6 +20,9 @@ macro_rules! test_cases {
     ($binary:ident, $runner:ident) => {
         test_cases!(simple_addition, $binary, $runner);
         test_cases!(simple_subtraction, $binary, $runner);
+
+        test_cases!(fib_divergent, $binary, $runner);
+        test_cases!(fib_tail_recursive, $binary, $runner);
     };
 
     ($name:ident, $binary:ident, $runner:ident) => {
