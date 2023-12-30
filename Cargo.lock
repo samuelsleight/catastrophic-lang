@@ -355,7 +355,7 @@ checksum = "de3145af08024dea9fa9914f381a17b8fc6034dfb00f3a84013f7ff43f29ed4c"
 [[package]]
 name = "pipeline"
 version = "0.1.0"
-source = "git+https://github.com/samuelsleight/pipelines#47e9ec925e42ea86a2174a0ff60da89760d91c81"
+source = "git+https://github.com/samuelsleight/pipelines#692050e9258e07f40ab675c00e4b993830eca7c1"
 
 [[package]]
 name = "ppv-lite86"

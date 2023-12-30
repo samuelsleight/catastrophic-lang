@@ -5,7 +5,7 @@ use catastrophic_analyser::stage::AnalysisStage;
 use catastrophic_core::{
     error::context::ErrorContext,
     profiling::TimeKeeper,
-    stage::{pipeline, Pipeline, PipelineError, RunPipeline, Stage, StageContext},
+    stage::{pipeline, Pipeline, PipelineResult, RunPipeline, Stage, StageContext},
 };
 use catastrophic_interpreter::stage::InterpreterStage;
 use catastrophic_parser::stage::ParseStage;
@@ -32,14 +32,14 @@ fn main() -> Result<()> {
         .run(pipeline_context);
 
     match result {
-        Ok(context) => {
+        PipelineResult::Ok(context) => {
             if args.profile {
                 context.time_keeper.finish()
             }
 
             Ok(())
         }
-        Err(PipelineError::Cancelled) => Ok(()),
-        Err(PipelineError::Err(error)) => Err(error),
+        PipelineResult::Cancelled => Ok(()),
+        PipelineResult::Err(error) => Err(error),
     }
 }
