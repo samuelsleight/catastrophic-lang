@@ -8,7 +8,7 @@ use catastrophic_core::{
     error::context::ErrorContext,
     pretty::{PrettyDebug, PrettyDebugger},
     profiling::TimeKeeper,
-    stage::{pipeline, Continue, Pipeline, PipelineError, RunPipeline, Stage, StageContext},
+    stage::{pipeline, Continue, Pipeline, PipelineResult, RunPipeline, Stage, StageContext},
 };
 use catastrophic_hir_optimizer::stage::OptimizationStage;
 use catastrophic_parser::stage::ParseStage;
@@ -62,17 +62,17 @@ impl App {
         }
     }
 
-    fn finish(&self, result: Result<StageContext<()>, PipelineError<anyhow::Error>>) -> Result<()> {
+    fn finish(&self, result: PipelineResult<StageContext<()>, anyhow::Error>) -> Result<()> {
         match result {
-            Ok(context) => {
+            PipelineResult::Ok(context) => {
                 if self.args.profile {
                     context.time_keeper.finish()
                 }
 
                 Ok(())
             }
-            Err(PipelineError::Cancelled) => Ok(()),
-            Err(PipelineError::Err(error)) => Err(error),
+            PipelineResult::Cancelled => Ok(()),
+            PipelineResult::Err(error) => Err(error),
         }
     }
 }

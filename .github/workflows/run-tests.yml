@@ -28,11 +28,22 @@ jobs:
         with: 
           version: "14.0"
 
+      # Install the target version of Rust
+      - name: Update Rust Toolchain
+        id: toolchain
+        uses: dtolnay/rust-toolchain@master
+        with: 
+          toolchain: "1.75.0"
+
+      - name: Set Rust Toolchain
+        run: rustup override set ${{steps.toolchain.outputs.name}}
+
       # Build and run the tests
-      - name: Build
+      - name: Build Workspace
         env: 
           LLVM_SYS_140_PREFIX: ${{ env.LLVM_PATH }}
-        run: cargo build --verbose
+        run: cargo build --verbose --workspace
+
       - name: Run Tests
         env: 
           LLVM_SYS_140_PREFIX: ${{ env.LLVM_PATH }}
