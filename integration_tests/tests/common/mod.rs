@@ -2,7 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
-use bintest::{BinTestBuilder, Command};
+use bintest::{BinTest, Command};
 use once_cell::sync::Lazy;
 
 #[derive(Clone, Copy)]
@@ -68,7 +68,7 @@ fn test_binary_name(binary: TestBinary) -> &'static str {
 }
 
 fn get_test_binary(binary: TestBinary) -> Command {
-    let bintest = BinTestBuilder::new()
+    let bintest = BinTest::with()
         .build_workspace(true)
         .build_executable(test_binary_name(binary))
         .quiet(true)

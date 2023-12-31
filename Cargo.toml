@@ -36,7 +36,7 @@ ruinous = { git = "https://github.com/samuelsleight/ruinous" }
 ruinous-util = { git = "https://github.com/samuelsleight/ruinous" }
 
 anyhow = "1.0.65"
-bintest = { git = "https://github.com/samuelsleight/bintest", branch = "workspace-options" }
+bintest = { git = "https://github.com/cehteh/bintest", branch = "devel" }
 clap = { version="4.1.4", features=["derive"] }
 dragon-tamer = { git = "https://github.com/samuelsleight/dragon-tamer" }
 once_cell = "1.19.0"
