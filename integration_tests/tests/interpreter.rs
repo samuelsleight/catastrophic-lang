@@ -5,6 +5,10 @@ use common::{get_test_case, TestBinary, TestCase};
 mod common;
 
 fn run_test_case(mut test_case: TestCase) {
+    if let Ok(stdin) = fs::File::open(test_case.stdin) {
+        test_case.command.stdin(stdin);
+    }
+
     let output = test_case
         .command
         .arg(test_case.input)
