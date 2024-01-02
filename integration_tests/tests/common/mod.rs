@@ -35,6 +35,8 @@ macro_rules! test_cases {
         test_cases!(ite_not_greater_than, $binary, $runner);
 
         test_cases!(input_char, $binary, $runner);
+        test_cases!(input_loop, $binary, $runner);
+        test_cases!(input_string, $binary, $runner);
 
         test_cases!(fib_divergent, $binary, $runner);
         test_cases!(fib_tail_recursive, $binary, $runner);

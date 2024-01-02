@@ -1,0 +1,22 @@
+input_echo: term -> {
+    ~
+    
+    input -> {
+        input
+        
+        input -> {
+            input ,
+            term input_echo ()
+        }
+        
+        input -> {}
+        
+        input term = ()
+        
+        ? () ()
+    }
+    
+    ()
+}
+
+10 input_echo ()
