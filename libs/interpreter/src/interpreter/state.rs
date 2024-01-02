@@ -185,10 +185,10 @@ impl<'a> Env<'a> {
     }
 
     fn output_char_instr(&mut self, span: Span<()>) -> Result<(), RuntimeError> {
+        // TODO: Error handling here
         match self.stack.pop() {
             Value::Number(value) => {
-                let value = char::try_from(u32::try_from(value).unwrap_or(0)).unwrap_or('\0');
-                print!("{}", value);
+                stdout().write(&[value as u8]).unwrap();
                 Ok(())
             }
             _ => Err(RuntimeError::OutputFunction(span)),
@@ -196,6 +196,7 @@ impl<'a> Env<'a> {
     }
 
     fn output_number_instr(&mut self, span: Span<()>) -> Result<(), RuntimeError> {
+        // TODO: Error handling here
         match self.stack.pop() {
             Value::Number(value) => {
                 print!("{}", value);
