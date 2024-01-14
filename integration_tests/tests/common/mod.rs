@@ -42,6 +42,8 @@ macro_rules! test_cases {
         test_cases!(input_loop, $binary, $runner);
         test_cases!(input_string, $binary, $runner);
 
+        test_cases!(nested_symbol_names, $binary, $runner);
+
         test_cases!(fib_divergent, $binary, $runner);
         test_cases!(fib_tail_recursive, $binary, $runner);
 
@@ -49,6 +51,9 @@ macro_rules! test_cases {
         test_cases!(error_unmatched_open_brace, $binary, $runner);
         test_cases!(error_unmatched_close_brace, $binary, $runner);
         test_cases!(error_unterminated_string, $binary, $runner);
+        test_cases!(error_undefined_symbol, $binary, $runner);
+        test_cases!(error_duplicate_symbol, $binary, $runner);
+        test_cases!(error_missing_arrow, $binary, $runner);
     };
 
     ($name:ident, $binary:ident, $runner:ident) => {

@@ -1,0 +1,7 @@
+Error: Unable to parse input
+
+Caused by:
+    error: 0:0: Encountered `:` without a corresponding symbol value
+    
+    	> test: a {
+    	> ^^^^

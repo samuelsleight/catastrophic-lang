@@ -1,0 +1,12 @@
+Error: Unable to parse input
+
+Caused by:
+    error: 1:0: Encountered a duplicate symbol definition
+    
+    	> test: 10
+    	> ^^^^
+    
+    note: 0:0: Symbol was previously defined here:
+    
+    	> test: 5
+    	> ^^^^
