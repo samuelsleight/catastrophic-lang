@@ -16,6 +16,7 @@ pub struct TestCase {
     pub input: PathBuf,
     pub expected: PathBuf,
     pub stdin: PathBuf,
+    pub stderr: PathBuf,
 }
 
 #[macro_export]
@@ -40,6 +41,11 @@ macro_rules! test_cases {
 
         test_cases!(fib_divergent, $binary, $runner);
         test_cases!(fib_tail_recursive, $binary, $runner);
+
+        test_cases!(error_unexpected_char, $binary, $runner);
+        test_cases!(error_unmatched_open_brace, $binary, $runner);
+        test_cases!(error_unmatched_close_brace, $binary, $runner);
+        test_cases!(error_unterminated_string, $binary, $runner);
     };
 
     ($name:ident, $binary:ident, $runner:ident) => {
@@ -61,6 +67,7 @@ pub fn get_test_case(binary: TestBinary, name: &str) -> TestCase {
         input: test_case_path.join("input.cat"),
         expected: test_case_path.join("output.txt"),
         stdin: test_case_path.join("stdin.txt"),
+        stderr: test_case_path.join("stderr.txt"),
     }
 }
 

@@ -1,0 +1,7 @@
+Error: Unable to parse input
+
+Caused by:
+    error: 0:11: Encountered `{` without corresponding `}`
+    
+    	> test: a -> {
+    	>            ^

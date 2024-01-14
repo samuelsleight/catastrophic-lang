@@ -15,7 +15,8 @@ fn run_test_case(mut test_case: TestCase) {
         lli_command.stdin(stdin);
     }
 
-    test_case
+    // First, run the `catastrophicc` compiler
+    let compiler_output = test_case
         .command
         .args(["--opt", "all"])
         .arg(test_case.input)
@@ -23,12 +24,18 @@ fn run_test_case(mut test_case: TestCase) {
         .output()
         .expect("Unable to sucessfully run executable");
 
-    let output = lli_command
-        .arg(&llvm_output_path)
-        .output()
-        .expect("Unable to sucessfully run lli");
+    if let Ok(expected_stderr) = fs::read(test_case.stderr) {
+        // If we are testing for an error, check that now and return if so
+        assert_eq!(compiler_output.stderr, expected_stderr);
+    } else {
+        // Otherwise, run `lli` on the `catastrphicc` output
+        let output = lli_command
+            .arg(&llvm_output_path)
+            .output()
+            .expect("Unable to sucessfully run lli");
 
-    assert_eq!(output.stdout, fs::read(test_case.expected).expect("Unable to read expected output"));
+        assert_eq!(output.stdout, fs::read(test_case.expected).expect("Unable to read expected output"));
+    }
 
     fs::remove_file(llvm_output_path).expect("Unable to delete temporary file");
 }

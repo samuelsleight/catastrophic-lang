@@ -15,7 +15,13 @@ fn run_test_case(mut test_case: TestCase) {
         .output()
         .expect("Unable to sucessfully run executable");
 
-    assert_eq!(output.stdout, fs::read(test_case.expected).expect("Unable to read expected output"))
+    let (actual, expected) = if let Ok(expected_stderr) = fs::read(test_case.stderr) {
+        (output.stderr, expected_stderr)
+    } else {
+        (output.stdout, fs::read(test_case.expected).expect("Unable to read expected output"))
+    };
+
+    assert_eq!(actual, expected);
 }
 
 mod interpreter {
