@@ -1,3 +1,5 @@
+#![cfg(not(tarpaulin))]
+
 use std::fs;
 
 use common::{get_llvm_binary, get_test_case, TestBinary, TestCase};

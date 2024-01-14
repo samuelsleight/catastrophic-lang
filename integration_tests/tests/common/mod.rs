@@ -58,6 +58,7 @@ macro_rules! test_cases {
 
     ($name:ident, $binary:ident, $runner:ident) => {
         #[test]
+        #[serial_test::file_serial]
         fn $name() {
             $runner(get_test_case(TestBinary::$binary, std::stringify!($name)))
         }
