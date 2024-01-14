@@ -120,6 +120,7 @@ test_cases! {
     simple_integer("10293", &[span(Token::Integer(10293), 0, 0, 0, 5)])
     numeric_ident("a1b2c3", &[span(Token::Ident("a1b2c3".to_owned()), 0, 0, 0, 6)])
     emoji_ident("🐉", &[span(Token::Ident("🐉".to_owned()), 0, 0, 0, 1)])
+    emoji_string("\"🐉\"", &[span(Token::String("🐉".to_owned()), 0, 0, 0, 3)])
     arrow("->", &[span(Token::Arrow, 0, 0, 0, 2)])
     parens("()", &[span(Token::Parens, 0, 0, 0, 2)])
     plus("+", &[span(Token::Plus, 0, 0, 0, 1)])
