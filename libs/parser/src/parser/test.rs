@@ -82,6 +82,16 @@ test_cases! {
                 block.push_instruction(span(Instruction::Push(InstrValue::Number('l' as ValueType)), 0, 0, 0, 7));
                 block.push_instruction(span(Instruction::Push(InstrValue::Number('o' as ValueType)), 0, 0, 0, 7));
             }))
+    single_emoji_string(
+        "\"🐉\"",
+        &block(
+            Block::no_args(),
+            |block| {
+                block.push_instruction(span(Instruction::Push(InstrValue::Number(240 as ValueType)), 0, 0, 0, 3));
+                block.push_instruction(span(Instruction::Push(InstrValue::Number(159 as ValueType)), 0, 0, 0, 3));
+                block.push_instruction(span(Instruction::Push(InstrValue::Number(144 as ValueType)), 0, 0, 0, 3));
+                block.push_instruction(span(Instruction::Push(InstrValue::Number(137 as ValueType)), 0, 0, 0, 3));
+            }))
     single_number(
         "12345",
         &block(
