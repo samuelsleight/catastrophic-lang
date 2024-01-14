@@ -35,6 +35,9 @@ macro_rules! test_cases {
         test_cases!(ite_not_less_than, $binary, $runner);
         test_cases!(ite_not_greater_than, $binary, $runner);
 
+        test_cases!(string_simple, $binary, $runner);
+        test_cases!(string_emoji, $binary, $runner);
+
         test_cases!(input_char, $binary, $runner);
         test_cases!(input_loop, $binary, $runner);
         test_cases!(input_string, $binary, $runner);
