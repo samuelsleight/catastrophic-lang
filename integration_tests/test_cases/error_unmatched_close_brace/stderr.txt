@@ -1,0 +1,17 @@
+Error: Unable to parse input
+
+Caused by:
+    error: 0:6: Encountered `->` without a corresponding block
+    
+    	> test: a ->
+    	>       ^
+    
+    error: 0:0: Encountered `:` without a corresponding symbol value
+    
+    	> test: a ->
+    	> ^^^^
+    
+    error: 2:0: Encountered `}` with no corresponding `{`
+    
+    	> }
+    	> ^

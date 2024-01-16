@@ -1,0 +1,7 @@
+Error: Unable to compile input
+
+Caused by:
+    error: 0:2: Use of undefined symbol `test`
+    
+    	> 5 test () .
+    	>   ^^^^

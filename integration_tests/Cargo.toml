@@ -6,3 +6,4 @@ edition.workspace = true
 [dev-dependencies]
 bintest.workspace = true
 once_cell.workspace = true
+serial_test.workspace = true

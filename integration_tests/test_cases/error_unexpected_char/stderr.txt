@@ -1,0 +1,7 @@
+Error: Unable to parse input
+
+Caused by:
+    error: 0:4: Encountered unexpected `£`
+    
+    	> 1 2 £ () ,
+    	>     ^

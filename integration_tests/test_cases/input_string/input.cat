@@ -1,0 +1,32 @@
+read: term -> {
+    ~
+    ch -> {
+        {
+            term read ()
+            ch
+        }
+
+        {}
+
+        ch term = ()
+
+        ? () ()
+    }
+    ()
+}
+
+print: c -> {
+    {
+        c ,
+        print ()
+    }
+
+    {}
+
+    c 0 = ()
+
+    ? () ()
+}
+
+0 10 read () 
+print ()
