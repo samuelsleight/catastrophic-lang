@@ -58,7 +58,6 @@ macro_rules! test_cases {
 
     ($name:ident, $binary:ident, $runner:ident) => {
         #[test]
-        #[serial_test::file_serial]
         fn $name() {
             $runner(get_test_case(TestBinary::$binary, std::stringify!($name)))
         }
@@ -92,11 +91,12 @@ fn test_binary_name(binary: TestBinary) -> &'static str {
 }
 
 fn get_test_binary(binary: TestBinary) -> Command {
-    let bintest = BinTest::with()
-        .build_workspace(true)
-        .build_executable(test_binary_name(binary))
-        .quiet(true)
-        .build();
+    static BINTEST: Lazy<BinTest> = Lazy::new(|| {
+        BinTest::with()
+            .build_workspace(true)
+            .quiet(true)
+            .build()
+    });
 
-    bintest.command(test_binary_name(binary))
+    BINTEST.command(test_binary_name(binary))
 }
