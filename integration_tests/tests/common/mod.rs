@@ -42,6 +42,9 @@ macro_rules! test_cases {
         test_cases!(input_loop, $binary, $runner);
         test_cases!(input_string, $binary, $runner);
 
+        test_cases!(closure_simple, $binary, $runner);
+        test_cases!(closure_list, $binary, $runner);
+
         test_cases!(nested_symbol_names, $binary, $runner);
 
         test_cases!(fib_divergent, $binary, $runner);
