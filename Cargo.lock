@@ -281,7 +281,7 @@ checksum = "acbf1af155f9b9ef647e42cdc158db4b64a1b61f743629225fde6f3e0be2a7c7"
 [[package]]
 name = "dragon-tamer"
 version = "0.2.0"
-source = "git+https://github.com/samuelsleight/dragon-tamer#5f39666151e3f967189cdcb62b9b12aa8b496bc2"
+source = "git+https://github.com/samuelsleight/dragon-tamer#fa0b22be54af570db92fdec4a86f35a95ec6ffda"
 dependencies = [
  "llvm-sys",
 ]
