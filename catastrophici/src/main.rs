@@ -23,7 +23,7 @@ fn main() -> Result<()> {
     let args = Args::try_parse()?;
 
     let error_context = ErrorContext::from_file(&args.input)?;
-    let time_keeper = TimeKeeper::new("Overall");
+    let time_keeper = TimeKeeper::new(&"Overall");
     let pipeline_context = StageContext::new(args.input, time_keeper, error_context);
 
     let result = pipeline(ParseStage.stage(), |_| ())
@@ -34,7 +34,7 @@ fn main() -> Result<()> {
     match result {
         PipelineResult::Ok(context) => {
             if args.profile {
-                context.time_keeper.finish()
+                context.time_keeper.finish();
             }
 
             Ok(())

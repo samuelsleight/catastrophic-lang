@@ -29,6 +29,14 @@ complexity = "warn"
 pedantic = "warn"
 style = "warn"
 
+# TODO
+cast_lossless = "allow"
+cast_possible_truncation = "allow"
+cast_possible_wrap = "allow"
+cast_sign_loss = "allow"
+missing_errors_doc = "allow"
+module_name_repetitions = "allow"
+
 [workspace.dependencies]
 catastrophic-core = { path = "libs/core" }
 catastrophic-parser = { path = "libs/parser" }

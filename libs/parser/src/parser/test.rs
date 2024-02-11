@@ -208,19 +208,19 @@ test_cases! {
         "fn: {}",
         &block(
             Block::no_args(), |block| {
-                symbol(block, span("fn".to_owned(), 0, 0, 0, 2), span(SymbolValue::Block(Block::no_args()), 0, 4, 0, 6))
+                symbol(block, span("fn".to_owned(), 0, 0, 0, 2), span(SymbolValue::Block(Block::no_args()), 0, 4, 0, 6));
             }))
     named_number(
         "num: 12345",
         &block(
             Block::no_args(), |block| {
-                symbol(block, span("num".to_owned(), 0, 0, 0, 3), span(SymbolValue::Number(12345), 0, 5, 0, 10))
+                symbol(block, span("num".to_owned(), 0, 0, 0, 3), span(SymbolValue::Number(12345), 0, 5, 0, 10));
             }))
     named_builtin(
         "add: +",
         &block(
             Block::no_args(), |block| {
-                symbol(block, span("add".to_owned(), 0, 0, 0, 3), span(SymbolValue::Builtin(Builtin::Plus), 0, 5, 0, 6))
+                symbol(block, span("add".to_owned(), 0, 0, 0, 3), span(SymbolValue::Builtin(Builtin::Plus), 0, 5, 0, 6));
             }))
     blocked_block(
         "{\n\t{}\n}",
@@ -289,7 +289,7 @@ fn parse_unterminated_string_fails() {
     if let Err(RuinousError::LexError(ruinous::lexer::Error::LexError(err))) = result {
         match err {
             LexError::UnterminatedString(s) if s == span((), 0, 0, 0, 1) => return,
-            _ => (),
+            LexError::UnterminatedString(_) => (),
         }
     }
 
@@ -303,6 +303,7 @@ fn parse_unexpected_char_fails() {
 
     if let Err(err) = result {
         match err {
+            #[allow(clippy::match_on_vec_items)]
             RuinousError::ParseErrors(errs) if errs.errors.len() == 1 => match errs.errors[0] {
                 ParseError::UnexpectedChar(s) if s == span('(', 0, 0, 0, 1) => return,
                 _ => (),
@@ -321,6 +322,7 @@ fn parse_unclosed_block_fails() {
 
     if let Err(err) = result {
         match err {
+            #[allow(clippy::match_on_vec_items)]
             RuinousError::ParseErrors(errs) if errs.errors.len() == 1 => match errs.errors[0] {
                 ParseError::BlockWithoutClosing(s) if s == span((), 0, 0, 0, 1) => return,
                 _ => (),
@@ -339,6 +341,7 @@ fn parse_unopened_block_fails() {
 
     if let Err(err) = result {
         match err {
+            #[allow(clippy::match_on_vec_items)]
             RuinousError::ParseErrors(errs) if errs.errors.len() == 1 => match errs.errors[0] {
                 ParseError::BlockClosedWithoutOpening(s) if s == span((), 0, 0, 0, 1) => return,
                 _ => (),
@@ -357,6 +360,7 @@ fn parse_solo_arrow_fails() {
 
     if let Err(err) = result {
         match err {
+            #[allow(clippy::match_on_vec_items)]
             RuinousError::ParseErrors(errs) if errs.errors.len() == 1 => match errs.errors[0] {
                 ParseError::ArrowWithoutArg(s) if s == span((), 0, 0, 0, 2) => return,
                 _ => (),
@@ -375,6 +379,7 @@ fn parse_value_prefixed_arrow_fails() {
 
     if let Err(err) = result {
         match err {
+            #[allow(clippy::match_on_vec_items)]
             RuinousError::ParseErrors(errs) if errs.errors.len() == 1 => match errs.errors[0] {
                 ParseError::ArrowWithoutArg(s) if s == span((), 0, 2, 0, 4) => return,
                 _ => (),
@@ -393,6 +398,7 @@ fn parse_unblocked_arrow_fails() {
 
     if let Err(err) = result {
         match err {
+            #[allow(clippy::match_on_vec_items)]
             RuinousError::ParseErrors(errs) if errs.errors.len() == 1 => match errs.errors[0] {
                 ParseError::ArrowWithoutBlock(s) if s == span((), 0, 0, 0, 1) => return,
                 _ => (),
@@ -411,6 +417,7 @@ fn parse_solo_colon_fails() {
 
     if let Err(err) = result {
         match err {
+            #[allow(clippy::match_on_vec_items)]
             RuinousError::ParseErrors(errs) if errs.errors.len() == 1 => match errs.errors[0] {
                 ParseError::LabelWithoutName(s) if s == span((), 0, 0, 0, 1) => return,
                 _ => (),
@@ -429,6 +436,7 @@ fn parse_value_prefixed_name_fails() {
 
     if let Err(err) = result {
         match err {
+            #[allow(clippy::match_on_vec_items)]
             RuinousError::ParseErrors(errs) if errs.errors.len() == 1 => match errs.errors[0] {
                 ParseError::LabelWithoutName(s) if s == span((), 0, 2, 0, 3) => return,
                 _ => (),
@@ -447,6 +455,7 @@ fn parse_unvalued_label_fails() {
 
     if let Err(err) = result {
         match err {
+            #[allow(clippy::match_on_vec_items)]
             RuinousError::ParseErrors(errs) if errs.errors.len() == 1 => match errs.errors[0] {
                 ParseError::LabelWithoutValue(s) if s == span((), 0, 0, 0, 3) => return,
                 _ => (),
@@ -465,6 +474,7 @@ fn parse_duplicate_label_fails() {
 
     if let Err(err) = result {
         match err {
+            #[allow(clippy::match_on_vec_items)]
             RuinousError::ParseErrors(errs) if errs.errors.len() == 1 => match errs.errors[0] {
                 ParseError::DuplicateSymbolError { first, duplicate } if first == span((), 0, 0, 0, 1) && duplicate == span((), 1, 0, 1, 1) => return,
                 _ => (),

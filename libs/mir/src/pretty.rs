@@ -51,26 +51,26 @@ impl PrettyDebug for Block {
 
 fn write_function(fmt: &mut PrettyFormatter, function: &Function) -> std::fmt::Result {
     match function {
-        Function::Block(index) => write!(fmt, "Block({})", index),
-        Function::BinOp(binop) => write!(fmt, "{:?}", binop),
-        Function::TriOp(triop) => write!(fmt, "{:?}", triop),
+        Function::Block(index) => write!(fmt, "Block({index})"),
+        Function::BinOp(binop) => write!(fmt, "{binop:?}"),
+        Function::TriOp(triop) => write!(fmt, "{triop:?}"),
     }
 }
 
 fn write_value(fmt: &mut PrettyFormatter, value: &Value) -> std::fmt::Result {
     match value {
-        Value::Arg(index) => write!(fmt, "Arg({})", index),
-        Value::Number(value) => write!(fmt, "{}", value),
+        Value::Arg(index) => write!(fmt, "Arg({index})"),
+        Value::Number(value) => write!(fmt, "{value}"),
         Value::Function(function) => write_function(fmt, function),
         Value::ImmediateBinOp(binop, x, y) => {
-            write!(fmt, "{:?}(", binop)?;
+            write!(fmt, "{binop:?}(")?;
             write_value(fmt, x)?;
             write!(fmt, ", ")?;
             write_value(fmt, y)?;
             write!(fmt, ")")
         }
         Value::ImmediateTriOp(triop, x, y, z) => {
-            write!(fmt, "{:?}(", triop)?;
+            write!(fmt, "{triop:?}(")?;
             write_value(fmt, x)?;
             write!(fmt, ", ")?;
             write_value(fmt, y)?;

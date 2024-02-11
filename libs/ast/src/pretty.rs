@@ -19,10 +19,10 @@ impl PrettyDebug for Block {
 fn write_block(block: &Block, fmt: &mut PrettyFormatter) -> std::fmt::Result {
     for (name, value) in &block.symbols {
         fmt.write_indent()?;
-        write!(fmt, "{}: ", name)?;
+        write!(fmt, "{name}: ")?;
 
         match &value.value.data {
-            SymbolValue::Number(value) => writeln!(fmt, "{}", value)?,
+            SymbolValue::Number(value) => writeln!(fmt, "{value}")?,
             SymbolValue::Block(block) => {
                 writeln!(fmt, "{{")?;
                 fmt.indent();
@@ -31,9 +31,9 @@ fn write_block(block: &Block, fmt: &mut PrettyFormatter) -> std::fmt::Result {
 
                 fmt.deindent();
                 fmt.write_indent()?;
-                writeln!(fmt, "}}")?
+                writeln!(fmt, "}}")?;
             }
-            SymbolValue::Builtin(builtin) => writeln!(fmt, "{}", builtin)?,
+            SymbolValue::Builtin(builtin) => writeln!(fmt, "{builtin}")?,
         }
     }
 
@@ -53,8 +53,8 @@ fn write_block(block: &Block, fmt: &mut PrettyFormatter) -> std::fmt::Result {
                 Command::InputNumber => writeln!(fmt, "InputNumber")?,
             },
             Instruction::Push(value) => match value {
-                InstrValue::Number(value) => writeln!(fmt, "Push[{}]", value)?,
-                InstrValue::Ident(ident) => writeln!(fmt, "Push[{}]", ident)?,
+                InstrValue::Number(value) => writeln!(fmt, "Push[{value}]")?,
+                InstrValue::Ident(ident) => writeln!(fmt, "Push[{ident}]")?,
                 InstrValue::Block(block) => {
                     writeln!(fmt, "Push {{")?;
                     fmt.indent();
@@ -63,9 +63,9 @@ fn write_block(block: &Block, fmt: &mut PrettyFormatter) -> std::fmt::Result {
 
                     fmt.deindent();
                     fmt.write_indent()?;
-                    writeln!(fmt, "}}")?
+                    writeln!(fmt, "}}")?;
                 }
-                InstrValue::Builtin(builtin) => writeln!(fmt, "Push[{:?}]", builtin)?,
+                InstrValue::Builtin(builtin) => writeln!(fmt, "Push[{builtin:?}]")?,
             },
         }
     }

@@ -34,7 +34,7 @@ impl App {
 
     fn make_context(&self) -> Result<StageContext<PathBuf>> {
         let error_context = ErrorContext::from_file(&self.args.input)?;
-        let time_keeper = TimeKeeper::new("Overall");
+        let time_keeper = TimeKeeper::new(&"Overall");
         let pipeline_context = StageContext::new(self.args.input.clone(), time_keeper, error_context);
         Ok(pipeline_context)
     }
@@ -66,7 +66,7 @@ impl App {
         match result {
             PipelineResult::Ok(context) => {
                 if self.args.profile {
-                    context.time_keeper.finish()
+                    context.time_keeper.finish();
                 }
 
                 Ok(())

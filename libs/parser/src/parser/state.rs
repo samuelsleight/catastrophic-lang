@@ -56,10 +56,10 @@ impl State {
             .push(span.swap(StackItem::Ident(ident)));
     }
 
-    fn process_string(&mut self, string: String, span: Span<()>) {
+    fn process_string(&mut self, string: &str, span: Span<()>) {
         for byte in string.bytes().rev() {
             self.stack
-                .push(span.swap(StackItem::Number(byte as ValueType)))
+                .push(span.swap(StackItem::Number(byte as ValueType)));
         }
     }
 
@@ -70,7 +70,7 @@ impl State {
 
     fn process_comment(&mut self, comment: String, span: Span<()>) {
         self.stack
-            .push(span.swap(StackItem::Comment(comment)))
+            .push(span.swap(StackItem::Comment(comment)));
     }
 
     fn process_number(&mut self, value: ValueType, span: Span<()>) {
@@ -259,7 +259,7 @@ impl State {
 
         match token.data {
             Token::Ident(ident) => self.process_ident(ident, span),
-            Token::String(string) => self.process_string(string, span),
+            Token::String(string) => self.process_string(&string, span),
             Token::Integer(value) => self.process_number(value, span),
             Token::Arrow => self.process_arrow(span),
             Token::Parens => self.process_command(Command::Call, span),
@@ -312,7 +312,7 @@ impl ParserState<Token> for State {
     type Error = ParseError;
 
     fn process(&mut self, token: Span<Token>) {
-        self.process(token)
+        self.process(token);
     }
 
     fn finish(self) -> Result<Self::Ast, ParseErrors<Self::Error>> {

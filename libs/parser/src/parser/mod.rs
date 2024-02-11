@@ -34,6 +34,7 @@ impl Parser<BufReader<File>> {
 }
 
 impl<'a> Parser<Cursor<&'a str>> {
+    #[must_use]
     pub fn with_str(input: &'a str) -> Self {
         let parser = RuinousParser::from_str(input);
         Self::new(parser)
@@ -45,6 +46,7 @@ impl<R> Parser<R> {
         Self { parser, permissive: false }
     }
 
+    #[must_use]
     pub fn permissive(mut self, value: bool) -> Self {
         self.permissive = value;
         self
