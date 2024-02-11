@@ -1,0 +1,11 @@
+make_adder: x -> {
+    y -> {
+        x y + ()
+    }
+}
+
+4
+
+5 make_adder ()
+
+() .

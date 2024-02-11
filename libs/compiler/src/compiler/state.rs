@@ -36,7 +36,13 @@ pub struct State {
     push_fn: llvm::Function<fn(i64)>,
     call_fn: llvm::Function<fn(i64) -> FunctionMetadata>,
 
-    stack: llvm::Value<*mut [i64; 256]>,
+    closure_push_fn: llvm::Function<fn(i64)>,
+    closure_offset_fn: llvm::Function<fn(i64, i64)>,
+
+    closure_stack: llvm::Value<*mut [i64; 2048]>,
+    closure_stack_index: llvm::Value<*mut u32>,
+
+    stack: llvm::Value<*mut [i64; 1024]>,
     index: llvm::Value<*mut u32>,
 
     functions: BTreeMap<FunctionKey, FunctionInfo>,
@@ -93,6 +99,10 @@ impl State {
         let pop_fn = module.add_function("stack_pop");
         let push_fn = module.add_function("stack_push");
         let call_fn = module.add_function("call_index");
+        let closure_push_fn = module.add_function("closure_push");
+        let closure_offset_fn = module.add_function("closure_offset");
+        let closure_stack = module.add_array();
+        let closure_stack_index = module.add_global(0);
         let stack = module.add_array();
         let index = module.add_global(0);
 
@@ -107,6 +117,10 @@ impl State {
             pop_fn,
             push_fn,
             call_fn,
+            closure_push_fn,
+            closure_offset_fn,
+            closure_stack,
+            closure_stack_index,
             stack,
             index,
             functions: BTreeMap::new(),
@@ -126,6 +140,60 @@ impl State {
             .build_add(&index, &llvm::Value::constant(1));
         builder
             .build_store(&self.index, &index)
+            .build_void_ret();
+    }
+
+    fn compile_closure_push(&mut self) {
+        let (value,) = self.closure_push_fn.params();
+
+        // TODO: Check for max stack size
+
+        let entry = self.closure_push_fn.add_block("entry");
+
+        let (index, builder) = entry
+            .build()
+            .build_load(&self.closure_stack_index);
+        let (index, builder) = builder
+            .build_index_store(&self.closure_stack, &index, &value)
+            .build_add(&index, &llvm::Value::constant(1));
+        builder
+            .build_store(&self.closure_stack_index, &index)
+            .build_void_ret();
+    }
+
+    fn compile_closure_offset(&mut self) {
+        let (index, offset) = self.closure_offset_fn.params();
+
+        let entry = self
+            .closure_offset_fn
+            .add_block("entry");
+
+        let cont = self.closure_offset_fn.add_block("cont");
+
+        let fin = self.closure_offset_fn.add_block("fin");
+        fin.build().build_void_ret();
+
+        entry
+            .build()
+            .build_conditional_jump(&offset, &fin, &cont);
+
+        // Get the arg from the closure stack
+        let (arg, builder) = cont
+            .build()
+            .build_index_load(&self.closure_stack, &index);
+
+        // Push the arg to the main stack
+        let builder = builder
+            .build_call(&self.push_fn, (arg,))
+            .1;
+
+        // Adjust the parameters
+        let (offset, builder) = builder.build_sub(&offset, &llvm::Value::constant(1));
+        let (index, builder) = builder.build_add(&index, &llvm::Value::constant(1));
+
+        builder
+            .build_call(&self.closure_offset_fn, (index, offset))
+            .1
             .build_void_ret();
     }
 
@@ -261,35 +329,25 @@ impl State {
             match &instr.data {
                 Instr::Command(command) => match command {
                     Command::Call => {
-                        let (index, builder) = block_builder.build_call(&self.pop_fn, ());
-                        let ((f, offset), builder) = builder.build_call(&self.call_fn, (index,));
+                        // Load the closure pointer from the main stack
+                        let (closure_index, builder) = block_builder.build_call(&self.pop_fn, ());
 
-                        let cont = self.functions[&FunctionKey::Block(block_index)]
-                            .value
-                            .add_block("cont");
+                        // Load the block index from the closure stack
+                        let (block_to_call_index, builder) = builder.build_index_load(&self.closure_stack, &closure_index);
 
-                        let mut last_block = cont;
+                        // Get the information for the block we are calling
+                        let ((f, offset), builder) = builder.build_call(&self.call_fn, (block_to_call_index,));
 
-                        let mut table = builder.build_jump_table(&offset, &cont);
+                        // Increment the closure pointer to point at the args
+                        let (arg_index, builder) = builder.build_add(&closure_index, &llvm::Value::constant(1));
 
-                        for (i, arg) in args.iter().enumerate() {
-                            let new_block = self.functions[&FunctionKey::Block(block_index)]
-                                .value
-                                .add_block(format!("block_{}", i));
+                        // Iteratively push all the closure arguments onto the stack
+                        let builder = builder
+                            .build_call(&self.closure_offset_fn, (arg_index, offset))
+                            .1;
 
-                            new_block
-                                .build()
-                                .build_call(&self.push_fn, (*arg,))
-                                .1
-                                .build_jump(&last_block);
-
-                            table = table.case(&llvm::Value::constant((i + 1) as i64), &new_block);
-                            last_block = new_block;
-                        }
-
-                        table.finish();
-
-                        block_builder = cont.build().build_call(&f, ()).1;
+                        // Call the function!
+                        block_builder = builder.build_call(&f, ()).1;
                     }
                     Command::OutputChar => {
                         let (value, builder) = block_builder.build_call(&self.pop_fn, ());
@@ -325,11 +383,31 @@ impl State {
                             .1
                     }
                     Value::Function(function) => {
-                        let index = self
-                            .queue_function(FunctionKey::from_function(function))
-                            .index as i64;
-                        block_builder = block_builder
-                            .build_call(&self.push_fn, (llvm::Value::constant(index),))
+                        let block_info = self.queue_function(FunctionKey::from_function(function));
+
+                        // Save closure stack index
+                        let (closure_index, builder) = block_builder.build_load(&self.closure_stack_index);
+
+                        // Push block index to closure stack
+                        let builder = builder
+                            .build_call(&self.closure_push_fn, (llvm::Value::constant(block_info.index as i64),))
+                            .1;
+
+                        // Push closure capture (offset args) to closure stack
+                        let builder = (0..block_info.offset)
+                            .into_iter()
+                            .rev()
+                            .fold(builder, |builder, arg| {
+                                builder
+                                    .build_call(&self.closure_push_fn, (*args.get(arg).unwrap(),))
+                                    .1
+                            });
+
+                        // Push closure stack value to main stack
+                        let (closure_index, builder) = builder.build_int_cast(&closure_index);
+
+                        block_builder = builder
+                            .build_call(&self.push_fn, (closure_index,))
                             .1;
                     }
                     Value::ImmediateBinOp(bin_op, x, y) => {
@@ -497,6 +575,8 @@ impl State {
     pub fn compile(&mut self) {
         self.compile_pop();
         self.compile_push();
+        self.compile_closure_push();
+        self.compile_closure_offset();
         self.queue_function(FunctionKey::Block(0));
 
         while let Some(function) = self.queue.pop() {

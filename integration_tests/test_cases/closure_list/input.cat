@@ -1,0 +1,55 @@
+list: value -> {
+    visitor -> {
+        value visitor ()
+    }
+}
+
+cons: list -> value -> {
+    visitor -> {
+        value visitor ()
+        visitor list ()
+    }
+}
+
+map_list: list -> fn -> {
+    visitor -> {
+        value -> { value fn () visitor () }
+        list ()
+    }
+}
+
+filter_list: list -> pred -> {
+    visitor -> {
+        value -> {
+            value
+            
+            value -> {}
+            
+            value -> {
+                value visitor ()
+            }
+            
+            value pred ()
+            ? () ()
+        }
+        list ()
+    }
+}
+
+print_list: list -> {
+    value -> { value . }
+    list
+    ()
+}
+
+1 list ()
+2 cons ()
+3 cons ()
+
+x -> { x 5 + () }
+map_list ()
+
+x -> { 6 x > () }
+filter_list ()
+
+print_list ()

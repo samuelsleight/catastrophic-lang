@@ -10,14 +10,26 @@ use super::error::RuntimeError;
 #[derive(Debug, Copy, Clone)]
 enum Value {
     Builtin(Builtin),
-    Block(usize),
+    Closure(usize),
     Number(ValueType),
 }
 
 #[derive(Debug, Copy, Clone)]
-enum Function {
+enum CallableFunction {
     Builtin(Builtin),
     Block(usize),
+}
+
+#[derive(Debug, Copy, Clone)]
+enum StackFunction {
+    Builtin(Builtin),
+    Closure(usize),
+}
+
+#[derive(Debug, Clone)]
+struct Closure {
+    block: usize,
+    args: Vec<Value>,
 }
 
 #[derive(Debug, Clone)]
@@ -28,14 +40,21 @@ struct Stack {
 struct Env<'a> {
     blocks: &'a [hir::Block],
     stack: &'a mut Stack,
+    closures: &'a mut Closures,
     args: Vec<Value>,
     block: usize,
     instr: usize,
 }
 
 #[derive(Debug, Clone)]
+struct Closures {
+    closures: Vec<Closure>,
+}
+
+#[derive(Debug, Clone)]
 pub struct State {
     blocks: Vec<hir::Block>,
+    closures: Closures,
     stack: Stack,
 }
 
@@ -55,11 +74,31 @@ impl Stack {
     }
 }
 
+impl Closures {
+    pub fn new() -> Self {
+        Self { closures: Vec::new() }
+    }
+
+    pub fn push(&mut self, block: usize, args: Vec<Value>) -> usize {
+        let len = self.closures.len();
+
+        self.closures
+            .push(Closure { block, args });
+
+        len
+    }
+
+    pub fn get(&self, index: usize) -> Option<&Closure> {
+        self.closures.get(index)
+    }
+}
+
 impl<'a> Env<'a> {
-    fn new(blocks: &'a [hir::Block], stack: &'a mut Stack, args: Vec<Value>, block: usize) -> Self {
+    fn new(blocks: &'a [hir::Block], stack: &'a mut Stack, closures: &'a mut Closures, args: Vec<Value>, block: usize) -> Self {
         Self {
             blocks,
             stack,
+            closures,
             args,
             block,
             instr: 0,
@@ -140,19 +179,19 @@ impl<'a> Env<'a> {
     }
 
     fn call_block(&mut self, args: Vec<Value>, block: usize) -> Result<(), RuntimeError> {
-        Env::new(self.blocks, self.stack, args, block).run()
+        Env::new(self.blocks, self.stack, self.closures, args, block).run()
     }
 
     fn call_instr(&mut self, span: Span<()>) -> Result<(), RuntimeError> {
         let function = match self.stack.pop() {
-            Value::Builtin(builtin) => Function::Builtin(builtin),
-            Value::Block(block) => Function::Block(block),
+            Value::Builtin(builtin) => StackFunction::Builtin(builtin),
+            Value::Closure(closure) => StackFunction::Closure(closure),
             Value::Number(_) => return Err(RuntimeError::CalledNumber(span)),
         };
 
-        let (offset_count, args_count) = match function {
-            Function::Builtin(builtin) => (
-                0,
+        let (parent_args, args_count, callable) = match function {
+            StackFunction::Builtin(builtin) => (
+                Vec::new(),
                 match builtin {
                     Builtin::Plus
                     | Builtin::Minus
@@ -165,22 +204,26 @@ impl<'a> Env<'a> {
 
                     Builtin::IfThenElse => 3,
                 },
+                CallableFunction::Builtin(builtin),
             ),
-            Function::Block(block) => match self.blocks.get(block) {
-                Some(block) => (block.offset, block.args),
+            StackFunction::Closure(closure) => match self.closures.get(closure) {
+                Some(closure) => match self.blocks.get(closure.block) {
+                    Some(block) => (closure.args.clone(), block.args, CallableFunction::Block(closure.block)),
+                    None => return Err(RuntimeError::CalledInvalidBlock(span)),
+                },
                 None => return Err(RuntimeError::CalledInvalidBlock(span)),
             },
         };
 
-        let mut args = self.args[0..offset_count].to_owned();
+        let mut args = parent_args;
 
         for _ in 0..args_count {
             args.push(self.stack.pop())
         }
 
-        match function {
-            Function::Builtin(builtin) => self.call_builtin(span, &args, builtin),
-            Function::Block(block) => self.call_block(args, block),
+        match callable {
+            CallableFunction::Builtin(builtin) => self.call_builtin(span, &args, builtin),
+            CallableFunction::Block(block) => self.call_block(args, block),
         }
     }
 
@@ -246,7 +289,15 @@ impl<'a> Env<'a> {
                     hir::Value::Number(value) => self.stack.push(Value::Number(value)),
                     hir::Value::Function(function) => match function {
                         hir::Function::Builtin(builtin) => self.stack.push(Value::Builtin(builtin)),
-                        hir::Function::Block(index) => self.stack.push(Value::Block(index)),
+                        hir::Function::Block(index) => {
+                            let args = match self.blocks.get(index) {
+                                Some(block) => self.args[0..block.offset].to_owned(),
+                                None => return Err(RuntimeError::CalledInvalidBlock(instr_span)),
+                            };
+
+                            self.stack
+                                .push(Value::Closure(self.closures.push(index, args)));
+                        }
                     },
                 },
             };
@@ -260,10 +311,14 @@ impl<'a> Env<'a> {
 
 impl State {
     pub fn new(blocks: Vec<hir::Block>) -> Self {
-        Self { blocks, stack: Stack::new() }
+        Self {
+            blocks,
+            stack: Stack::new(),
+            closures: Closures::new(),
+        }
     }
 
     pub fn interpret(&mut self) -> Result<(), RuntimeError> {
-        Env::new(&self.blocks, &mut self.stack, Vec::new(), 0).run()
+        Env::new(&self.blocks, &mut self.stack, &mut self.closures, Vec::new(), 0).run()
     }
 }
