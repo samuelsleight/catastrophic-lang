@@ -21,6 +21,14 @@ members = [
 version = "0.1.0"
 edition = "2021"
 
+[workspace.lints.clippy]
+correctness = "deny"
+suspicious = "deny"
+perf = "deny"
+complexity = "warn"
+pedantic = "warn"
+style = "warn"
+
 [workspace.dependencies]
 catastrophic-core = { path = "libs/core" }
 catastrophic-parser = { path = "libs/parser" }

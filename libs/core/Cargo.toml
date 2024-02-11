@@ -3,6 +3,9 @@ name = "catastrophic-core"
 version.workspace = true
 edition.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 anyhow.workspace = true
 ruinous-util.workspace = true
