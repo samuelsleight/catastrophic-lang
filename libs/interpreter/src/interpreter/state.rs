@@ -64,7 +64,7 @@ impl Stack {
     }
 
     pub fn push(&mut self, value: Value) {
-        self.stack.push(value)
+        self.stack.push(value);
     }
 
     pub fn pop(&mut self) -> Value {
@@ -172,7 +172,7 @@ impl<'a> Env<'a> {
                 }
             }
         }
-        .map_err(|_| RuntimeError::InvalidArgsForBuiltin(span, builtin))?;
+        .map_err(|()| RuntimeError::InvalidArgsForBuiltin(span, builtin))?;
 
         self.stack.push(result);
         Ok(())
@@ -218,7 +218,7 @@ impl<'a> Env<'a> {
         let mut args = parent_args;
 
         for _ in 0..args_count {
-            args.push(self.stack.pop())
+            args.push(self.stack.pop());
         }
 
         match callable {
@@ -231,7 +231,7 @@ impl<'a> Env<'a> {
         // TODO: Error handling here
         match self.stack.pop() {
             Value::Number(value) => {
-                stdout().write(&[value as u8]).unwrap();
+                let _ = stdout().write(&[value as u8]).unwrap();
                 Ok(())
             }
             _ => Err(RuntimeError::OutputFunction(span)),
@@ -242,31 +242,29 @@ impl<'a> Env<'a> {
         // TODO: Error handling here
         match self.stack.pop() {
             Value::Number(value) => {
-                print!("{}", value);
+                print!("{value}");
                 Ok(())
             }
             _ => Err(RuntimeError::OutputFunction(span)),
         }
     }
 
-    fn input_char_instr(&mut self) -> Result<(), RuntimeError> {
+    fn input_char_instr(&mut self) {
         // TODO: Error handling here
         stdout().flush().unwrap();
         let mut buffer = [b'\0'];
         stdin().read_exact(&mut buffer).unwrap();
         self.stack
             .push(Value::Number(buffer[0] as char as ValueType));
-        Ok(())
     }
 
-    fn input_number_instr(&mut self) -> Result<(), RuntimeError> {
+    fn input_number_instr(&mut self) {
         // TODO: Error handling here
         stdout().flush().unwrap();
         let mut buffer = String::new();
         stdin().read_line(&mut buffer).unwrap();
         self.stack
             .push(Value::Number(buffer.trim().parse().unwrap()));
-        Ok(())
     }
 
     fn run(&mut self) -> Result<(), RuntimeError> {
@@ -281,8 +279,8 @@ impl<'a> Env<'a> {
                     Command::Call => self.call_instr(instr_span)?,
                     Command::OutputChar => self.output_char_instr(instr_span)?,
                     Command::OutputNumber => self.output_number_instr(instr_span)?,
-                    Command::InputChar => self.input_char_instr()?,
-                    Command::InputNumber => self.input_number_instr()?,
+                    Command::InputChar => self.input_char_instr(),
+                    Command::InputNumber => self.input_number_instr(),
                 },
                 hir::Instr::Push(value) => match value {
                     hir::Value::Arg(index) => self.stack.push(self.args[index]),

@@ -18,7 +18,7 @@ pub struct TimeScope<'keeper> {
 }
 
 impl TimeKeeper {
-    pub fn new<S: ToString>(label: S) -> Self {
+    pub fn new<S: ToString>(label: &S) -> Self {
         let entry = TimeEntry {
             label: label.to_string(),
             start: Instant::now(),
@@ -28,7 +28,7 @@ impl TimeKeeper {
         Self { entries: vec![entry] }
     }
 
-    pub fn scope<S: ToString>(&mut self, label: S) -> TimeScope {
+    pub fn scope<S: ToString>(&mut self, label: &S) -> TimeScope {
         TimeScope::make(&mut self.entries, 1, label.to_string())
     }
 
@@ -46,7 +46,7 @@ impl TimeKeeper {
 }
 
 impl<'keeper> TimeScope<'keeper> {
-    pub fn scope<S: ToString>(&mut self, label: S) -> TimeScope {
+    pub fn scope<S: ToString>(&mut self, label: &S) -> TimeScope {
         Self::make(self.entries, self.indent + 1, label.to_string())
     }
 

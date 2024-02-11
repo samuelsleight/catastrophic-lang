@@ -3,5 +3,8 @@ name = "catastrophic-ast"
 version.workspace = true
 edition.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 catastrophic-core.workspace = true

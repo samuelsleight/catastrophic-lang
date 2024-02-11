@@ -114,7 +114,7 @@ macro_rules! test_cases {
 
 test_cases! {
     empty_input("", &[])
-    empty_string("\"\"", &[span(Token::String("".to_owned()), 0, 0, 0, 2)])
+    empty_string("\"\"", &[span(Token::String(String::new()), 0, 0, 0, 2)])
     simple_ident("hello", &[span(Token::Ident("hello".to_owned()), 0, 0, 0, 5)])
     simple_string("\"hello\"", &[span(Token::String("hello".to_owned()), 0, 0, 0, 7)])
     simple_integer("10293", &[span(Token::Integer(10293), 0, 0, 0, 5)])

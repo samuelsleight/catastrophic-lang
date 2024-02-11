@@ -3,6 +3,9 @@ name = "catastrophic-compiler"
 version.workspace = true
 edition.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 dragon-tamer.workspace = true
 catastrophic-core.workspace = true

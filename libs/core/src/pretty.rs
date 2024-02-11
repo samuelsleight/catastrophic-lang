@@ -50,7 +50,7 @@ impl<T: PrettyDebug> PrettyDebug for Vec<T> {
         fmt.indent();
 
         for item in self {
-            T::pretty_debug(item, fmt)?
+            T::pretty_debug(item, fmt)?;
         }
 
         fmt.deindent();

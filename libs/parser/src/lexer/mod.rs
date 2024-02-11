@@ -29,6 +29,7 @@ impl Lexer<BufReader<File>> {
 }
 
 impl<'a> Lexer<Cursor<&'a str>> {
+    #[must_use]
     pub fn with_str(input: &'a str) -> Self {
         let lexer = RuinousLexer::from_str(input);
         Self { lexer }

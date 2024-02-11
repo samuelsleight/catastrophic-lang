@@ -13,6 +13,7 @@ pub struct OptimizationStage {
 }
 
 impl OptimizationStage {
+    #[must_use]
     pub fn new(opt: Optimization) -> Self {
         Self { opt }
     }

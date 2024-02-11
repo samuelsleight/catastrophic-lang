@@ -23,7 +23,7 @@ impl OptimizationPass for ImmediateConditionalCalls {
                     let span = last.swap(());
 
                     match &last.data {
-                        mir::Instr::Push(mir::Value::ImmediateTriOp(mir::TriOp::IfThenElse, value, x, y)) => match (x.deref(), y.deref()) {
+                        mir::Instr::Push(mir::Value::ImmediateTriOp(mir::TriOp::IfThenElse, value, x, y)) => match (&**x, &**y) {
                             (&mir::Value::Function(a), &mir::Value::Function(b)) => {
                                 *last = span.swap(mir::Instr::ImmediateConditionalCall(value.deref().clone(), a, b));
                             }

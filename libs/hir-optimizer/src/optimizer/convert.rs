@@ -2,9 +2,9 @@ use catastrophic_core::span::Span;
 use catastrophic_hir::hir;
 use catastrophic_mir::mir;
 
-fn convert_instr(hir: Span<hir::Instr>) -> Span<mir::Instr> {
-    let span = hir.swap(());
-    let mir = match hir.data {
+fn convert_instr(higher_ir: Span<hir::Instr>) -> Span<mir::Instr> {
+    let span = higher_ir.swap(());
+    let middle_ir = match higher_ir.data {
         hir::Instr::Command(command) => mir::Instr::Command(command),
         hir::Instr::Push(value) => mir::Instr::Push(match value {
             hir::Value::Arg(arg) => mir::Value::Arg(arg),
@@ -26,7 +26,7 @@ fn convert_instr(hir: Span<hir::Instr>) -> Span<mir::Instr> {
         }),
     };
 
-    span.swap(mir)
+    span.swap(middle_ir)
 }
 
 fn convert_block(hir: hir::Block) -> mir::Block {

@@ -21,7 +21,7 @@ impl ErrorProvider for RuntimeError {
             RuntimeError::CalledNumber(span) => writer.error(Some(span), "Attampted to call a number instead of a function"),
             RuntimeError::CalledInvalidBlock(span) => writer.error(Some(span), "Attempted to call a block tht does not exist"),
             RuntimeError::InvalidArgsForBuiltin(span, builtin) => {
-                writer.error(Some(span), &format!("Invalid args for calling builtin function `{}`", builtin))
+                writer.error(Some(span), &format!("Invalid args for calling builtin function `{builtin}`"))
             }
             RuntimeError::InsufficientArgsForFunction(span) => writer.error(Some(span), "Attempted to call a function with insufficient arguments"),
             RuntimeError::OutputFunction(span) => writer.error(Some(span), "Attempted to output a function as a value"),

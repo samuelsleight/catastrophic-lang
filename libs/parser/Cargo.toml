@@ -3,6 +3,9 @@ name = "catastrophic-parser"
 version.workspace = true
 edition.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 ruinous.workspace = true
 unic-emoji.workspace = true

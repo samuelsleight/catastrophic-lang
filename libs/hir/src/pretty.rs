@@ -22,11 +22,11 @@ impl PrettyDebug for Block {
                     Command::InputNumber => writeln!(fmt, "InputNumber")?,
                 },
                 Instr::Push(value) => match value {
-                    Value::Arg(index) => writeln!(fmt, "Push[Arg({})]", index)?,
-                    Value::Number(value) => writeln!(fmt, "Push[{}]", value)?,
+                    Value::Arg(index) => writeln!(fmt, "Push[Arg({index})]")?,
+                    Value::Number(value) => writeln!(fmt, "Push[{value}]")?,
                     Value::Function(function) => match function {
-                        Function::Block(index) => writeln!(fmt, "Push[Block({})]", index)?,
-                        Function::Builtin(builtin) => writeln!(fmt, "Push[{}]", builtin)?,
+                        Function::Block(index) => writeln!(fmt, "Push[Block({index})]")?,
+                        Function::Builtin(builtin) => writeln!(fmt, "Push[{builtin}]")?,
                     },
                 },
             }

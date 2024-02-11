@@ -24,7 +24,7 @@ impl ErrorProvider for CompileErrors {
         for error in &self.errors {
             match error {
                 CompileError::UndefinedSymbolError(ref symbol) => {
-                    writer.error(Some(symbol.swap(())), &format!("Use of undefined symbol `{}`", symbol.data))?
+                    writer.error(Some(symbol.swap(())), &format!("Use of undefined symbol `{}`", symbol.data))?;
                 }
             }
         }

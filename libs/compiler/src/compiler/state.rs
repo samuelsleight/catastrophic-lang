@@ -59,7 +59,7 @@ impl FunctionKey {
 
     fn llvm_name(&self) -> String {
         match self {
-            FunctionKey::Block(index) => format!("block_{}", index),
+            FunctionKey::Block(index) => format!("block_{index}"),
             FunctionKey::BinOp(builtin) => format!(
                 "builtin_{}",
                 match builtin {
@@ -226,25 +226,12 @@ impl State {
         let (x, builder) = builder.build_call(&self.pop_fn, ());
         let (y, builder) = builder.build_call(&self.pop_fn, ());
 
-        let (result, builder) = self.build_bin_op(builder, bin_op, x, y);
+        let (result, builder) = build_bin_op(builder, bin_op, x, y);
 
         builder
             .build_call(&self.push_fn, (result,))
             .1
             .build_void_ret();
-    }
-
-    fn build_bin_op(&self, builder: llvm::Builder, bin_op: BinOp, x: llvm::Value<i64>, y: llvm::Value<i64>) -> (llvm::Value<i64>, llvm::Builder) {
-        match bin_op {
-            BinOp::Plus => builder.build_add(&x, &y),
-            BinOp::Minus => builder.build_sub(&x, &y),
-            BinOp::Multiply => builder.build_mul(&x, &y),
-            BinOp::Divide => builder.build_sdiv(&x, &y),
-            BinOp::Equals => builder.build_eq(&x, &y),
-            BinOp::GreaterThan => builder.build_gt(&x, &y),
-            BinOp::LessThan => builder.build_lt(&x, &y),
-            BinOp::Random => unimplemented!(),
-        }
     }
 
     fn compile_tri_op(&mut self, tri_op: TriOp) {
@@ -258,25 +245,12 @@ impl State {
         let (y, builder) = builder.build_call(&self.pop_fn, ());
         let (z, builder) = builder.build_call(&self.pop_fn, ());
 
-        let (result, builder) = self.build_tri_op(builder, tri_op, x, y, z);
+        let (result, builder) = build_tri_op(builder, tri_op, x, y, z);
 
         builder
             .build_call(&self.push_fn, (result,))
             .1
             .build_void_ret();
-    }
-
-    fn build_tri_op(
-        &self,
-        builder: llvm::Builder,
-        tri_op: TriOp,
-        x: llvm::Value<i64>,
-        y: llvm::Value<i64>,
-        z: llvm::Value<i64>,
-    ) -> (llvm::Value<i64>, llvm::Builder) {
-        match tri_op {
-            TriOp::IfThenElse => builder.build_conditional_value(&x, &y, &z),
-        }
     }
 
     fn build_value(&mut self, builder: llvm::Builder, args: &[llvm::Value<i64>], value: &Value) -> (llvm::Value<i64>, llvm::Builder) {
@@ -294,30 +268,202 @@ impl State {
                 let (x, builder) = self.build_value(builder, args, x);
                 let (y, builder) = self.build_value(builder, args, y);
 
-                self.build_bin_op(builder, *bin_op, x, y)
+                build_bin_op(builder, *bin_op, x, y)
             }
             Value::ImmediateTriOp(tri_op, ref x, ref y, ref z) => {
                 let (x, builder) = self.build_value(builder, args, x);
                 let (y, builder) = self.build_value(builder, args, y);
                 let (z, builder) = self.build_value(builder, args, z);
 
-                self.build_tri_op(builder, *tri_op, x, y, z)
+                build_tri_op(builder, *tri_op, x, y, z)
             }
         }
     }
 
+    fn build_call_command(&self, builder: llvm::Builder) -> llvm::Builder {
+        // Load the closre pointer from the main stack
+        let (closure_index, builder) = builder.build_call(&self.pop_fn, ());
+
+        // Load the block index from the closure stack
+        let (block_to_call_index, builder) = builder.build_index_load(&self.closure_stack, &closure_index);
+
+        // Get the information for the block we are calling
+        let ((f, offset), builder) = builder.build_call(&self.call_fn, (block_to_call_index,));
+
+        // Increment the closure pointer to point at the args
+        let (arg_index, builder) = builder.build_add(&closure_index, &llvm::Value::constant(1));
+
+        // Iteratively push all the closure arguments onto the stack
+        let builder = builder
+            .build_call(&self.closure_offset_fn, (arg_index, offset))
+            .1;
+
+        // Call the function!
+        builder.build_call(&f, ()).1
+    }
+
+    fn build_command_instr(&self, builder: llvm::Builder, command: Command) -> llvm::Builder {
+        match command {
+            Command::Call => self.build_call_command(builder),
+            Command::OutputChar => {
+                let (value, builder) = builder.build_call(&self.pop_fn, ());
+                let (value, builder) = builder.build_int_cast(&value);
+                builder
+                    .build_call(&self.putchar_fn, (value,))
+                    .1
+            }
+            Command::OutputNumber => {
+                let (value, builder) = builder.build_call(&self.pop_fn, ());
+                builder
+                    .build_variadic_call(&self.printf_fn, (self.printf_str.clone(),), &[value.untyped()])
+                    .1
+            }
+            Command::InputChar => {
+                let (value, builder) = builder.build_call(&self.getchar_fn, ());
+                let (value, builder) = builder.build_int_cast(&value);
+                builder
+                    .build_call(&self.push_fn, (value,))
+                    .1
+            }
+            Command::InputNumber => unimplemented!(),
+        }
+    }
+
+    fn build_push_instr(&mut self, builder: llvm::Builder, args: &[llvm::Value<i64>], value: &Value) -> llvm::Builder {
+        match value {
+            Value::Arg(arg) => {
+                builder
+                    .build_call(&self.push_fn, (args[*arg],))
+                    .1
+            }
+            Value::Number(number) => {
+                builder
+                    .build_call(&self.push_fn, (llvm::Value::constant(*number),))
+                    .1
+            }
+            Value::Function(function) => {
+                let block_info = self.queue_function(FunctionKey::from_function(function));
+
+                // Save closure stack index
+                let (closure_index, builder) = builder.build_load(&self.closure_stack_index);
+
+                // Push block index to closure stack
+                let builder = builder
+                    .build_call(&self.closure_push_fn, (llvm::Value::constant(block_info.index as i64),))
+                    .1;
+
+                // Push closure capture (offset args) to closure stack
+                let builder = (0..block_info.offset)
+                    .rev()
+                    .fold(builder, |builder, arg| {
+                        builder
+                            .build_call(&self.closure_push_fn, (*args.get(arg).unwrap(),))
+                            .1
+                    });
+
+                // Push closure stack value to main stack
+                let (closure_index, builder) = builder.build_int_cast(&closure_index);
+
+                builder
+                    .build_call(&self.push_fn, (closure_index,))
+                    .1
+            }
+            Value::ImmediateBinOp(bin_op, x, y) => {
+                let (x, builder) = self.build_value(builder, args, x);
+                let (y, builder) = self.build_value(builder, args, y);
+
+                let (result, builder) = build_bin_op(builder, *bin_op, x, y);
+
+                builder
+                    .build_call(&self.push_fn, (result,))
+                    .1
+            }
+            Value::ImmediateTriOp(tri_op, x, y, z) => {
+                let (x, builder) = self.build_value(builder, args, x);
+                let (y, builder) = self.build_value(builder, args, y);
+                let (z, builder) = self.build_value(builder, args, z);
+
+                let (result, builder) = build_tri_op(builder, *tri_op, x, y, z);
+
+                builder
+                    .build_call(&self.push_fn, (result,))
+                    .1
+            }
+        }
+    }
+
+    fn build_immediate_call_instr(&mut self, mut builder: llvm::Builder, args: &[llvm::Value<i64>], function: &Function) -> llvm::Builder {
+        let info = self.queue_function(FunctionKey::from_function(function));
+
+        for arg in args.iter().take(info.offset) {
+            builder = builder
+                .build_call(&self.push_fn, (*arg,))
+                .1;
+        }
+
+        builder.build_call(&info.value, ()).1
+    }
+
+    fn build_immediate_conditional_call_instr(
+        &mut self,
+        block_builder: llvm::Builder,
+        args: &[llvm::Value<i64>],
+        function_info: FunctionInfo,
+        value: &Value,
+        x: &Function,
+        y: &Function,
+    ) -> llvm::Builder {
+        let x = self.queue_function(FunctionKey::from_function(x));
+        let y = self.queue_function(FunctionKey::from_function(y));
+
+        let cont = function_info.value.add_block("cont");
+
+        let x_block = function_info.value.add_block("x");
+
+        let mut builder = x_block.build();
+
+        for arg in args.iter().take(x.offset).rev() {
+            builder = builder
+                .build_call(&self.push_fn, (*arg,))
+                .1;
+        }
+
+        builder
+            .build_call(&x.value, ())
+            .1
+            .build_jump(&cont);
+
+        let y_block = function_info.value.add_block("y");
+
+        let mut builder = y_block.build();
+
+        for arg in args.iter().take(y.offset).rev() {
+            builder = builder
+                .build_call(&self.push_fn, (*arg,))
+                .1;
+        }
+
+        builder
+            .build_call(&y.value, ())
+            .1
+            .build_jump(&cont);
+
+        let (value, builder) = self.build_value(block_builder, args, value);
+        builder.build_conditional_jump(&value, &y_block, &x_block);
+
+        cont.build()
+    }
+
     fn compile_block(&mut self, block_index: usize) {
-        let entry = self.functions[&FunctionKey::Block(block_index)]
-            .value
-            .add_block("entry");
+        let function_info = self.functions[&FunctionKey::Block(block_index)];
+        let entry = function_info.value.add_block("entry");
 
         let mut block_builder = entry.build();
 
         let block = self.ir[block_index].clone();
 
-        let (args, builder) = (0..block.args + block.offset)
-            .into_iter()
-            .fold((Vec::with_capacity(block.args + block.offset), block_builder), |(mut vec, builder), _| {
+        let (args, builder) =
+            (0..block.args + block.offset).fold((Vec::with_capacity(block.args + block.offset), block_builder), |(mut vec, builder), _| {
                 let (value, builder) = builder.build_call(&self.pop_fn, ());
                 vec.push(value);
                 (vec, builder)
@@ -326,171 +472,12 @@ impl State {
         block_builder = builder;
 
         for instr in &block.instrs {
-            match &instr.data {
-                Instr::Command(command) => match command {
-                    Command::Call => {
-                        // Load the closure pointer from the main stack
-                        let (closure_index, builder) = block_builder.build_call(&self.pop_fn, ());
-
-                        // Load the block index from the closure stack
-                        let (block_to_call_index, builder) = builder.build_index_load(&self.closure_stack, &closure_index);
-
-                        // Get the information for the block we are calling
-                        let ((f, offset), builder) = builder.build_call(&self.call_fn, (block_to_call_index,));
-
-                        // Increment the closure pointer to point at the args
-                        let (arg_index, builder) = builder.build_add(&closure_index, &llvm::Value::constant(1));
-
-                        // Iteratively push all the closure arguments onto the stack
-                        let builder = builder
-                            .build_call(&self.closure_offset_fn, (arg_index, offset))
-                            .1;
-
-                        // Call the function!
-                        block_builder = builder.build_call(&f, ()).1;
-                    }
-                    Command::OutputChar => {
-                        let (value, builder) = block_builder.build_call(&self.pop_fn, ());
-                        let (value, builder) = builder.build_int_cast(&value);
-                        block_builder = builder
-                            .build_call(&self.putchar_fn, (value,))
-                            .1;
-                    }
-                    Command::OutputNumber => {
-                        let (value, builder) = block_builder.build_call(&self.pop_fn, ());
-                        block_builder = builder
-                            .build_variadic_call(&self.printf_fn, (self.printf_str.clone(),), &[value.untyped()])
-                            .1;
-                    }
-                    Command::InputChar => {
-                        let (value, builder) = block_builder.build_call(&self.getchar_fn, ());
-                        let (value, builder) = builder.build_int_cast(&value);
-                        block_builder = builder
-                            .build_call(&self.push_fn, (value,))
-                            .1;
-                    }
-                    Command::InputNumber => (),
-                },
-                Instr::Push(ref value) => match value {
-                    Value::Arg(arg) => {
-                        block_builder = block_builder
-                            .build_call(&self.push_fn, (args[*arg],))
-                            .1
-                    }
-                    Value::Number(number) => {
-                        block_builder = block_builder
-                            .build_call(&self.push_fn, (llvm::Value::constant(*number),))
-                            .1
-                    }
-                    Value::Function(function) => {
-                        let block_info = self.queue_function(FunctionKey::from_function(function));
-
-                        // Save closure stack index
-                        let (closure_index, builder) = block_builder.build_load(&self.closure_stack_index);
-
-                        // Push block index to closure stack
-                        let builder = builder
-                            .build_call(&self.closure_push_fn, (llvm::Value::constant(block_info.index as i64),))
-                            .1;
-
-                        // Push closure capture (offset args) to closure stack
-                        let builder = (0..block_info.offset)
-                            .into_iter()
-                            .rev()
-                            .fold(builder, |builder, arg| {
-                                builder
-                                    .build_call(&self.closure_push_fn, (*args.get(arg).unwrap(),))
-                                    .1
-                            });
-
-                        // Push closure stack value to main stack
-                        let (closure_index, builder) = builder.build_int_cast(&closure_index);
-
-                        block_builder = builder
-                            .build_call(&self.push_fn, (closure_index,))
-                            .1;
-                    }
-                    Value::ImmediateBinOp(bin_op, x, y) => {
-                        let (x, builder) = self.build_value(block_builder, &args, x);
-                        let (y, builder) = self.build_value(builder, &args, y);
-
-                        let (result, builder) = self.build_bin_op(builder, *bin_op, x, y);
-
-                        block_builder = builder
-                            .build_call(&self.push_fn, (result,))
-                            .1;
-                    }
-                    Value::ImmediateTriOp(tri_op, x, y, z) => {
-                        let (x, builder) = self.build_value(block_builder, &args, x);
-                        let (y, builder) = self.build_value(builder, &args, y);
-                        let (z, builder) = self.build_value(builder, &args, z);
-
-                        let (result, builder) = self.build_tri_op(builder, *tri_op, x, y, z);
-
-                        block_builder = builder
-                            .build_call(&self.push_fn, (result,))
-                            .1;
-                    }
-                },
-                Instr::ImmediateCall(function) => {
-                    let info = self.queue_function(FunctionKey::from_function(function));
-
-                    for arg in args.iter().take(info.offset) {
-                        block_builder = block_builder
-                            .build_call(&self.push_fn, (*arg,))
-                            .1;
-                    }
-
-                    block_builder = block_builder
-                        .build_call(&info.value, ())
-                        .1;
-                }
+            block_builder = match &instr.data {
+                Instr::Command(command) => self.build_command_instr(block_builder, *command),
+                Instr::Push(ref value) => self.build_push_instr(block_builder, &args, value),
+                Instr::ImmediateCall(function) => self.build_immediate_call_instr(block_builder, &args, function),
                 Instr::ImmediateConditionalCall(value, x, y) => {
-                    let x = self.queue_function(FunctionKey::from_function(x));
-                    let y = self.queue_function(FunctionKey::from_function(y));
-
-                    let cont = self.functions[&FunctionKey::Block(block_index)]
-                        .value
-                        .add_block("cont");
-
-                    let x_block = self.functions[&FunctionKey::Block(block_index)]
-                        .value
-                        .add_block("x");
-
-                    let mut builder = x_block.build();
-
-                    for arg in args.iter().take(x.offset).rev() {
-                        builder = builder
-                            .build_call(&self.push_fn, (*arg,))
-                            .1;
-                    }
-
-                    builder
-                        .build_call(&x.value, ())
-                        .1
-                        .build_jump(&cont);
-
-                    let y_block = self.functions[&FunctionKey::Block(block_index)]
-                        .value
-                        .add_block("y");
-
-                    let mut builder = y_block.build();
-
-                    for arg in args.iter().take(y.offset).rev() {
-                        builder = builder
-                            .build_call(&self.push_fn, (*arg,))
-                            .1;
-                    }
-
-                    builder
-                        .build_call(&y.value, ())
-                        .1
-                        .build_jump(&cont);
-
-                    let (value, builder) = self.build_value(block_builder, &args, value);
-                    builder.build_conditional_jump(&value, &y_block, &x_block);
-
-                    block_builder = cont.build()
+                    self.build_immediate_conditional_call_instr(block_builder, &args, function_info, value, x, y)
                 }
             }
         }
@@ -586,6 +573,31 @@ impl State {
         self.compile_call();
         self.compile_main();
 
-        println!("{:?}", self.module)
+        println!("{:?}", self.module);
+    }
+}
+
+fn build_tri_op(
+    builder: llvm::Builder,
+    tri_op: TriOp,
+    x: llvm::Value<i64>,
+    y: llvm::Value<i64>,
+    z: llvm::Value<i64>,
+) -> (llvm::Value<i64>, llvm::Builder) {
+    match tri_op {
+        TriOp::IfThenElse => builder.build_conditional_value(&x, &y, &z),
+    }
+}
+
+fn build_bin_op(builder: llvm::Builder, bin_op: BinOp, x: llvm::Value<i64>, y: llvm::Value<i64>) -> (llvm::Value<i64>, llvm::Builder) {
+    match bin_op {
+        BinOp::Plus => builder.build_add(&x, &y),
+        BinOp::Minus => builder.build_sub(&x, &y),
+        BinOp::Multiply => builder.build_mul(&x, &y),
+        BinOp::Divide => builder.build_sdiv(&x, &y),
+        BinOp::Equals => builder.build_eq(&x, &y),
+        BinOp::GreaterThan => builder.build_gt(&x, &y),
+        BinOp::LessThan => builder.build_lt(&x, &y),
+        BinOp::Random => unimplemented!(),
     }
 }

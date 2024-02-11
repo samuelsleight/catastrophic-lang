@@ -47,7 +47,7 @@ impl<Input, S: Stage<Input>> PipelineStage<anyhow::Error> for StageWrapper<Input
         } = context;
 
         let timed_result = {
-            let mut timing = time_keeper.scope(S::name());
+            let mut timing = time_keeper.scope(&S::name());
             self.0.run(input, &mut timing)
         };
 

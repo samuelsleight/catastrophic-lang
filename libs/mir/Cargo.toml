@@ -3,6 +3,9 @@ name = "catastrophic-mir"
 version.workspace = true
 edition.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 catastrophic-hir.workspace = true
 catastrophic-core.workspace = true
