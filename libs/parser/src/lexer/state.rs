@@ -3,8 +3,8 @@ use catastrophic_core::{
     defines::ValueType,
     span::{Location, Span},
 };
+use icu_properties::sets::emoji;
 use ruinous::lexer::state::{Continuation, State as LexerState};
-use unic_emoji::char::is_emoji;
 
 use super::error::LexError;
 
@@ -32,7 +32,7 @@ fn is_ident_starter(c: char) -> bool {
     if let 'a'..='z' | 'A'..='Z' | '_' = c {
         true
     } else {
-        is_emoji(c)
+        emoji().contains(c)
     }
 }
 
