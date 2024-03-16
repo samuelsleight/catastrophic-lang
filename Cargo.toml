@@ -52,7 +52,7 @@ ruinous = { git = "https://github.com/samuelsleight/ruinous" }
 ruinous-util = { git = "https://github.com/samuelsleight/ruinous" }
 
 anyhow = "1.0.65"
-bintest = { git = "https://github.com/cehteh/bintest", branch = "devel" }
+bintest = "2.0.0"
 clap = { version="4.1.4", features=["derive"] }
 dragon-tamer = { git = "https://github.com/samuelsleight/dragon-tamer" }
 icu_properties = "1.4.0"
