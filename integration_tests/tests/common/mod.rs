@@ -94,12 +94,9 @@ fn test_binary_name(binary: TestBinary) -> &'static str {
 }
 
 fn get_test_binary(binary: TestBinary) -> Command {
-    static BINTEST: Lazy<BinTest> = Lazy::new(|| {
-        BinTest::with()
-            .build_workspace(true)
-            .quiet(true)
-            .build()
-    });
-
-    BINTEST.command(test_binary_name(binary))
+    BinTest::with()
+        .workspace()
+        .quiet()
+        .build()
+        .command(test_binary_name(binary))
 }
