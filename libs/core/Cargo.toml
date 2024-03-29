@@ -9,4 +9,4 @@ workspace = true
 [dependencies]
 anyhow.workspace = true
 ruinous-util.workspace = true
-pipeline.workspace = true
+waterworks.workspace = true
