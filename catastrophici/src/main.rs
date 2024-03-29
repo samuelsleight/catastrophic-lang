@@ -5,7 +5,7 @@ use catastrophic_analyser::stage::AnalysisStage;
 use catastrophic_core::{
     error::context::ErrorContext,
     profiling::TimeKeeper,
-    stage::{pipeline, Pipeline, PipelineResult, RunPipeline, Stage, StageContext},
+    stage::{pipeline, Extend, Pipeline, PipelineResult, Stage, StageContext},
 };
 use catastrophic_interpreter::stage::InterpreterStage;
 use catastrophic_parser::stage::ParseStage;

@@ -11,7 +11,7 @@ use crate::{
 
 use anyhow::{Context, Result};
 
-pub use pipeline::{pipeline, Continue, Pipeline, PipelineResult, RunPipeline, Stage as PipelineStage};
+pub use waterworks::{pipeline, Continue, Extend, Pipeline, PipelineResult, Stage as PipelineStage};
 
 pub struct StageWrapper<Input, S: Stage<Input>>(S, PhantomData<Input>);
 
