@@ -21,3 +21,10 @@ pub fn passes() -> Vec<Box<dyn OptimizationPass>> {
         Box::new(ImmediateConditionalCalls),
     ]
 }
+
+pub fn pass_names() -> Vec<&'static str> {
+    passes()
+        .into_iter()
+        .map(|pass| pass.name())
+        .collect()
+}

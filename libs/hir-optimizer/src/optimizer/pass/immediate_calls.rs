@@ -9,7 +9,7 @@ pub struct ImmediateCalls;
 
 impl OptimizationPass for ImmediateCalls {
     fn name(&self) -> &'static str {
-        "Immediate Call Pass"
+        "Immediate Call"
     }
 
     fn run(&self, context: &OptimizationContext) -> Vec<Span<mir::Instr>> {

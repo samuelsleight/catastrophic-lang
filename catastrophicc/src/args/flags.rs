@@ -12,3 +12,8 @@ pub enum Optimization {
     None,
     All,
 }
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+pub enum List {
+    Passes,
+}

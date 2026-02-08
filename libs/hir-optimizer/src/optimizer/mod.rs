@@ -17,6 +17,11 @@ pub enum Optimization {
 pub struct Optimizer;
 
 impl Optimizer {
+    #[must_use]
+    pub fn pass_names() -> Vec<&'static str> {
+        pass::pass_names()
+    }
+
     pub fn optimize_hir<'a, 'b: 'a>(opt: Optimization, higher_ir: Vec<hir::Block>, time_scope: &'a mut TimeScope<'b>) -> Vec<mir::Block> {
         let mut middle_ir = {
             let _scope = time_scope.scope(&"Conversion");
@@ -25,7 +30,7 @@ impl Optimizer {
 
         if opt > Optimization::None {
             for pass in pass::passes() {
-                let _scope = time_scope.scope(&pass.name());
+                let _scope = time_scope.scope(&format!("{} Pass", &pass.name()));
 
                 for input in &mut middle_ir {
                     let context = OptimizationContext::new(input);

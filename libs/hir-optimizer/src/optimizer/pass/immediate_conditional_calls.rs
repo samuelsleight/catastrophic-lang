@@ -11,7 +11,7 @@ pub struct ImmediateConditionalCalls;
 
 impl OptimizationPass for ImmediateConditionalCalls {
     fn name(&self) -> &'static str {
-        "Immediate Conditional Call Pass"
+        "Immediate Conditional Call"
     }
 
     fn run(&self, context: &OptimizationContext) -> Vec<Span<mir::Instr>> {

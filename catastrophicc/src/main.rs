@@ -1,7 +1,10 @@
 use std::{fmt::Debug, path::PathBuf};
 
 use anyhow::Result;
-use args::{flags::DebugMode, Args};
+use args::{
+    flags::{DebugMode, List},
+    Args,
+};
 use catastrophic_analyser::stage::AnalysisStage;
 use catastrophic_compiler::stage::CompilationStage;
 use catastrophic_core::{
@@ -25,17 +28,30 @@ impl App {
     }
 
     fn run(&self) -> Result<()> {
-        let pipeline_context = self.make_context()?;
-        let pipeline = self.make_pipeline();
+        if let Some(list) = self.args.list {
+            match list {
+                List::Passes => {
+                    for pass in OptimizationStage::pass_names() {
+                        println!("{}", pass);
+                    }
+                }
+            }
 
-        let result = pipeline.run(pipeline_context);
-        self.finish(result)
+            Ok(())
+        } else {
+            let pipeline_context = self.make_context()?;
+            let pipeline = self.make_pipeline();
+
+            let result = pipeline.run(pipeline_context);
+            self.finish(result)
+        }
     }
 
     fn make_context(&self) -> Result<StageContext<PathBuf>> {
-        let error_context = ErrorContext::from_file(&self.args.input)?;
+        let path = self.args.input.clone().unwrap();
+        let error_context = ErrorContext::from_file(&path)?;
         let time_keeper = TimeKeeper::new(&"Overall");
-        let pipeline_context = StageContext::new(self.args.input.clone(), time_keeper, error_context);
+        let pipeline_context = StageContext::new(path, time_keeper, error_context);
         Ok(pipeline_context)
     }
 

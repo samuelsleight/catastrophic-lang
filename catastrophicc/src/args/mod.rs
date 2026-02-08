@@ -7,6 +7,11 @@ pub mod flags;
 
 #[derive(Debug, Clone, Parser)]
 pub struct Args {
+    // Debug options
+    #[arg(long, help_heading = "Debug")]
+    pub list: Option<flags::List>,
+
+    // Compilation options
     #[arg(long)]
     pub debug: Option<flags::DebugMode>,
 
@@ -19,7 +24,9 @@ pub struct Args {
     #[arg(long = "opt", default_value = "all")]
     pub opt: flags::Optimization,
 
-    pub input: PathBuf,
+    // Compilation input
+    #[arg(required_unless_present = "list")]
+    pub input: Option<PathBuf>,
 }
 
 impl Args {

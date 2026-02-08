@@ -17,6 +17,11 @@ impl OptimizationStage {
     pub fn new(opt: Optimization) -> Self {
         Self { opt }
     }
+
+    #[must_use]
+    pub fn pass_names() -> Vec<&'static str> {
+        Optimizer::pass_names()
+    }
 }
 
 impl Stage<Vec<hir::Block>> for OptimizationStage {
