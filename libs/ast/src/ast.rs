@@ -85,7 +85,7 @@ impl Block {
         Self { args, ..Self::no_args() }
     }
 
-    pub fn with_symbol(&mut self, name: String) -> Entry<String, Symbol> {
+    pub fn with_symbol(&mut self, name: String) -> Entry<'_, String, Symbol> {
         self.symbols.entry(name)
     }
 

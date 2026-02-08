@@ -28,7 +28,7 @@ impl TimeKeeper {
         Self { entries: vec![entry] }
     }
 
-    pub fn scope<S: ToString>(&mut self, label: &S) -> TimeScope {
+    pub fn scope<S: ToString>(&mut self, label: &S) -> TimeScope<'_> {
         TimeScope::make(&mut self.entries, 1, label.to_string())
     }
 
@@ -46,11 +46,11 @@ impl TimeKeeper {
 }
 
 impl<'keeper> TimeScope<'keeper> {
-    pub fn scope<S: ToString>(&mut self, label: &S) -> TimeScope {
+    pub fn scope<S: ToString>(&mut self, label: &S) -> TimeScope<'_> {
         Self::make(self.entries, self.indent + 1, label.to_string())
     }
 
-    fn make(entries: &mut Vec<TimeEntry>, indent: usize, mut label: String) -> TimeScope {
+    fn make(entries: &mut Vec<TimeEntry>, indent: usize, mut label: String) -> TimeScope<'_> {
         for _ in 0..indent {
             label.insert(0, ' ');
         }
