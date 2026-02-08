@@ -28,7 +28,7 @@ pub struct Parser<R> {
 
 impl Parser<BufReader<File>> {
     pub fn with_file<P: AsRef<Path>>(path: P) -> Result<Self, Error> {
-        let parser = RuinousParser::from_file(path)?;
+        let parser = RuinousParser::with_file(path)?;
         Ok(Self::new(parser))
     }
 }
@@ -36,7 +36,7 @@ impl Parser<BufReader<File>> {
 impl<'a> Parser<Cursor<&'a str>> {
     #[must_use]
     pub fn with_str(input: &'a str) -> Self {
-        let parser = RuinousParser::from_str(input);
+        let parser = RuinousParser::with_str(input);
         Self::new(parser)
     }
 }

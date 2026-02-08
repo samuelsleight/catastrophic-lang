@@ -23,7 +23,7 @@ pub struct Lexer<R> {
 
 impl Lexer<BufReader<File>> {
     pub fn with_file<P: AsRef<Path>>(path: P) -> Result<Self, Error> {
-        let lexer = RuinousLexer::from_file(path)?;
+        let lexer = RuinousLexer::with_file(path)?;
         Ok(Self { lexer })
     }
 }
@@ -31,7 +31,7 @@ impl Lexer<BufReader<File>> {
 impl<'a> Lexer<Cursor<&'a str>> {
     #[must_use]
     pub fn with_str(input: &'a str) -> Self {
-        let lexer = RuinousLexer::from_str(input);
+        let lexer = RuinousLexer::with_str(input);
         Self { lexer }
     }
 }
