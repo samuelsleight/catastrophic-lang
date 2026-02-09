@@ -26,7 +26,7 @@ jobs:
       - name: Install LLVM
         uses: KyleMayes/install-llvm-action@v2.0.9
         with:
-          version: "14.0"
+          version: "21"
           arch: ${{ case(matrix.os == 'macos-latest', 'arm64', 'x64') }}
 
       # Install the target version of Rust
@@ -42,10 +42,10 @@ jobs:
       # Build and run the tests
       - name: Build Workspace
         env:
-          LLVM_SYS_140_PREFIX: ${{ env.LLVM_PATH }}
+          LLVM_SYS_211_PREFIX: ${{ env.LLVM_PATH }}
         run: cargo build --verbose --workspace
 
       - name: Run Tests
         env:
-          LLVM_SYS_140_PREFIX: ${{ env.LLVM_PATH }}
+          LLVM_SYS_211_PREFIX: ${{ env.LLVM_PATH }}
         run: cargo test --verbose --workspace
