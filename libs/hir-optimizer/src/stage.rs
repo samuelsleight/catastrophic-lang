@@ -6,16 +6,16 @@ use catastrophic_core::{
 use catastrophic_hir::hir;
 use catastrophic_mir::mir;
 
-use crate::optimizer::{Optimization, Optimizer};
+use crate::optimizer::{Optimizer, Options};
 
 pub struct OptimizationStage {
-    opt: Optimization,
+    options: Options,
 }
 
 impl OptimizationStage {
     #[must_use]
-    pub fn new(opt: Optimization) -> Self {
-        Self { opt }
+    pub fn new(options: Options) -> Self {
+        Self { options }
     }
 
     #[must_use]
@@ -29,7 +29,7 @@ impl Stage<Vec<hir::Block>> for OptimizationStage {
     type Error = NoError;
 
     fn run(self, input: Vec<hir::Block>, time_scope: &mut TimeScope) -> Result<Self::Output, Self::Error> {
-        Ok(Optimizer::optimize_hir(self.opt, input, time_scope))
+        Ok(Optimizer::optimize_hir(self.options, input, time_scope))
     }
 
     fn name() -> &'static str {

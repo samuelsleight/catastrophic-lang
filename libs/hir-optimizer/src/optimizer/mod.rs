@@ -3,18 +3,36 @@ use catastrophic_hir::hir;
 use catastrophic_mir::mir;
 
 use self::context::OptimizationContext;
+use self::pass::OptimizationPass;
 
 mod context;
 mod convert;
 mod pass;
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Optimization {
-    None,
-    All,
+pub struct Options {
+    passes: Vec<Box<dyn OptimizationPass>>,
 }
 
 pub struct Optimizer;
+
+impl Options {
+    pub fn no_passes() -> Self {
+        Self { passes: Vec::new() }
+    }
+
+    pub fn all_passes() -> Self {
+        Self { passes: pass::passes() }
+    }
+
+    pub fn without_pass(name: &str) -> Self {
+        Self {
+            passes: pass::passes()
+                .into_iter()
+                .filter(|pass| pass.name() != name)
+                .collect(),
+        }
+    }
+}
 
 impl Optimizer {
     #[must_use]
@@ -22,21 +40,19 @@ impl Optimizer {
         pass::pass_names()
     }
 
-    pub fn optimize_hir<'a, 'b: 'a>(opt: Optimization, higher_ir: Vec<hir::Block>, time_scope: &'a mut TimeScope<'b>) -> Vec<mir::Block> {
+    pub fn optimize_hir<'a, 'b: 'a>(options: Options, higher_ir: Vec<hir::Block>, time_scope: &'a mut TimeScope<'b>) -> Vec<mir::Block> {
         let mut middle_ir = {
             let _scope = time_scope.scope(&"Conversion");
             convert::convert_blocks(higher_ir)
         };
 
-        if opt > Optimization::None {
-            for pass in pass::passes() {
-                let _scope = time_scope.scope(&format!("{} Pass", &pass.name()));
+        for pass in options.passes {
+            let _scope = time_scope.scope(&format!("{} Pass", &pass.name()));
 
-                for input in &mut middle_ir {
-                    let context = OptimizationContext::new(input);
-                    let instrs = pass.run(&context);
-                    input.instrs = instrs;
-                }
+            for input in &mut middle_ir {
+                let context = OptimizationContext::new(input);
+                let instrs = pass.run(&context);
+                input.instrs = instrs;
             }
         }
 
