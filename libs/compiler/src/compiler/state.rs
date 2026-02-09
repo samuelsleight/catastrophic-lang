@@ -395,7 +395,7 @@ impl State {
     fn build_immediate_call_instr(&mut self, mut builder: llvm::Builder, args: &[llvm::Value<i64>], function: &Function) -> llvm::Builder {
         let info = self.queue_function(FunctionKey::from_function(function));
 
-        for arg in args.iter().take(info.offset) {
+        for arg in args.iter().take(info.offset).rev() {
             builder = builder
                 .build_call(&self.push_fn, (*arg,))
                 .1;
