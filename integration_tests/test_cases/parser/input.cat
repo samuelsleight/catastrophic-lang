@@ -1,0 +1,190 @@
+# Boolean-returning expressions
+false: a -> { 1 0 = () }
+true: a -> { 1 1 = () }
+
+# List definition
+empty: visitor -> {}
+
+cons: list -> value -> {
+    visitor -> {
+        value visitor ()
+        visitor list ()
+    }
+}
+
+# Parse helpers
+is_digit: c -> {
+    c
+
+    false
+
+    c -> {
+        c
+
+        false
+
+        true
+
+        47 c > ()
+
+        ? () ()
+    }
+
+    58 c < ()
+
+    ? () ()
+}
+
+# Main parsing method
+parse_input: {
+    finish: 0
+    peek: 1
+    consume: 2
+
+    # Number parsing mode:
+    # Consumes characters until "not a digit" is received
+    parse_number: tokens -> char -> number -> {
+        check_digit: char -> {
+            {
+                tokens
+                number
+                cons ()
+
+                peek
+                process_char
+            }
+
+            {
+                tokens
+                consume
+
+                "0" char - ()
+                number 10 * ()
+                + ()
+
+                number -> {
+                    tokens -> char -> {
+                        tokens char number parse_number ()
+                    }
+                }
+
+                ()
+            }
+
+            char is_digit ()
+
+            ? () ()
+        }
+
+        char check_digit ()
+    }
+
+    # Top-level parsing mode
+    process_char: tokens -> char -> {
+        # Final case, check if the parsing is done
+        check_eof: char -> {
+            {
+                "Error: Unexpected '" ,,,,,,,,,,,,,,,,,,,
+                char ,
+                10 "'" ,,
+
+                empty
+                finish
+                {}
+            }
+
+            {
+                tokens
+                finish
+                {}
+            }
+
+            char 10 = ()
+
+            ? () ()
+        }
+
+        # Check if we are about to parse a number
+        check_digit: char -> {
+            {
+                char check_eof ()
+            }
+
+            {
+                tokens
+                consume
+
+                "0" char - ()
+
+                number -> {
+                    tokens -> char -> {
+                        tokens char number parse_number ()
+                    }
+                }
+
+                ()
+            }
+
+            char is_digit ()
+
+            ? () ()
+        }
+
+        # Skip any whitespace
+        check_whitespace: char -> {
+            {
+                char check_digit ()
+            }
+
+            {
+                tokens
+                consume
+                process_char
+            }
+
+            char " " = ()
+
+            ? () ()
+        }
+
+        char check_whitespace ()
+    }
+
+    # Main input loop
+    main_loop: tokens -> process -> {
+        handle: tokens -> char -> process -> {
+            tokens char process ()
+
+            tokens -> result -> process -> {
+                {
+                    { tokens process main_loop () }
+                    { tokens char process handle () }
+                    peek result = ()
+                    ? () ()
+                }
+
+                {
+                    tokens
+                }
+
+                finish result = ()
+                ? () ()
+            }
+
+            ()
+        }
+
+        tokens ~ process handle ()
+    }
+
+    empty process_char main_loop ()
+}
+
+print_list: list -> {
+    value -> { value . }
+    list
+    ()
+}
+
+parse_input ()
+print_list ()
