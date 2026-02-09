@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 
-use catastrophic_hir_optimizer::optimizer::Optimization;
 use clap::Parser;
 
 pub mod flags;
@@ -21,8 +20,11 @@ pub struct Args {
     #[arg(long)]
     pub profile: bool,
 
-    #[arg(long = "opt", default_value = "all")]
+    #[arg(long, default_value = "all")]
     pub opt: flags::Optimization,
+
+    #[arg(long)]
+    pub skip_pass: Option<String>,
 
     // Compilation input
     #[arg(required_unless_present = "list")]
@@ -32,14 +34,5 @@ pub struct Args {
 impl Args {
     pub fn try_parse() -> Result<Self, clap::error::Error> {
         <Self as Parser>::try_parse()
-    }
-}
-
-impl From<flags::Optimization> for Optimization {
-    fn from(value: flags::Optimization) -> Self {
-        match value {
-            flags::Optimization::None => Optimization::None,
-            flags::Optimization::All => Optimization::All,
-        }
     }
 }

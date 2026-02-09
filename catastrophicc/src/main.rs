@@ -2,7 +2,7 @@ use std::{fmt::Debug, path::PathBuf};
 
 use anyhow::Result;
 use args::{
-    flags::{DebugMode, List},
+    flags::{DebugMode, List, Optimization},
     Args,
 };
 use catastrophic_analyser::stage::AnalysisStage;
@@ -13,7 +13,7 @@ use catastrophic_core::{
     profiling::TimeKeeper,
     stage::{pipeline, Continue, Extend, Pipeline, PipelineResult, Stage, StageContext},
 };
-use catastrophic_hir_optimizer::stage::OptimizationStage;
+use catastrophic_hir_optimizer::{optimizer::Options, stage::OptimizationStage};
 use catastrophic_parser::stage::ParseStage;
 
 mod args;
@@ -58,7 +58,17 @@ impl App {
     fn make_pipeline(&self) -> impl Pipeline<anyhow::Error, Start = StageContext<PathBuf>, End = StageContext<()>> {
         pipeline(ParseStage.stage(), self.debug_callback(DebugMode::Ast))
             .and_then(AnalysisStage.stage(), self.debug_callback(DebugMode::Hir))
-            .and_then(OptimizationStage::new(self.args.opt.into()).stage(), self.debug_callback(DebugMode::Mir))
+            .and_then(
+                OptimizationStage::new(if let Optimization::None = self.args.opt {
+                    Options::no_passes()
+                } else if let Some(ref pass) = self.args.skip_pass {
+                    Options::without_pass(pass)
+                } else {
+                    Options::all_passes()
+                })
+                .stage(),
+                self.debug_callback(DebugMode::Mir),
+            )
             .and_then(CompilationStage.stage(), |_| ())
     }
 
