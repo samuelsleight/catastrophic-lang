@@ -24,9 +24,10 @@ jobs:
 
       # Install an appropriate version of llvm
       - name: Install LLVM
-        uses: KyleMayes/install-llvm-action@v1.9.0
+        uses: KyleMayes/install-llvm-action@v2.0.9
         with:
           version: "14.0"
+          arch: ${{ case(matrix.os == 'macos-latest', 'arm64', 'x64') }}
 
       # Install the target version of Rust
       - name: Update Rust Toolchain
