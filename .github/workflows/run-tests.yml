@@ -1,23 +1,23 @@
 name: Run Tests
 
-on: 
-  push: 
-    branches: [ "main" ]
-  pull_request: 
-    branches: [ "main" ]
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
-env: 
+env:
   CARGO_TERM_COLOR: always
 
-jobs: 
-  build_and_test: 
-    strategy: 
-      matrix: 
+jobs:
+  build_and_test:
+    strategy:
+      matrix:
         os: [macos-latest, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
-    steps: 
+    steps:
       # Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -25,26 +25,26 @@ jobs:
       # Install an appropriate version of llvm
       - name: Install LLVM
         uses: KyleMayes/install-llvm-action@v1.9.0
-        with: 
+        with:
           version: "14.0"
 
       # Install the target version of Rust
       - name: Update Rust Toolchain
         id: toolchain
         uses: dtolnay/rust-toolchain@master
-        with: 
-          toolchain: "1.75.0"
+        with:
+          toolchain: "1.83.0"
 
       - name: Set Rust Toolchain
         run: rustup override set ${{steps.toolchain.outputs.name}}
 
       # Build and run the tests
       - name: Build Workspace
-        env: 
+        env:
           LLVM_SYS_140_PREFIX: ${{ env.LLVM_PATH }}
         run: cargo build --verbose --workspace
 
       - name: Run Tests
-        env: 
+        env:
           LLVM_SYS_140_PREFIX: ${{ env.LLVM_PATH }}
         run: cargo test --verbose --workspace
