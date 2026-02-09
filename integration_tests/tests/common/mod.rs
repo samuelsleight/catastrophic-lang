@@ -70,7 +70,7 @@ macro_rules! test_cases {
 }
 
 static TEST_CASE_DIR: Lazy<PathBuf> = Lazy::new(|| Path::new(std::env!("CARGO_MANIFEST_DIR")).join("test_cases"));
-static LLVM_DIR: Lazy<PathBuf> = Lazy::new(|| Path::new(std::env!("LLVM_SYS_140_PREFIX")).join("bin"));
+static LLVM_DIR: Lazy<PathBuf> = Lazy::new(|| Path::new(std::env!("LLVM_SYS_211_PREFIX")).join("bin"));
 
 pub fn get_test_case(binary: TestBinary, name: &str) -> TestCase {
     let test_case_path = TEST_CASE_DIR.join(name);
