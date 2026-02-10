@@ -24,26 +24,65 @@ reverse_list: list -> {
     list ()
 }
 
+split_list: list -> {
+    empty
+
+    1 true ()
+
+    value -> {
+        first -> {
+            new_list -> {
+                new_list value cons ()
+                1 false ()
+            }
+
+            new_list -> {
+                value
+
+                new_list value cons ()
+                1 false ()
+            }
+
+            first ? () ()
+        }
+
+        ()
+    }
+
+    list ()
+    bool -> {} ()
+}
+
+list_empty: list -> {
+    1 true ()
+
+    value -> {
+        result -> { 1 false () } ()
+    }
+
+    list ()
+}
+
 # Parse helpers
 is_digit: c -> {
     c
-    
+
     false
-    
+
     c -> {
         c
-        
+
         false
-        
+
         true
-        
+
         47 c > ()
-        
+
         ? () ()
     }
-    
+
     58 c < ()
-    
+
     ? () ()
 }
 
@@ -74,7 +113,7 @@ parse_input: {
     parse_number: tokens -> char -> number -> {
         check_digit: char -> {
             {
-                tokens 
+                tokens
                 number number_token ()
                 cons ()
 
@@ -100,7 +139,7 @@ parse_input: {
             }
 
             char is_digit ()
-            
+
             ? () ()
         }
 
@@ -140,7 +179,7 @@ parse_input: {
             }
 
             {
-                tokens 
+                tokens
                 token_minus operator_token ()
                 cons ()
 
@@ -149,7 +188,7 @@ parse_input: {
             }
 
             char "-" = ()
-            
+
             ? () ()
         }
 
@@ -160,7 +199,7 @@ parse_input: {
             }
 
             {
-                tokens 
+                tokens
                 token_plus operator_token ()
                 cons ()
 
@@ -169,7 +208,7 @@ parse_input: {
             }
 
             char "+" = ()
-            
+
             ? () ()
         }
 
@@ -195,7 +234,7 @@ parse_input: {
             }
 
             char is_digit ()
-            
+
             ? () ()
         }
 
@@ -212,7 +251,7 @@ parse_input: {
             }
 
             char " " = ()
-            
+
             ? () ()
         }
 
@@ -225,15 +264,15 @@ parse_input: {
             tokens char process ()
 
             tokens -> result -> process -> {
-                { 
+                {
                     { tokens process main_loop () }
                     { tokens char process handle () }
                     peek result = ()
                     ? () ()
                 }
 
-                { 
-                    tokens 
+                {
+                    tokens
                 }
 
                 finish result = ()
@@ -251,6 +290,21 @@ parse_input: {
 
 # Parsed input execution method
 execute_input: tokens -> {
+    operator_precedence: operator -> {
+        {
+            { 0 }
+            { 0 }
+            operator token_minus = ()
+
+            ? () ()
+        }
+
+        { 0 }
+        operator token_plus = ()
+
+        ? () ()
+    }
+
     operator_builtin: operator -> {
         {
             { 0 }
@@ -271,12 +325,48 @@ execute_input: tokens -> {
         ()
     }
 
-    operator_visitor: operator -> {
-        operator operator_builtin ()
+    operator_visitor: new_operator -> {
+        operator_stack -> {
+            new_operator
 
-        operator_stack -> operator -> {
-            # TODO: peek and check precedence
-            operator_stack operator cons ()
+            new_operator -> {
+                peek_loop: operator_stack -> {
+                    operator_stack split_list ()
+
+                    head -> rest -> {
+                        rest
+
+                        rest -> {
+                            rest head cons ()
+                            new_operator cons ()
+                        }
+
+                        rest -> {
+                            head operator_builtin () ()
+                            rest new_operator operator_visitor ()
+                        }
+
+                        head operator_precedence ()
+                        new_operator operator_precedence ()
+                        < ()
+
+                        ? () ()
+                    }
+
+                    ()
+                }
+
+                operator_stack peek_loop ()
+            }
+
+            new_operator -> {
+                operator_stack new_operator cons ()
+            }
+
+
+            operator_stack list_empty ()
+
+            ? () ()
         }
 
         ()
@@ -288,13 +378,13 @@ execute_input: tokens -> {
 
     fold_operators: operators -> {
         operator -> {
-            operator ()
+            operator operator_builtin () ()
         }
 
         operators ()
     }
 
-    empty 
+    empty
     list_visitor tokens ()
     fold_operators ()
 }
