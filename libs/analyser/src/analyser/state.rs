@@ -7,6 +7,7 @@ use super::error::{CompileError, CompileErrors};
 
 pub struct QueuedBlock {
     block: ast::Block,
+    name: String,
     parent: Option<usize>,
 }
 
@@ -17,27 +18,35 @@ pub struct State {
 }
 
 impl QueuedBlock {
-    pub fn new(block: ast::Block) -> Self {
-        Self { block, parent: None }
+    pub fn new<S: Into<String>>(block: ast::Block, name: S) -> Self {
+        Self {
+            block,
+            name: name.into(),
+            parent: None,
+        }
     }
 
-    pub fn new_with_parent(block: ast::Block, parent: usize) -> Self {
-        Self { block, parent: Some(parent) }
+    pub fn new_with_parent<S: Into<String>>(block: ast::Block, name: S, parent: usize) -> Self {
+        Self {
+            block,
+            name: name.into(),
+            parent: Some(parent),
+        }
     }
 }
 
 impl State {
     pub fn new(top_level: ast::Block) -> Self {
         Self {
-            queue: VecDeque::from([QueuedBlock::new(top_level)]),
+            queue: VecDeque::from([QueuedBlock::new(top_level, "start")]),
             ir: Vec::new(),
             errors: Vec::new(),
         }
     }
 
-    fn queue_block(&mut self, block: ast::Block, parent: usize) -> usize {
+    fn queue_block<S: Into<String>>(&mut self, block: ast::Block, name: S, parent: usize) -> usize {
         self.queue
-            .push_front(QueuedBlock::new_with_parent(block, parent));
+            .push_front(QueuedBlock::new_with_parent(block, name, parent));
         self.queue.len() + self.ir.len()
     }
 
@@ -47,17 +56,22 @@ impl State {
             block
                 .parent
                 .map(|index| &self.ir[index]),
+            block.name,
         );
 
         for (name, symbol) in block.block.symbols {
             let symbol = match symbol.value.data {
                 ast::SymbolValue::Number(value) => hir::Value::Number(value),
-                ast::SymbolValue::Block(block) => hir::Value::Function(hir::Function::Block(self.queue_block(block, index))),
+                ast::SymbolValue::Block(block) => {
+                    hir::Value::Function(hir::Function::Block(self.queue_block(block, format!("{}_{}", ir.name, name), index)))
+                }
                 ast::SymbolValue::Builtin(builtin) => hir::Value::Function(hir::Function::Builtin(builtin)),
             };
 
             ir.push_symbol(name, symbol);
         }
+
+        let mut next = 0;
 
         for instr in block.block.instrs.into_iter().rev() {
             let instr_span = instr.swap(());
@@ -66,7 +80,10 @@ impl State {
                 ast::Instruction::Push(value) => {
                     let value = match value {
                         ast::InstrValue::Number(value) => hir::Value::Number(value),
-                        ast::InstrValue::Block(block) => hir::Value::Function(hir::Function::Block(self.queue_block(block, index))),
+                        ast::InstrValue::Block(block) => {
+                            next += 1u64;
+                            hir::Value::Function(hir::Function::Block(self.queue_block(block, format!("{}_{}", ir.name, next), index)))
+                        }
                         ast::InstrValue::Builtin(builtin) => hir::Value::Function(hir::Function::Builtin(builtin)),
                         ast::InstrValue::Ident(ref name) => {
                             if let Some(value) = ir.lookup_symbol(name) {

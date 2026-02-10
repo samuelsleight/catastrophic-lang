@@ -47,4 +47,5 @@ pub struct Block {
     pub offset: usize,
     pub args: usize,
     pub instrs: Vec<Span<Instr>>,
+    pub name: String,
 }

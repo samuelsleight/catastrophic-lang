@@ -57,9 +57,9 @@ impl FunctionKey {
         }
     }
 
-    fn llvm_name(&self) -> String {
+    fn llvm_name(&self, name: Option<&str>) -> String {
         match self {
-            FunctionKey::Block(index) => format!("block_{index}"),
+            FunctionKey::Block(_) => format!("block_{}", name.unwrap()),
             FunctionKey::BinOp(builtin) => format!(
                 "builtin_{}",
                 match builtin {
@@ -500,13 +500,16 @@ impl State {
             Entry::Vacant(entry) => {
                 self.queue.push(function);
 
+                let (offset, name) = if let FunctionKey::Block(idx) = function {
+                    let block = &self.ir[idx];
+                    (block.offset, Some(&block.name as &str))
+                } else {
+                    (0, None)
+                };
+
                 let llvm_function = self
                     .module
-                    .add_function(function.llvm_name());
-                let offset = match function {
-                    FunctionKey::Block(idx) => self.ir[idx].offset,
-                    _ => 0,
-                };
+                    .add_function(function.llvm_name(name));
 
                 *entry.insert(FunctionInfo::new(count, offset, llvm_function))
             }

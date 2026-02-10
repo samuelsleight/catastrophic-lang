@@ -29,11 +29,14 @@ pub struct Block {
     pub env: Vec<Value>,
     pub symbols: HashMap<String, usize>,
     pub instrs: Vec<Span<Instr>>,
+    pub name: String,
 }
 
 impl Block {
     #[must_use]
-    pub fn new(args: Vec<Span<String>>, parent: Option<&Block>) -> Self {
+    pub fn new<S: Into<String>>(args: Vec<Span<String>>, parent: Option<&Block>, name: S) -> Self {
+        let name = name.into();
+
         let mut block = parent.map_or_else(
             || Self {
                 offset: 0,
@@ -41,6 +44,7 @@ impl Block {
                 env: Vec::new(),
                 symbols: HashMap::new(),
                 instrs: Vec::new(),
+                name: name.clone(),
             },
             |parent| Self {
                 offset: parent.offset + parent.args,
@@ -48,6 +52,7 @@ impl Block {
                 env: parent.env.clone(),
                 symbols: parent.symbols.clone(),
                 instrs: Vec::new(),
+                name: name.clone(),
             },
         );
 
