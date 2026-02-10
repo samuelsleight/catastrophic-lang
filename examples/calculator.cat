@@ -24,26 +24,65 @@ reverse_list: list -> {
     list ()
 }
 
+split_list: list -> {
+    empty
+
+    1 true ()
+
+    value -> {
+        first -> {
+            new_list -> {
+                new_list value cons ()
+                1 false ()
+            }
+
+            new_list -> {
+                value
+
+                new_list
+                1 false ()
+            }
+
+            first ? () ()
+        }
+
+        ()
+    }
+
+    list ()
+    bool -> {} ()
+}
+
+list_empty: list -> {
+    1 true ()
+
+    value -> {
+        result -> { 1 false () } ()
+    }
+
+    list ()
+}
+
 # Parse helpers
 is_digit: c -> {
     c
-    
+
     false
-    
+
     c -> {
         c
-        
+
         false
-        
+
         true
-        
+
         47 c > ()
-        
+
         ? () ()
     }
-    
+
     58 c < ()
-    
+
     ? () ()
 }
 
@@ -62,6 +101,7 @@ operator_token: operator -> {
 
 token_plus: 0
 token_minus: 1
+token_times: 2
 
 # Main parsing method
 parse_input: {
@@ -74,7 +114,7 @@ parse_input: {
     parse_number: tokens -> char -> number -> {
         check_digit: char -> {
             {
-                tokens 
+                tokens
                 number number_token ()
                 cons ()
 
@@ -100,7 +140,7 @@ parse_input: {
             }
 
             char is_digit ()
-            
+
             ? () ()
         }
 
@@ -132,15 +172,35 @@ parse_input: {
             ? () ()
         }
 
-        # Check for the "-" operator
-        check_minus: char -> {
+        # Check for the "*" operator
+        check_times: char -> {
             {
                 # TODO: Additional operators and parenthesis
                 char check_eof ()
             }
 
             {
-                tokens 
+                tokens
+                token_times operator_token ()
+                cons ()
+
+                consume
+                process_char
+            }
+
+            char "*" = ()
+
+            ? () ()
+        }
+
+        # Check for the "-" operator
+        check_minus: char -> {
+            {
+                char check_times ()
+            }
+
+            {
+                tokens
                 token_minus operator_token ()
                 cons ()
 
@@ -149,7 +209,7 @@ parse_input: {
             }
 
             char "-" = ()
-            
+
             ? () ()
         }
 
@@ -160,7 +220,7 @@ parse_input: {
             }
 
             {
-                tokens 
+                tokens
                 token_plus operator_token ()
                 cons ()
 
@@ -169,7 +229,7 @@ parse_input: {
             }
 
             char "+" = ()
-            
+
             ? () ()
         }
 
@@ -195,7 +255,7 @@ parse_input: {
             }
 
             char is_digit ()
-            
+
             ? () ()
         }
 
@@ -212,7 +272,7 @@ parse_input: {
             }
 
             char " " = ()
-            
+
             ? () ()
         }
 
@@ -225,15 +285,15 @@ parse_input: {
             tokens char process ()
 
             tokens -> result -> process -> {
-                { 
+                {
                     { tokens process main_loop () }
                     { tokens char process handle () }
                     peek result = ()
                     ? () ()
                 }
 
-                { 
-                    tokens 
+                {
+                    tokens
                 }
 
                 finish result = ()
@@ -251,9 +311,40 @@ parse_input: {
 
 # Parsed input execution method
 execute_input: tokens -> {
+    # Helper function to get the precedence for an operator
+    operator_precedence: operator -> {
+        {
+            {
+                { 0 }
+                { 3 }
+                operator token_times = ()
+
+                ? () ()
+            }
+
+            { 2 }
+            operator token_minus = ()
+
+            ? () ()
+        }
+
+        { 2 }
+        operator token_plus = ()
+
+        ? () ()
+    }
+
+    # Helper function to get the builtin function to executa an operator
     operator_builtin: operator -> {
         {
-            { 0 }
+            {
+                { 0 }
+                { * }
+                operator token_times = ()
+
+                ? () ()
+            }
+
             { x -> y -> { y x - () } }
             operator token_minus = ()
 
@@ -266,35 +357,80 @@ execute_input: tokens -> {
         ? () ()
     }
 
+    # Visitor for a numeric token that pushes it to the output stack
     number_visitor: number -> {
-        operator_stack -> { number operator_stack }
-        ()
+        # The operator stack is a list on top of the numbers on the actual stack,
+        # so swap them
+        operator_stack -> { number operator_stack } ()
     }
 
-    operator_visitor: operator -> {
-        operator operator_builtin ()
+    # Visitor for an operator token
+    operator_visitor: new_operator -> {
+        # Grab the operator stack so we can play with it
+        # The rest of the stack will be the numbers in our expression so far
+        operator_stack -> {
+            # Here, we need to recursively:
+            #  - Check the precedence of the top of the stack
+            #  - Fold down the top of the numeric stack if needed
+            #  - If not needed, finish and push this new operator to the stack
 
-        operator_stack -> operator -> {
-            # TODO: peek and check precedence
-            operator_stack operator cons ()
+            # Push a function for handling a non-empty operator stack
+            {
+                peek_loop: operator_stack -> {
+                    operator_stack split_list ()
+
+                    head -> rest -> {
+                        {
+                            head operator_builtin () ()
+                            rest new_operator operator_visitor ()
+                        }
+
+                        {
+                            rest head cons ()
+                            new_operator cons ()
+                        }
+
+                        head operator_precedence ()
+                        new_operator operator_precedence ()
+                        > ()
+
+                        ? () ()
+                    }
+
+                    ()
+                }
+
+                operator_stack peek_loop ()
+            }
+
+            # Push a function for handling an empty operator stack
+            {
+                # Simply push the new operator to the list!
+                operator_stack new_operator cons ()
+            }
+
+            operator_stack list_empty ()
+
+            ? () ()
         }
 
         ()
     }
 
+    # Visit each token in our parsed expression
     list_visitor: token -> {
         number_visitor operator_visitor token ()
     }
 
     fold_operators: operators -> {
         operator -> {
-            operator ()
+            operator operator_builtin () ()
         }
 
         operators ()
     }
 
-    empty 
+    empty
     list_visitor tokens ()
     fold_operators ()
 }
