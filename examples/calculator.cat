@@ -39,7 +39,7 @@ split_list: list -> {
             new_list -> {
                 value
 
-                new_list value cons ()
+                new_list
                 1 false ()
             }
 
@@ -101,6 +101,7 @@ operator_token: operator -> {
 
 token_plus: 0
 token_minus: 1
+token_times: 2
 
 # Main parsing method
 parse_input: {
@@ -171,11 +172,31 @@ parse_input: {
             ? () ()
         }
 
-        # Check for the "-" operator
-        check_minus: char -> {
+        # Check for the "*" operator
+        check_times: char -> {
             {
                 # TODO: Additional operators and parenthesis
                 char check_eof ()
+            }
+
+            {
+                tokens
+                token_times operator_token ()
+                cons ()
+
+                consume
+                process_char
+            }
+
+            char "*" = ()
+
+            ? () ()
+        }
+
+        # Check for the "-" operator
+        check_minus: char -> {
+            {
+                char check_times ()
             }
 
             {
@@ -292,14 +313,21 @@ parse_input: {
 execute_input: tokens -> {
     operator_precedence: operator -> {
         {
-            { 0 }
-            { 0 }
+            {
+                { 0 }
+                { 3 }
+                operator token_times = ()
+
+                ? () ()
+            }
+
+            { 2 }
             operator token_minus = ()
 
             ? () ()
         }
 
-        { 0 }
+        { 2 }
         operator token_plus = ()
 
         ? () ()
@@ -307,7 +335,14 @@ execute_input: tokens -> {
 
     operator_builtin: operator -> {
         {
-            { 0 }
+            {
+                { 0 }
+                { * }
+                operator token_times = ()
+
+                ? () ()
+            }
+
             { x -> y -> { y x - () } }
             operator token_minus = ()
 
@@ -337,18 +372,18 @@ execute_input: tokens -> {
                         rest
 
                         rest -> {
-                            rest head cons ()
-                            new_operator cons ()
-                        }
-
-                        rest -> {
                             head operator_builtin () ()
                             rest new_operator operator_visitor ()
                         }
 
+                        rest -> {
+                            rest head cons ()
+                            new_operator cons ()
+                        }
+
                         head operator_precedence ()
                         new_operator operator_precedence ()
-                        < ()
+                        > ()
 
                         ? () ()
                     }
