@@ -311,6 +311,7 @@ parse_input: {
 
 # Parsed input execution method
 execute_input: tokens -> {
+    # Helper function to get the precedence for an operator
     operator_precedence: operator -> {
         {
             {
@@ -333,6 +334,7 @@ execute_input: tokens -> {
         ? () ()
     }
 
+    # Helper function to get the builtin function to executa an operator
     operator_builtin: operator -> {
         {
             {
@@ -355,28 +357,35 @@ execute_input: tokens -> {
         ? () ()
     }
 
+    # Visitor for a numeric token that pushes it to the output stack
     number_visitor: number -> {
-        operator_stack -> { number operator_stack }
-        ()
+        # The operator stack is a list on top of the numbers on the actual stack,
+        # so swap them
+        operator_stack -> { number operator_stack } ()
     }
 
+    # Visitor for an operator token
     operator_visitor: new_operator -> {
+        # Grab the operator stack so we can play with it
+        # The rest of the stack will be the numbers in our expression so far
         operator_stack -> {
-            new_operator
+            # Here, we need to recursively:
+            #  - Check the precedence of the top of the stack
+            #  - Fold down the top of the numeric stack if needed
+            #  - If not needed, finish and push this new operator to the stack
 
-            new_operator -> {
+            # Push a function for handling a non-empty operator stack
+            {
                 peek_loop: operator_stack -> {
                     operator_stack split_list ()
 
                     head -> rest -> {
-                        rest
-
-                        rest -> {
+                        {
                             head operator_builtin () ()
                             rest new_operator operator_visitor ()
                         }
 
-                        rest -> {
+                        {
                             rest head cons ()
                             new_operator cons ()
                         }
@@ -394,10 +403,11 @@ execute_input: tokens -> {
                 operator_stack peek_loop ()
             }
 
-            new_operator -> {
+            # Push a function for handling an empty operator stack
+            {
+                # Simply push the new operator to the list!
                 operator_stack new_operator cons ()
             }
-
 
             operator_stack list_empty ()
 
@@ -407,6 +417,7 @@ execute_input: tokens -> {
         ()
     }
 
+    # Visit each token in our parsed expression
     list_visitor: token -> {
         number_visitor operator_visitor token ()
     }
