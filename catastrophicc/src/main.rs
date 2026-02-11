@@ -32,7 +32,7 @@ impl App {
             match list {
                 List::Passes => {
                     for pass in OptimizationStage::pass_names() {
-                        println!("{}", pass);
+                        println!("{pass}");
                     }
                 }
             }

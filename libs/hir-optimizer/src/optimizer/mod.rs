@@ -16,14 +16,17 @@ pub struct Options {
 pub struct Optimizer;
 
 impl Options {
+    #[must_use]
     pub fn no_passes() -> Self {
         Self { passes: Vec::new() }
     }
 
+    #[must_use]
     pub fn all_passes() -> Self {
         Self { passes: pass::passes() }
     }
 
+    #[must_use]
     pub fn without_pass(name: &str) -> Self {
         Self {
             passes: pass::passes()

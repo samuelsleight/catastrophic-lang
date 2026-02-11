@@ -22,15 +22,14 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace.lints.clippy]
-correctness = "deny"
-suspicious = "deny"
-perf = "deny"
-complexity = "warn"
-pedantic = "warn"
-style = "warn"
+correctness = { level = "deny", priority = -1 }
+suspicious = { level = "deny", priority = -1 }
+perf = { level = "deny", priority = -1 }
+complexity = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+style = { level = "warn", priority = -1 }
 
 # TODO
-cast_lossless = "allow"
 cast_possible_truncation = "allow"
 cast_possible_wrap = "allow"
 cast_sign_loss = "allow"

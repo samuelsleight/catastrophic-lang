@@ -59,7 +59,7 @@ impl State {
     fn process_string(&mut self, string: &str, span: Span<()>) {
         for byte in string.bytes().rev() {
             self.stack
-                .push(span.swap(StackItem::Number(byte as ValueType)));
+                .push(span.swap(StackItem::Number(ValueType::from(byte))));
         }
     }
 

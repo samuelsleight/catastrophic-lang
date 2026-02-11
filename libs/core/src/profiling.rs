@@ -45,7 +45,7 @@ impl TimeKeeper {
     }
 }
 
-impl<'keeper> TimeScope<'keeper> {
+impl TimeScope<'_> {
     pub fn scope<S: ToString>(&mut self, label: &S) -> TimeScope<'_> {
         Self::make(self.entries, self.indent + 1, label.to_string())
     }
@@ -72,7 +72,7 @@ impl<'keeper> TimeScope<'keeper> {
     }
 }
 
-impl<'keeper> Drop for TimeScope<'keeper> {
+impl Drop for TimeScope<'_> {
     fn drop(&mut self) {
         Self::finish(self.entries, self.start);
     }

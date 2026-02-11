@@ -298,7 +298,7 @@ impl<'a> Env<'a> {
                         }
                     },
                 },
-            };
+            }
 
             self.instr += 1;
         }
