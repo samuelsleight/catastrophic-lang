@@ -1,4 +1,7 @@
-use std::collections::{btree_map::Entry, BTreeMap};
+use std::{
+    collections::{btree_map::Entry, BTreeMap},
+    path::PathBuf,
+};
 
 use catastrophic_mir::mir::{BinOp, Block, Command, Function, Instr, TriOp, Value};
 use dragon_tamer as llvm;
@@ -90,8 +93,14 @@ impl FunctionInfo {
 }
 
 impl State {
-    pub fn new(ir: Vec<Block>) -> Self {
-        let module = llvm::Module::new("test", "test");
+    pub fn new(ir: Vec<Block>, source_filename: PathBuf) -> Self {
+        let module_name = source_filename
+            .file_stem()
+            .unwrap()
+            .to_string_lossy();
+
+        let module = llvm::Module::new(module_name, &source_filename);
+
         let putchar_fn = module.add_function("putchar");
         let printf_str = module.add_string("%lld");
         let printf_fn = module.add_function("printf");
@@ -101,6 +110,7 @@ impl State {
         let call_fn = module.add_function("call_index");
         let closure_push_fn = module.add_function("closure_push");
         let closure_offset_fn = module.add_function("closure_offset");
+
         let closure_stack = module.add_array();
         let closure_stack_index = module.add_global(0);
         let stack = module.add_array();
