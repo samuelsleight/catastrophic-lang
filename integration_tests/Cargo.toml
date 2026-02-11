@@ -6,3 +6,6 @@ edition.workspace = true
 [dev-dependencies]
 bintest.workspace = true
 once_cell.workspace = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(tarpaulin)'] }

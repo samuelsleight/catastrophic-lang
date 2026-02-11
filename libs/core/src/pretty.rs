@@ -11,7 +11,7 @@ pub trait PrettyDebug {
 
 pub struct PrettyDebugger<'a, T>(pub &'a T);
 
-impl<'a, 'b> PrettyFormatter<'a, 'b> {
+impl PrettyFormatter<'_, '_> {
     pub fn indent(&mut self) {
         self.indent += 1;
     }
@@ -29,7 +29,7 @@ impl<'a, 'b> PrettyFormatter<'a, 'b> {
     }
 }
 
-impl<'a, T: PrettyDebug> fmt::Display for PrettyDebugger<'a, T> {
+impl<T: PrettyDebug> fmt::Display for PrettyDebugger<'_, T> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         let mut pretty_formatter = PrettyFormatter { indent: 0, fmt: formatter };
 
@@ -38,7 +38,7 @@ impl<'a, T: PrettyDebug> fmt::Display for PrettyDebugger<'a, T> {
     }
 }
 
-impl<'a, 'b> Write for PrettyFormatter<'a, 'b> {
+impl Write for PrettyFormatter<'_, '_> {
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.fmt.write_str(s)
     }
