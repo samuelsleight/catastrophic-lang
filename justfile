@@ -1,7 +1,7 @@
 alias i := interpret
 alias c := compile
 
-llvm := "${LLVM_SYS_140_PREFIX}"
+llvm := "${LLVM_SYS_211_PREFIX}"
 opt := "all"
 
 # Run the project tests
