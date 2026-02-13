@@ -1,4 +1,7 @@
-use std::collections::{btree_map::Entry, BTreeMap};
+use std::{
+    collections::{btree_map::Entry, BTreeMap},
+    path::PathBuf,
+};
 
 use catastrophic_mir::mir::{BinOp, Block, Command, Function, Instr, TriOp, Value};
 use dragon_tamer as llvm;
@@ -57,9 +60,9 @@ impl FunctionKey {
         }
     }
 
-    fn llvm_name(&self) -> String {
+    fn llvm_name(&self, name: Option<&str>) -> String {
         match self {
-            FunctionKey::Block(index) => format!("block_{index}"),
+            FunctionKey::Block(_) => format!("block_{}", name.unwrap()),
             FunctionKey::BinOp(builtin) => format!(
                 "builtin_{}",
                 match builtin {
@@ -90,10 +93,16 @@ impl FunctionInfo {
 }
 
 impl State {
-    pub fn new(ir: Vec<Block>) -> Self {
-        let module = llvm::Module::new("test", "test");
+    pub fn new(ir: Vec<Block>, source_filename: PathBuf) -> Self {
+        let module_name = source_filename
+            .file_stem()
+            .unwrap()
+            .to_string_lossy();
+
+        let module = llvm::Module::new(module_name, &source_filename);
+
         let putchar_fn = module.add_function("putchar");
-        let printf_str = module.add_string("%lld");
+        let printf_str = module.add_named_string("format_number", "%lld");
         let printf_fn = module.add_function("printf");
         let getchar_fn = module.add_function("getchar");
         let pop_fn = module.add_function("stack_pop");
@@ -101,10 +110,11 @@ impl State {
         let call_fn = module.add_function("call_index");
         let closure_push_fn = module.add_function("closure_push");
         let closure_offset_fn = module.add_function("closure_offset");
-        let closure_stack = module.add_array();
-        let closure_stack_index = module.add_global(0);
-        let stack = module.add_array();
-        let index = module.add_global(0);
+
+        let closure_stack = module.add_named_array("closure_stack");
+        let closure_stack_index = module.add_named_global("closure_stack_pointer", 0);
+        let stack = module.add_named_array("value_stack");
+        let index = module.add_named_global("value_stack_pointer", 0);
 
         Self {
             ir,
@@ -500,13 +510,16 @@ impl State {
             Entry::Vacant(entry) => {
                 self.queue.push(function);
 
+                let (offset, name) = if let FunctionKey::Block(idx) = function {
+                    let block = &self.ir[idx];
+                    (block.offset, Some(&block.name as &str))
+                } else {
+                    (0, None)
+                };
+
                 let llvm_function = self
                     .module
-                    .add_function(function.llvm_name());
-                let offset = match function {
-                    FunctionKey::Block(idx) => self.ir[idx].offset,
-                    _ => 0,
-                };
+                    .add_function(function.llvm_name(name));
 
                 *entry.insert(FunctionInfo::new(count, offset, llvm_function))
             }

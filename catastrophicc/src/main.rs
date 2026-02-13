@@ -56,6 +56,15 @@ impl App {
     }
 
     fn make_pipeline(&self) -> impl Pipeline<anyhow::Error, Start = StageContext<PathBuf>, End = StageContext<()>> {
+        let source_filename = PathBuf::from(
+            self.args
+                .input
+                .as_ref()
+                .unwrap()
+                .file_name()
+                .unwrap(),
+        );
+
         pipeline(ParseStage.stage(), self.debug_callback(DebugMode::Ast))
             .and_then(AnalysisStage.stage(), self.debug_callback(DebugMode::Hir))
             .and_then(
@@ -69,7 +78,7 @@ impl App {
                 .stage(),
                 self.debug_callback(DebugMode::Mir),
             )
-            .and_then(CompilationStage.stage(), |_| ())
+            .and_then(CompilationStage::new(source_filename).stage(), |_| ())
     }
 
     fn debug_callback<Input: Debug + PrettyDebug>(&self, debug: DebugMode) -> for<'a> fn(&'a StageContext<Input>) -> Continue {

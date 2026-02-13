@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use catastrophic_core::{
     error::{context::ErrorProvider, writer::ErrorWriter},
     profiling::TimeScope,
@@ -7,14 +9,22 @@ use catastrophic_mir::mir;
 
 use crate::compiler::Compiler;
 
-pub struct CompilationStage;
+pub struct CompilationStage {
+    source_filename: PathBuf,
+}
+
+impl CompilationStage {
+    pub fn new(source_filename: PathBuf) -> Self {
+        Self { source_filename }
+    }
+}
 
 impl Stage<Vec<mir::Block>> for CompilationStage {
     type Output = ();
     type Error = NoError;
 
     fn run(self, input: Vec<mir::Block>, _: &mut TimeScope) -> Result<Self::Output, Self::Error> {
-        Compiler::compile(input);
+        Compiler::compile(input, self.source_filename);
         Ok(())
     }
 

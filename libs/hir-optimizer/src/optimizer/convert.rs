@@ -38,6 +38,7 @@ fn convert_block(hir: hir::Block) -> mir::Block {
             .into_iter()
             .map(convert_instr)
             .collect(),
+        name: hir.name,
     }
 }
 
