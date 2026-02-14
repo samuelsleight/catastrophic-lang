@@ -15,6 +15,7 @@ pub struct CompilationStage {
 }
 
 impl CompilationStage {
+    #[must_use]
     pub fn new(source_filename: PathBuf) -> Self {
         Self { source_filename }
     }

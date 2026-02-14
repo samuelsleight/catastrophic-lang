@@ -1,45 +1,44 @@
 #![cfg(not(tarpaulin))]
 
-use std::fs;
+use std::{fs, process::Command};
 
-use common::{get_llvm_binary, get_test_case, TestBinary, TestCase};
+use common::{get_test_case, TestBinary, TestCase};
+use tempfile::tempdir;
 
 mod common;
 
 fn run_test_case(mut test_case: TestCase) {
-    let llvm_output_path = test_case
-        .input
-        .with_file_name("compiler_llvm_output");
-
-    let mut lli_command = get_llvm_binary("lli");
-
-    if let Ok(stdin) = fs::File::open(test_case.stdin) {
-        lli_command.stdin(stdin);
-    }
+    let dir = tempdir().unwrap();
+    let output = dir.path().join("output");
 
     // First, run the `catastrophicc` compiler
     let compiler_output = test_case
         .command
-        .args(["--opt", "none", "--debug", "llvm-ir", "--pretty"])
+        .args(["--opt", "none", "-o"])
+        .arg(&output)
         .arg(test_case.input)
-        .stdout(fs::File::create(&llvm_output_path).expect("Unable to open llvm output file"))
         .output()
-        .expect("Unable to sucessfully run executable");
+        .expect("Unable to sucessfully run compiler");
 
     if let Ok(expected_stderr) = fs::read(test_case.stderr) {
         // If we are testing for an error, check that now and return if so
         assert_eq!(compiler_output.stderr, expected_stderr);
+    } else if !compiler_output.status.success() {
+        panic!("Failed running compiler: {}", String::from_utf8(compiler_output.stderr).unwrap());
     } else {
-        // Otherwise, run `lli` on the `catastrphicc` output
-        let output = lli_command
-            .arg(&llvm_output_path)
+        // Otherwise, run the compiled output
+        let mut output_command = Command::new(output);
+
+        if let Ok(stdin) = fs::File::open(test_case.stdin) {
+            output_command.stdin(stdin);
+        };
+
+        let output = output_command
             .output()
-            .expect("Unable to sucessfully run lli");
+            .expect("Unable to sucessfully run output executable");
 
         assert_eq!(output.stdout, fs::read(test_case.expected).expect("Unable to read expected output"));
     }
-
-    fs::remove_file(llvm_output_path).expect("Unable to delete temporary file");
 }
 
 mod compiler {

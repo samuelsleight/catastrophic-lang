@@ -8,8 +8,13 @@ pub use dragon_tamer as llvm;
 pub struct FinishedModule(llvm::Module);
 
 impl FinishedModule {
+    #[must_use]
     pub fn new(module: llvm::Module) -> Self {
         Self(module)
+    }
+
+    pub fn compile_for_host(&self, output: llvm::CompileOutput) -> Result<llvm::OutputFile, String> {
+        self.0.compile_for_host(output)
     }
 }
 

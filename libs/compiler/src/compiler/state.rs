@@ -1,6 +1,6 @@
 use std::{
     collections::{btree_map::Entry, BTreeMap},
-    path::PathBuf,
+    path::Path,
 };
 
 use catastrophic_llvm::{llvm, FinishedModule};
@@ -93,13 +93,13 @@ impl FunctionInfo {
 }
 
 impl State {
-    pub fn new(ir: Vec<Block>, source_filename: PathBuf) -> Self {
+    pub fn new(ir: Vec<Block>, source_filename: &Path) -> Self {
         let module_name = source_filename
             .file_stem()
             .unwrap()
             .to_string_lossy();
 
-        let module = llvm::Module::new(module_name, &source_filename);
+        let module = llvm::Module::new(module_name, source_filename);
 
         let putchar_fn = module.add_function("putchar");
         let printf_str = module.add_named_string("format_number", "%lld");

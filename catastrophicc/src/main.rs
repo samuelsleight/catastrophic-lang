@@ -57,6 +57,14 @@ impl App {
     }
 
     fn make_pipeline(&self) -> impl Pipeline<anyhow::Error, Start = StageContext<PathBuf>, End = StageContext<()>> {
+        let optimization_options = if let Optimization::None = self.args.opt {
+            Options::no_passes()
+        } else if let Some(ref pass) = self.args.skip_pass {
+            Options::without_pass(pass)
+        } else {
+            Options::all_passes()
+        };
+
         let source_filename = PathBuf::from(
             self.args
                 .input
@@ -66,21 +74,17 @@ impl App {
                 .unwrap(),
         );
 
+        let output_filename = self
+            .args
+            .output
+            .clone()
+            .unwrap_or_else(|| PathBuf::from(source_filename.file_stem().unwrap()));
+
         pipeline(ParseStage.stage(), self.debug_callback(DebugMode::Ast))
             .and_then(AnalysisStage.stage(), self.debug_callback(DebugMode::Hir))
-            .and_then(
-                OptimizationStage::new(if let Optimization::None = self.args.opt {
-                    Options::no_passes()
-                } else if let Some(ref pass) = self.args.skip_pass {
-                    Options::without_pass(pass)
-                } else {
-                    Options::all_passes()
-                })
-                .stage(),
-                self.debug_callback(DebugMode::Mir),
-            )
+            .and_then(OptimizationStage::new(optimization_options).stage(), self.debug_callback(DebugMode::Mir))
             .and_then(CompilationStage::new(source_filename).stage(), self.debug_callback(DebugMode::LlvmIr))
-            .and_then(OutputStage.stage(), |_| ())
+            .and_then(OutputStage::new(output_filename).stage(), |_| ())
     }
 
     fn debug_callback<Input: Debug + PrettyDebug>(&self, debug: DebugMode) -> for<'a> fn(&'a StageContext<Input>) -> Continue {

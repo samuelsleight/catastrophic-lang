@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::Path;
 
 use catastrophic_llvm::FinishedModule;
 use catastrophic_mir::mir::Block;
@@ -10,7 +10,8 @@ mod state;
 pub struct Compiler;
 
 impl Compiler {
-    pub fn compile(ir: Vec<Block>, source_filename: PathBuf) -> FinishedModule {
-        State::new(ir, source_filename).compile()
+    #[must_use]
+    pub fn compile<P: AsRef<Path>>(ir: Vec<Block>, source_filename: P) -> FinishedModule {
+        State::new(ir, source_filename.as_ref()).compile()
     }
 }
