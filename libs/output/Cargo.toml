@@ -9,3 +9,6 @@ workspace = true
 [dependencies]
 catastrophic-core.workspace = true
 catastrophic-llvm.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+find-msvc-tools.workspace = true

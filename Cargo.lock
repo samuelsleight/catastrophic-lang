@@ -210,6 +210,7 @@ version = "0.1.0"
 dependencies = [
  "catastrophic-core",
  "catastrophic-llvm",
+ "find-msvc-tools",
 ]
 
 [[package]]
@@ -334,7 +335,7 @@ dependencies = [
 [[package]]
 name = "dragon-tamer"
 version = "211.1.0"
-source = "git+https://github.com/samuelsleight/dragon-tamer?branch=compilation-and-linking#71a240105d29dade70e68692b7e2e170ad6ca7f7"
+source = "git+https://github.com/samuelsleight/dragon-tamer?branch=compilation-and-linking#6720c61c4c436788e5ac40c026d94cb331c590ab"
 dependencies = [
  "llvm-sys",
  "tempfile",
