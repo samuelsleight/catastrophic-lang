@@ -10,6 +10,8 @@ members = [
     "libs/hir-optimizer",
     "libs/mir",
     "libs/compiler",
+    "libs/llvm",
+    "libs/output",
 
     "catastrophici",
     "catastrophicc",
@@ -46,6 +48,8 @@ catastrophic-interpreter = { path = "libs/interpreter" }
 catastrophic-hir-optimizer = { path = "libs/hir-optimizer" }
 catastrophic-mir = { path = "libs/mir" }
 catastrophic-compiler = { path = "libs/compiler" }
+catastrophic-llvm = { path = "libs/llvm" }
+catastrophic-output = { path = "libs/output" }
 
 ruinous = { git = "https://github.com/samuelsleight/ruinous" }
 ruinous-util = { git = "https://github.com/samuelsleight/ruinous" }

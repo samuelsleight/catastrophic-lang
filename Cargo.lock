@@ -143,8 +143,8 @@ name = "catastrophic-compiler"
 version = "0.1.0"
 dependencies = [
  "catastrophic-core",
+ "catastrophic-llvm",
  "catastrophic-mir",
- "dragon-tamer",
 ]
 
 [[package]]
@@ -183,11 +183,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "catastrophic-llvm"
+version = "0.1.0"
+dependencies = [
+ "catastrophic-core",
+ "dragon-tamer",
+]
+
+[[package]]
 name = "catastrophic-mir"
 version = "0.1.0"
 dependencies = [
  "catastrophic-core",
  "catastrophic-hir",
+]
+
+[[package]]
+name = "catastrophic-output"
+version = "0.1.0"
+dependencies = [
+ "catastrophic-core",
+ "catastrophic-llvm",
 ]
 
 [[package]]
@@ -218,6 +234,7 @@ dependencies = [
  "catastrophic-compiler",
  "catastrophic-core",
  "catastrophic-hir-optimizer",
+ "catastrophic-output",
  "catastrophic-parser",
  "clap",
 ]

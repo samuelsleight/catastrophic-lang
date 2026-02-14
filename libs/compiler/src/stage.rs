@@ -5,6 +5,7 @@ use catastrophic_core::{
     profiling::TimeScope,
     stage::Stage,
 };
+use catastrophic_llvm::FinishedModule;
 use catastrophic_mir::mir;
 
 use crate::compiler::Compiler;
@@ -20,12 +21,11 @@ impl CompilationStage {
 }
 
 impl Stage<Vec<mir::Block>> for CompilationStage {
-    type Output = ();
+    type Output = FinishedModule;
     type Error = NoError;
 
     fn run(self, input: Vec<mir::Block>, _: &mut TimeScope) -> Result<Self::Output, Self::Error> {
-        Compiler::compile(input, self.source_filename);
-        Ok(())
+        Ok(Compiler::compile(input, self.source_filename))
     }
 
     fn name() -> &'static str {

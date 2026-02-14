@@ -1,5 +1,5 @@
 [package]
-name = "catastrophic-compiler"
+name = "catastrophic-output"
 version.workspace = true
 edition.workspace = true
 
@@ -8,5 +8,4 @@ workspace = true
 
 [dependencies]
 catastrophic-core.workspace = true
-catastrophic-mir.workspace = true
 catastrophic-llvm.workspace = true

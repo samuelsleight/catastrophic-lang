@@ -14,6 +14,7 @@ use catastrophic_core::{
     stage::{pipeline, Continue, Extend, Pipeline, PipelineResult, Stage, StageContext},
 };
 use catastrophic_hir_optimizer::{optimizer::Options, stage::OptimizationStage};
+use catastrophic_output::stage::OutputStage;
 use catastrophic_parser::stage::ParseStage;
 
 mod args;
@@ -78,7 +79,8 @@ impl App {
                 .stage(),
                 self.debug_callback(DebugMode::Mir),
             )
-            .and_then(CompilationStage::new(source_filename).stage(), |_| ())
+            .and_then(CompilationStage::new(source_filename).stage(), self.debug_callback(DebugMode::LlvmIr))
+            .and_then(OutputStage.stage(), |_| ())
     }
 
     fn debug_callback<Input: Debug + PrettyDebug>(&self, debug: DebugMode) -> for<'a> fn(&'a StageContext<Input>) -> Continue {

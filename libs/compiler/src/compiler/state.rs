@@ -3,8 +3,8 @@ use std::{
     path::PathBuf,
 };
 
+use catastrophic_llvm::{llvm, FinishedModule};
 use catastrophic_mir::mir::{BinOp, Block, Command, Function, Instr, TriOp, Value};
-use dragon_tamer as llvm;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 enum FunctionKey {
@@ -572,7 +572,7 @@ impl State {
         builder.build_ret(&result);
     }
 
-    pub fn compile(&mut self) {
+    pub fn compile(mut self) -> FinishedModule {
         self.compile_pop();
         self.compile_push();
         self.compile_closure_push();
@@ -586,7 +586,7 @@ impl State {
         self.compile_call();
         self.compile_main();
 
-        println!("{:?}", self.module);
+        FinishedModule::new(self.module)
     }
 }
 

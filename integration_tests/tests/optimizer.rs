@@ -20,7 +20,7 @@ fn run_test_case(mut test_case: TestCase) {
     // First, run the `catastrophicc` compiler
     let compiler_output = test_case
         .command
-        .args(["--opt", "all"])
+        .args(["--opt", "all", "--debug", "llvm-ir", "--pretty"])
         .arg(test_case.input)
         .stdout(fs::File::create(&llvm_output_path).expect("Unable to open llvm output file"))
         .output()
