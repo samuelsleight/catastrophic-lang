@@ -1,5 +1,5 @@
 [package]
-name = "catastrophic-compiler"
+name = "catastrophic-llvm"
 version.workspace = true
 edition.workspace = true
 
@@ -7,6 +7,5 @@ edition.workspace = true
 workspace = true
 
 [dependencies]
+dragon-tamer.workspace = true
 catastrophic-core.workspace = true
-catastrophic-mir.workspace = true
-catastrophic-llvm.workspace = true

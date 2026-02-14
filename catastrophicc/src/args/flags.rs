@@ -5,6 +5,7 @@ pub enum DebugMode {
     Ast,
     Hir,
     Mir,
+    LlvmIr,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]

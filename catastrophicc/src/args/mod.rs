@@ -23,6 +23,9 @@ pub struct Args {
     #[arg(long, default_value = "all")]
     pub opt: flags::Optimization,
 
+    #[arg(short, long)]
+    pub output: Option<PathBuf>,
+
     #[arg(long)]
     pub skip_pass: Option<String>,
 

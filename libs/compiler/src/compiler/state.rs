@@ -1,10 +1,10 @@
 use std::{
     collections::{btree_map::Entry, BTreeMap},
-    path::PathBuf,
+    path::Path,
 };
 
+use catastrophic_llvm::{llvm, FinishedModule};
 use catastrophic_mir::mir::{BinOp, Block, Command, Function, Instr, TriOp, Value};
-use dragon_tamer as llvm;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 enum FunctionKey {
@@ -93,13 +93,13 @@ impl FunctionInfo {
 }
 
 impl State {
-    pub fn new(ir: Vec<Block>, source_filename: PathBuf) -> Self {
+    pub fn new(ir: Vec<Block>, source_filename: &Path) -> Self {
         let module_name = source_filename
             .file_stem()
             .unwrap()
             .to_string_lossy();
 
-        let module = llvm::Module::new(module_name, &source_filename);
+        let module = llvm::Module::new(module_name, source_filename);
 
         let putchar_fn = module.add_function("putchar");
         let printf_str = module.add_named_string("format_number", "%lld");
@@ -572,7 +572,7 @@ impl State {
         builder.build_ret(&result);
     }
 
-    pub fn compile(&mut self) {
+    pub fn compile(mut self) -> FinishedModule {
         self.compile_pop();
         self.compile_push();
         self.compile_closure_push();
@@ -586,7 +586,7 @@ impl State {
         self.compile_call();
         self.compile_main();
 
-        println!("{:?}", self.module);
+        FinishedModule::new(self.module)
     }
 }
 
